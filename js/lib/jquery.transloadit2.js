@@ -309,7 +309,7 @@
       return;
     }
 
-    this.$modal.expose.close();
+    $.mask.close();
     this.$modal.remove();
   };
 
@@ -369,8 +369,6 @@
             , closeOnClick: false
             }
           ).load();
-
-    this.$modal.expose = expose;
 
     this.$modal.$close.click(function() {
       self.cancel();
