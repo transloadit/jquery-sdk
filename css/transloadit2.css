@@ -1,0 +1,119 @@
+/* CSS RESET */
+#transloadit,#transloadit *,#transloadit a:hover,#transloadit a:visited,#transloadit a:active{
+  background:none;
+  border:none;
+  bottom:auto;
+  clear:none;
+  cursor:default;
+  /*display:inline;*/
+  float:none;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:medium;
+  font-style:normal;
+  font-weight:normal;
+  height:auto;
+  left:auto;
+  letter-spacing:normal;
+  line-height:normal;
+  max-height:none;
+  max-width:none;
+  min-height:0;
+  min-width:0;
+  overflow:visible;
+  position:static;
+  right:auto;
+  text-align:left;
+  text-decoration:none;
+  text-indent:0;
+  text-transform:none;
+  top:auto;
+  visibility:visible;
+  white-space:normal;
+  width:auto;
+  z-index:auto;
+}
+
+#transloadit{
+  position: fixed !important;
+  top: 50% !important;
+  left: 0px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 1px !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  display: block !important;
+}
+#transloadit, #transloadit label{
+  font-family: "Helvetica Neue",Helvetica,sans-serif !important;
+}
+
+#transloadit .content{
+  margin-left: -170px !important;
+  position: absolute !important;
+  top: -50px !important;
+  left: 50% !important;
+  width: 300px !important;
+  height: 100px !important;
+  visibility: visible !important;
+  float: left !important;
+}
+#transloadit .content{
+  background-color: #fff !important;
+  background: no-repeat url(img/spinner.gif) top center !important;
+}
+#transloadit .content-error{background-image: url(img/spinner-error.png) !important;}
+#transloadit .error{
+  text-align: center !important;
+  margin: 0 0 0 0 !important;
+}
+
+#transloadit .close{
+  margin: -10px 0 0 180px;
+  display: block;
+  cursor: pointer !important;
+  background: no-repeat url(img/apple-close.png) !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+#transloadit .status{
+  width: 280px !important;
+  margin: 65px 0 0 10px !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+#transloadit .progress{
+  margin: 15px 0 0 8px !important;
+  width: 280px !important;
+  border: 1px solid #000 !important;
+  height: 20px !important;
+}
+#transloadit .progress span{
+  background-color: #27AAE1 !important;
+  display: block !important;
+  height: 20px !important;
+  width: 0;
+  color: #000 !important;
+  text-align: left !important;
+  text-indent: 10px !important;
+  overflow: visible !important;
+}
+#transloadit label{
+  float: left !important;
+  position: relative  !important;
+  z-index: 9999 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  text-align: center !important;
+  font-size: 13px !important;
+  line-height: 20px !important;
+  font-weight: normal !important;
+}
+#transloadit .job_progress span{background-color: #B5E000 !important;}
+#transloadit .job_error span{background-color: #E40000 !important;}
+
+/*iframe{width: 1024px; height: 1024px;}*/
+#transloadit_expose{background:#fff !important;}
