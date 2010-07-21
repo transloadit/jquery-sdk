@@ -1,5 +1,7 @@
+/** @license jQuery Tools 1.2.3: Tero Piirainen | Public domain
+*/
+
 /**
- * @license 
  * jQuery Tools 1.2.3 / Expose - Dim the lights
  * 
  * NO COPYRIGHTS OR LICENSES. DO WHAT YOU LIKE.

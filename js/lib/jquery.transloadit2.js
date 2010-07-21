@@ -1,3 +1,5 @@
+/** @license jquery.transloadit2.js: @license Copyright (c) 2010 Felix Geisendörfer | MIT License: http://www.opensource.org/licenses/mit-license.php
+ */
 (function($) {
   var PROTOCOL = (document.location.protocol == 'https:')
       ? 'https://'

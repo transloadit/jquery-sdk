@@ -1,3 +1,6 @@
+/** @license jQuery JSONP Core Plugin 2.1.2: Copyright (c) 2010 Julian Aubourg | MIT License: http://www.opensource.org/licenses/mit-license.php
+*/
+
 /*
  * jQuery JSONP Core Plugin 2.1.2 (2010-06-20)
  * 
