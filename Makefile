@@ -31,4 +31,4 @@ install: $(build_path) $(css_path)
 clean:
 	-rm build/*.*
 
-.PHONY: build clean install
+.PHONY: clean install
