@@ -8,7 +8,7 @@
       : 'http://'
     , OPTIONS =
       { service: PROTOCOL+'api2.transloadit.com/'
-      , assets: PROTOCOL+'assets.transloadit/'
+      , assets: PROTOCOL+'assets.transloadit.com/'
       , onStart: function() {}
       , onProgress: function() {}
       , onCancel: function() {}

@@ -1,6 +1,9 @@
+install_dir = ../../crm/app/webroot
 build_name = jquery.transloadit2.js
 build_path = build/$(build_name)
 build_size = @ls -lh $(build_path) | awk '{print "$(1)", $$9, $$5}'
+css_name = transloadit2.css
+css_path = css/$(css_name)
 compile_js =\
 	@curl \
 	-s \
@@ -21,8 +24,9 @@ $(build_path): js/dep/*.js js/lib/*.js
 	$(call build_size,after:)
 
 # TRANSLOADIT INTERNAL
-install: $(build_path)
-	cp $(build_path) ../../crm/app/webroot/js/$(build_name)
+install: $(build_path) $(css_path)
+	cp $(build_path) $(install_dir)/js/$(build_name)
+	cp $(css_path) $(install_dir)/css/$(css_name)
 
 clean:
 	-rm build/*.*
