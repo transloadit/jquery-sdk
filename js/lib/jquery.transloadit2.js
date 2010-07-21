@@ -11,6 +11,8 @@
       , assets: PROTOCOL+'assets.transloadit.com/'
       , onStart: function() {}
       , onProgress: function() {}
+      , onUpload: function() {}
+      , onResult: function() {}
       , onCancel: function() {}
       , onError: function() {}
       , onSuccess: function() {}
@@ -62,6 +64,7 @@
     this.ended = null;
     this.pollStarted = null;
     this.pollRetries = 0;
+    this.seq = 0;
     this.started = false;
     this.assembly = null;
     this.params = null;
@@ -96,6 +99,7 @@
     this.ended = false;
     this.bytesReceivedBefore = 0;
     this.pollRetries = 0;
+    this.seq = 0;
 
     this.assemblyId = this.uuid();
 
@@ -183,7 +187,7 @@
     this.pollStarted = +new Date();
 
     $.jsonp({
-      url: this._options['service']+'assemblies/'+this.assemblyId+(query || ''),
+      url: this._options['service']+'assemblies/'+this.assemblyId+(query || '?seq='+this.seq),
       timeout: 6000,
       callbackParameter: 'callback',
       success: function(assembly) {
@@ -214,6 +218,8 @@
           return;
         }
 
+        self.seq = assembly.last_seq;
+
         if (!self.started) {
           self.started = true;
           self._options.onStart(assembly);
@@ -226,6 +232,16 @@
           , isComplete = (assembly.ok == 'ASSEMBLY_COMPLETED');
 
         self._options.onProgress(assembly.bytes_received, assembly.bytes_expected);
+
+        for (var i = 0; i < assembly.uploads.length; i++) {
+          self._options.onUpload(assembly.uploads[i]);
+        }
+
+        for (var step in assembly.results) {
+          for (var i = 0; i < assembly.results[step].length; i++) {
+            self._options.onResult(step, assembly.results[step][i]);
+          }
+        }
 
         if (isCanceled) {
           self.ended = true;
