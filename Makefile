@@ -1,11 +1,6 @@
-build:
+build/jquery.transloadit2.js: js/dep/*.js js/lib/*.js
 	@echo "Combining files ..."
-	@cat \
-	  js/dep/jquery.easing.js \
-	  js/dep/jquery.jsonp.js \
-	  js/dep/json2.js \
-	  js/dep/toolbox.expose.js \
-	  js/lib/jquery.transloadit2.js > build/jquery.transloadit2.js
+	@cat $^ > build/jquery.transloadit2.js
 	@echo "Compiling with Closure REST API ..."
 	@curl \
 		-s \
@@ -20,7 +15,10 @@ build:
 	@echo "Build complete:"
 	@ls -lh build/jquery.transloadit2.js | awk '{print $$9, $$5}'
 
+install: build/jquery.transloadit2.js
+	cp build/jquery.transloadit2.js ../../crm/app/webroot/jquery.transloadit2.js
+
 clean:
 	-rm build/*.*
 
-.PHONY: build clean
+.PHONY: build clean install
