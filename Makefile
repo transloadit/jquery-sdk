@@ -21,6 +21,6 @@ build:
 	@ls -lh build/jquery.transloadit2.js | awk '{print $$9, $$5}'
 
 clean:
-	rm build/*.*
+	-rm build/*.*
 
 .PHONY: build clean
