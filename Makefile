@@ -1,23 +1,28 @@
-build/jquery.transloadit2.js: js/dep/*.js js/lib/*.js
-	@echo "Combining files ..."
-	@cat $^ > build/jquery.transloadit2.js
-	@echo "Compiling with Closure REST API ..."
+build_name = jquery.transloadit2.js
+build_path = build/$(build_name)
+build_size = @ls -lh $(build_path) | awk '{print "$(1)", $$9, $$5}'
+compile_js =\
 	@curl \
-		-s \
-		-X POST \
-		-H 'Expect: ' \
-		--data-urlencode compilation_level="SIMPLE_OPTIMIZATIONS" \
-		--data-urlencode output_format="text" \
-		--data-urlencode output_info="compiled_code" \
-		--data-urlencode js_code@build/jquery.transloadit2.js \
-		-o build/jquery.transloadit2.js \
-		http://closure-compiler.appspot.com/compile
-	@echo "Build complete:"
-	@ls -lh build/jquery.transloadit2.js | awk '{print $$9, $$5}'
+	-s \
+	-X POST \
+	-H 'Expect: ' \
+	--data-urlencode compilation_level="SIMPLE_OPTIMIZATIONS" \
+	--data-urlencode output_format="text" \
+	--data-urlencode output_info="compiled_code" \
+	--data-urlencode js_code@$(build_path) \
+	-o $(1) \
+	http://closure-compiler.appspot.com/compile
+
+$(build_path): js/dep/*.js js/lib/*.js
+	@cat $^ > $(build_path)
+	$(call build_size,before:)
+	@echo "compiling with google closure rest api ..."
+	$(call compile_js,$(build_path))
+	$(call build_size,after:)
 
 # TRANSLOADIT INTERNAL
-install: build/jquery.transloadit2.js
-	cp build/jquery.transloadit2.js ../../crm/app/webroot/js/jquery.transloadit2.js
+install: $(build_path)
+	cp $(build_path) ../../crm/app/webroot/js/$(build_name)
 
 clean:
 	-rm build/*.*
