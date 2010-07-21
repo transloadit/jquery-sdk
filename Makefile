@@ -15,8 +15,9 @@ build/jquery.transloadit2.js: js/dep/*.js js/lib/*.js
 	@echo "Build complete:"
 	@ls -lh build/jquery.transloadit2.js | awk '{print $$9, $$5}'
 
+# TRANSLOADIT INTERNAL
 install: build/jquery.transloadit2.js
-	cp build/jquery.transloadit2.js ../../crm/app/webroot/jquery.transloadit2.js
+	cp build/jquery.transloadit2.js ../../crm/app/webroot/js/jquery.transloadit2.js
 
 clean:
 	-rm build/*.*
