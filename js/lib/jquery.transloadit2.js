@@ -231,15 +231,15 @@
           , isCanceled = (assembly.ok == 'ASSEMBLY_CANCELED')
           , isComplete = (assembly.ok == 'ASSEMBLY_COMPLETED');
 
-        self._options.onProgress(assembly.bytes_received, assembly.bytes_expected);
+        self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
 
         for (var i = 0; i < assembly.uploads.length; i++) {
-          self._options.onUpload(assembly.uploads[i]);
+          self._options.onUpload(assembly.uploads[i], assembly);
         }
 
         for (var step in assembly.results) {
           for (var i = 0; i < assembly.results[step].length; i++) {
-            self._options.onResult(step, assembly.results[step][i]);
+            self._options.onResult(step, assembly.results[step][i], assembly);
           }
         }
 
@@ -301,6 +301,12 @@
       }
     });
   };
+
+  Uploader.prototype.stop = function() {
+    document.title = this.documentTitle;
+    this.ended = true;
+  };
+
 
   Uploader.prototype.cancel = function() {
     // @todo this has still a race condition if a new upload is started
