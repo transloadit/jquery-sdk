@@ -61,6 +61,8 @@
     this.documentTitle = null;
     this.timer = null;
     this._options = {};
+    this.uploads = [];
+    this.results = {};
     this.ended = null;
     this.pollStarted = null;
     this.pollRetries = 0;
@@ -100,6 +102,8 @@
     this.bytesReceivedBefore = 0;
     this.pollRetries = 0;
     this.seq = 0;
+    this.uploads = [];
+    this.results = {};
 
     this.assemblyId = this.uuid();
 
@@ -235,11 +239,14 @@
 
         for (var i = 0; i < assembly.uploads.length; i++) {
           self._options.onUpload(assembly.uploads[i], assembly);
+          self.uploads.push(assembly.uploads[i]);
         }
 
         for (var step in assembly.results) {
+          self.results[step] = self.results[step] || [];
           for (var i = 0; i < assembly.results[step].length; i++) {
             self._options.onResult(step, assembly.results[step][i], assembly);
+            self.results[step].push(assembly.results[step][i]);
           }
         }
 
@@ -255,6 +262,8 @@
         if (isComplete || (!self._options['wait'] && isExecuting)) {
           self.ended = true;
           document.title = self.documentTitle;
+          assembly.uploads = self.uploads;
+          assembly.results = self.results;
           self._options.onSuccess(assembly);
           if (self._options.modal) {
             self.cancel();
