@@ -31,7 +31,7 @@
       , method
       , upload
       , r;
-  
+
     if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
       args.unshift('init');
     }
@@ -95,7 +95,7 @@
 
   Uploader.prototype.start = function() {
     var self = this;
-  
+
     this.ended = false;
     this.bytesReceivedBefore = 0;
     this.pollRetries = 0;
@@ -385,7 +385,7 @@
     this.$modal.$error.hide();
 
     var self = this
-      , expose = 
+      , expose =
           this.$modal.expose
           ( { api: true
             , maskId: 'transloadit_expose'
