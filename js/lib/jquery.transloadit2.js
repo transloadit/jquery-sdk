@@ -58,6 +58,7 @@
   function Uploader() {
     this.assemblyId = null;
 
+    this.instance = null;
     this.documentTitle = null;
     this.timer = null;
     this._options = {};
@@ -88,11 +89,48 @@
 
     var self = this;
     $form.bind('submit.transloadit', function() {
-      self.start();
+      self.getBoredInstance();
       return false;
     });
 
     this.includeCss();
+  };
+
+  Uploader.prototype.getBoredInstance = function() {
+    var self = this;
+
+    this.instance = null;
+
+    $.jsonp({
+      url: this._options['service']+'instances/bored',
+      timeout: 6000,
+      callbackParameter: 'callback',
+      success: function(instance) {
+        if (instance.error) {
+          self.ended = true;
+          self.renderError(instance);
+          self._options.onError(instance);
+          return;
+        }
+
+        self.instance = instance.api2_host;
+        self.start();
+      },
+      error: function(xhr, status) {
+        self.ended = true
+        var err =
+          { error: 'CONNECTION_ERROR'
+          , message: 'There was a problem connecting to the upload server'
+          , reason: 'JSONP request status: '+status
+          };
+        self.renderError(err);
+        self._options.onError(err);
+      }
+    });
+
+    if (this._options.modal) {
+      this.showModal();
+    }
   };
 
   Uploader.prototype.start = function() {
@@ -143,7 +181,7 @@
       .hide();
 
     this.$uploadForm = $('<form enctype="multipart/form-data" />')
-      .attr('action', this._options['service']+'assemblies/'+this.assemblyId+'?redirect=false')
+      .attr('action', PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false')
       .attr('target', 'transloadit-' + this.assemblyId)
       .attr('method', 'POST')
       .append(this.$files)
@@ -170,10 +208,6 @@
     setTimeout(function() {
       self._poll();
     }, 300);
-
-    if (this._options.modal) {
-      this.showModal();
-    }
   };
 
   Uploader.prototype._poll = function(query) {
@@ -191,7 +225,7 @@
     this.pollStarted = +new Date();
 
     $.jsonp({
-      url: this._options['service']+'assemblies/'+this.assemblyId+(query || '?seq='+this.seq),
+      url: PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+(query || '?seq='+this.seq),
       timeout: 6000,
       callbackParameter: 'callback',
       success: function(assembly) {
