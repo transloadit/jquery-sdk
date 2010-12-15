@@ -9,6 +9,7 @@
     , OPTIONS =
       { service: PROTOCOL+'api2.transloadit.com/'
       , assets: PROTOCOL+'assets.transloadit.com/'
+      , beforeStart: function() {return true;}
       , onStart: function() {}
       , onProgress: function() {}
       , onUpload: function() {}
@@ -89,7 +90,10 @@
 
     var self = this;
     $form.bind('submit.transloadit', function() {
-      self.getBoredInstance();
+      if(self._options.beforeStart()) {
+        self.getBoredInstance();
+      }
+      
       return false;
     });
 
