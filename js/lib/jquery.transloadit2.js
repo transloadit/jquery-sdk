@@ -92,8 +92,8 @@
     $form.bind('submit.transloadit', function() {
       if (self._options.beforeStart()) {
         self.getBoredInstance();
-        return false;
       }
+      return false;
     });
 
     this.includeCss();
