@@ -196,7 +196,7 @@
     }
 
     this.$form
-      .find('input[type!=file]')
+      .find(':input[type!=file]')
       .filter(fieldsFilter)
       .clone()
       .prependTo(this.$uploadForm);
