@@ -327,7 +327,7 @@
         self.pollRetries++;
         if (self.pollRetries > 3) {
           document.title = self.documentTitle;
-          self.ended = true
+          self.ended = true;
           var err =
             { error: 'CONNECTION_ERROR'
             , message: 'There was a problem connecting to the upload server'
