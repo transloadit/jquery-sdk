@@ -24,7 +24,7 @@ The minified output file can be found in: `build/jquery.transloadit2.js`.
 This plugin includes the following dependencies:
 
 * [jquery.easing.js](http://gsgd.co.uk/sandbox/jquery/easing/) by George McGinley Smith (BSD License)
-* [jquery.jsonp.js](http://gsgd.co.uk/sandbox/jquery/easing/) by Julian Aubourg (MIT License)
+* [jquery.jsonp.js](http://code.google.com/p/jquery-jsonp/) by Julian Aubourg (MIT License)
 * [toolbox.expose.js](http://flowplayer.org/tools/toolbox/expose.html) by Tero Piirainen (Public domain)
 * [json2.js](http://www.json.org/json2.js) by Douglas Crockford (Public domain)
 
