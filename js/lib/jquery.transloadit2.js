@@ -136,6 +136,7 @@
   Uploader.prototype.start = function() {
     var self = this;
 
+    this.started = false;
     this.ended = false;
     this.bytesReceivedBefore = 0;
     this.pollRetries = 0;
