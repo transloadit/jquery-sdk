@@ -172,7 +172,7 @@
 
     self.$fileClones = $().not(document);
     this.$files.each(function() {
-      var $clone = $(this).clone();
+      var $clone = $(this).clone(true);
       self.$fileClones = self.$fileClones.add($clone);
       $clone.insertAfter(this);
     });
