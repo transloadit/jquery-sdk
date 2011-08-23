@@ -374,8 +374,6 @@
 
       if (navigator.appName == 'Microsoft Internet Explorer') {
         this.$iframe[0].contentWindow.document.execCommand('Stop');
-      } else {
-        this.$iframe[0].contentWindow.stop();
       }
 
       setTimeout(function() {
