@@ -372,7 +372,11 @@
 
       this._poll('?method=delete');
 
-      if (this.$iframe[0].contentWindow.document.execCommand) { // IE browsers
+      var hasExecCommand =
+        typeof this.$iframe[0].contentWindow.document.execCommand !== undefined &&
+        typeof this.$iframe[0].contentWindow.document.execCommand !== 'function';
+
+      if (hasExecCommand) { // IE browsers
         this.$iframe[0].contentWindow.document.execCommand('Stop');
       } else { // other browsers
         this.$iframe[0].contentWindow.stop();
