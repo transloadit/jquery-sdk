@@ -372,12 +372,9 @@
 
       this._poll('?method=delete');
 
-      var canAccessStop = this.$iframe[0].contentWindow &&
-                           typeof this.$iframe[0].contentWindow.stop === 'function';
-
-      if (canAccessStop) { // non IE browsers
+      try { // non-IE browsers
         this.$iframe[0].contentWindow.stop();
-      } else { // IE browsers
+      } catch { // IE browsers
         this.$iframe[0].contentWindow.document.execCommand('Stop');
       }
 
