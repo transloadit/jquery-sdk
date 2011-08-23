@@ -374,7 +374,7 @@
 
       var hasExecCommand =
         typeof this.$iframe[0].contentWindow.document.execCommand !== undefined &&
-        typeof this.$iframe[0].contentWindow.document.execCommand !== 'function';
+        typeof this.$iframe[0].contentWindow.document.execCommand === 'function';
 
       if (hasExecCommand) { // IE browsers
         this.$iframe[0].contentWindow.document.execCommand('Stop');
