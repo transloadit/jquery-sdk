@@ -372,10 +372,10 @@
 
       this._poll('?method=delete');
 
-      try { // non-IE browsers
-        this.$iframe[0].contentWindow.stop();
-      } catch { // IE browsers
+      if (navigator.appName == 'Microsoft Internet Explorer') {
         this.$iframe[0].contentWindow.document.execCommand('Stop');
+      } else {
+        this.$iframe[0].contentWindow.stop();
       }
 
       setTimeout(function() {
