@@ -1,7 +1,7 @@
 /** @license jquery.transloadit2.js: Copyright (c) 2010 Felix Geisendörfer | MIT License: http://www.opensource.org/licenses/mit-license.php
  *
  * Fork this on Github: http://github.com/transloadit/jquery-sdk
- * 
+ *
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
@@ -372,7 +372,12 @@
 
       this._poll('?method=delete');
 
-      this.$iframe[0].contentWindow.stop();
+      if (this.$iframe[0].contentWindow.document.execCommand) { // IE browsers
+        this.$iframe[0].contentWindow.document.execCommand('Stop');
+      } else { // other browsers
+        this.$iframe[0].contentWindow.stop();
+      }
+
       setTimeout(function() {
         self.$iframe.remove();
       }, 500);
