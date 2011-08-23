@@ -372,13 +372,13 @@
 
       this._poll('?method=delete');
 
-      var hasExecCommand = this.$iframe[0].contentWindow.document &&
-                           typeof this.$iframe[0].contentWindow.document.execCommand === 'function';
+      var canAccessStop = this.$iframe[0].contentWindow &&
+                           typeof this.$iframe[0].contentWindow.stop === 'function';
 
-      if (hasExecCommand) { // IE browsers
-        this.$iframe[0].contentWindow.document.execCommand('Stop');
-      } else { // other browsers
+      if (canAccessStop) { // non IE browsers
         this.$iframe[0].contentWindow.stop();
+      } else { // IE browsers
+        this.$iframe[0].contentWindow.document.execCommand('Stop');
       }
 
       setTimeout(function() {
