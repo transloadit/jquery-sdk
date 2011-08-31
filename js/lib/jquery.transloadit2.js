@@ -241,7 +241,7 @@
         self.assembly = assembly;
         if (assembly.error == 'ASSEMBLY_NOT_FOUND') {
           self.pollRetries++;
-          if (self.pollRetries > 15) {
+          if (self.pollRetries > self._options.retry_limit) {
             document.title = self.documentTitle;
             self.ended = true;
             self.renderError(assembly);
