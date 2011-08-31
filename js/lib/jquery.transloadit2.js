@@ -20,6 +20,7 @@
       , onError: function() {}
       , onSuccess: function() {}
       , interval: 2500
+      , retry_limit: 3
       , wait: false
       , autoSubmit: true
       , modal: true
@@ -329,7 +330,7 @@
         }
 
         self.pollRetries++;
-        if (self.pollRetries > 3) {
+        if (self.pollRetries > self._options.retry_limit) {
           document.title = self.documentTitle;
           self.ended = true;
           var err =
