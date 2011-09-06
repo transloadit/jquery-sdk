@@ -20,6 +20,7 @@
       , onError: function() {}
       , onSuccess: function() {}
       , interval: 2500
+      , retry_limit: 3
       , wait: false
       , autoSubmit: true
       , modal: true
@@ -240,7 +241,7 @@
         self.assembly = assembly;
         if (assembly.error == 'ASSEMBLY_NOT_FOUND') {
           self.pollRetries++;
-          if (self.pollRetries > 15) {
+          if (self.pollRetries > self._options.retry_limit) {
             document.title = self.documentTitle;
             self.ended = true;
             self.renderError(assembly);
@@ -329,7 +330,7 @@
         }
 
         self.pollRetries++;
-        if (self.pollRetries > 3) {
+        if (self.pollRetries > self._options.retry_limit) {
           document.title = self.documentTitle;
           self.ended = true;
           var err =
