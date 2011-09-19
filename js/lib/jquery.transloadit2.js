@@ -20,6 +20,9 @@
       , onError: function() {}
       , onSuccess: function() {}
       , interval: 2500
+      , pollTimeout: 8000
+      , poll404Retries: 15
+      , pollConnectionRetries: 3
       , wait: false
       , autoSubmit: true
       , modal: true
@@ -106,7 +109,7 @@
 
     $.jsonp({
       url: this._options['service']+'instances/bored',
-      timeout: 6000,
+      timeout: self._options.pollTimeout,
       callbackParameter: 'callback',
       success: function(instance) {
         if (instance.error) {
@@ -230,7 +233,7 @@
 
     $.jsonp({
       url: PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+(query || '?seq='+this.seq),
-      timeout: 6000,
+      timeout: self._options.pollTimeout,
       callbackParameter: 'callback',
       success: function(assembly) {
         if (self.ended) {
@@ -240,7 +243,8 @@
         self.assembly = assembly;
         if (assembly.error == 'ASSEMBLY_NOT_FOUND') {
           self.pollRetries++;
-          if (self.pollRetries > 15) {
+
+          if (self.pollRetries > self._options.poll404Retries) {
             document.title = self.documentTitle;
             self.ended = true;
             self.renderError(assembly);
@@ -329,7 +333,7 @@
         }
 
         self.pollRetries++;
-        if (self.pollRetries > 3) {
+        if (self.pollRetries > self._options.pollConnectionRetries) {
           document.title = self.documentTitle;
           self.ended = true;
           var err =
