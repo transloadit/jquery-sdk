@@ -28,6 +28,9 @@ install: $(build_path) $(css_path)
 	cp $(build_path) $(install_dir)/js/$(build_name)
 	cp $(css_path) $(install_dir)/css/$(css_name)
 
+link:
+	ln -s `pwd` ${install_dir}/jquery-sdk
+
 clean:
 	-rm build/*.*
 
