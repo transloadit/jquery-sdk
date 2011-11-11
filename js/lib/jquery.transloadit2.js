@@ -514,7 +514,7 @@
       uuid += Math.floor(Math.random() * 16).toString(16);
     }
     return uuid;
-  }
+  };
 
   Uploader.prototype.options = function(options) {
     if (arguments.length == 0) {
