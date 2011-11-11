@@ -168,7 +168,7 @@
     if (this.params.redirect_url) {
       this.$form.attr('action', this.params.redirect_url);
     } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
-      alert('Error: input[name=params] does not include a redirect_url')
+      alert('Error: input[name=params] does not include a redirect_url');
       return;
     }
 
