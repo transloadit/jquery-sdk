@@ -35,7 +35,7 @@
   $.fn.transloadit = function() {
     var args = Array.prototype.slice.call(arguments)
       , method
-      , upload
+      , uploader
       , r;
 
     if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
