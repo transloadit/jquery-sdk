@@ -197,7 +197,7 @@
 
     var fieldsFilter = '[name=params], [name=signature]';
     if (this._options.fields === true) {
-      fieldsFilter = '*'
+      fieldsFilter = '*';
     } else if (typeof this._options.fields == 'string') {
       fieldsFilter += ', '+this._options.fields;
     }
