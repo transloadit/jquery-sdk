@@ -448,7 +448,7 @@
             , closeOnEsc: false
             , closeOnClick: false
             }
-          ).load();
+          );
 
     this.$modal.$close.click(function() {
       self.cancel();
