@@ -26,6 +26,7 @@
       , wait: false
       , autoSubmit: true
       , modal: true
+	  , include: ''
       , exclude: ''
       , fields: false
       , debug: true
@@ -172,9 +173,19 @@
       return;
     }
 
-    this.$files = this.$form
-      .find('input[type=file]')
-      .not(this._options.exclude);
+	// EDIT PATCH FOR PHONEGAP
+	// Add 'include : string' to params to add files in classed inputs
+	// Note: will automatically add include to params.exclude to omit from fields
+	if(this.params.include){
+		this.$files = this.$form
+	      .find(this._options.include)
+	      .not(this._options.exclude);
+	}else{
+	    this.$files = this.$form
+	      .find('input[type=file]')
+	      .not(this._options.exclude);
+	}
+
 
     self.$fileClones = $().not(document);
     this.$files.each(function() {
@@ -204,6 +215,7 @@
 
     this.$form
       .find(':input[type!=file]')
+	  .not(this._options.include)
       .filter(fieldsFilter)
       .clone()
       .prependTo(this.$uploadForm);
