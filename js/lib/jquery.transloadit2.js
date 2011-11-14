@@ -12,6 +12,7 @@
     , OPTIONS =
       { service: PROTOCOL+'api2.transloadit.com/'
       , assets: PROTOCOL+'assets.transloadit.com/'
+      , beforeStart: function() { return true; }
       , onStart: function() {}
       , onProgress: function() {}
       , onUpload: function() {}
@@ -61,6 +62,10 @@
       : r;
   };
 
+  function validFileFields() {
+    return this.$form.find('input[type=file]').not(this._options.exclude);
+  }
+
   function Uploader() {
     this.assemblyId = null;
 
@@ -95,7 +100,9 @@
 
     var self = this;
     $form.bind('submit.transloadit', function() {
-      self.getBoredInstance();
+      // If there are no valid upload fields, transloadit() is a no-op
+      if (validFileFields.call(self).length == 0) return true;
+      if (self._options.beforeStart()) self.getBoredInstance();
       return false;
     });
 
@@ -172,9 +179,7 @@
       return;
     }
 
-    this.$files = this.$form
-      .find('input[type=file]')
-      .not(this._options.exclude);
+    this.$files = validFileFields.call(this);
 
     self.$fileClones = $().not(document);
     this.$files.each(function() {
