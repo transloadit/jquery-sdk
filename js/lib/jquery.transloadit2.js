@@ -35,7 +35,7 @@
   $.fn.transloadit = function() {
     var args = Array.prototype.slice.call(arguments)
       , method
-      , upload
+      , uploader
       , r;
 
     if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
@@ -123,7 +123,7 @@
         self.start();
       },
       error: function(xhr, status) {
-        self.ended = true
+        self.ended = true;
         var err =
           { error: 'CONNECTION_ERROR'
           , message: 'There was a problem connecting to the upload server'
@@ -168,7 +168,7 @@
     if (this.params.redirect_url) {
       this.$form.attr('action', this.params.redirect_url);
     } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
-      alert('Error: input[name=params] does not include a redirect_url')
+      alert('Error: input[name=params] does not include a redirect_url');
       return;
     }
 
@@ -197,7 +197,7 @@
 
     var fieldsFilter = '[name=params], [name=signature]';
     if (this._options.fields === true) {
-      fieldsFilter = '*'
+      fieldsFilter = '*';
     } else if (typeof this._options.fields == 'string') {
       fieldsFilter += ', '+this._options.fields;
     }
@@ -448,7 +448,7 @@
             , closeOnEsc: false
             , closeOnClick: false
             }
-          ).load();
+          );
 
     this.$modal.$close.click(function() {
       self.cancel();
@@ -509,12 +509,12 @@
   };
 
   Uploader.prototype.uuid = function() {
-    var uuid = '';
+    var uuid = '', i;
     for (i = 0; i < 32; i++) {
       uuid += Math.floor(Math.random() * 16).toString(16);
     }
     return uuid;
-  }
+  };
 
   Uploader.prototype.options = function(options) {
     if (arguments.length == 0) {
