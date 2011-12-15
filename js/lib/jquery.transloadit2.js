@@ -24,6 +24,7 @@
       , poll404Retries: 15
       , pollConnectionRetries: 3
       , wait: false
+      , processZeroFiles: true
       , autoSubmit: true
       , modal: true
       , exclude: ''
@@ -95,7 +96,14 @@
 
     var self = this;
     $form.bind('submit.transloadit', function() {
-      self.getBoredInstance();
+      self.validate();
+      self.detectFileInputs();
+      if (!self._options['processZeroFiles'] && self.$files.length === 0) {
+        self.submitForm();
+      } else {
+        self.getBoredInstance();
+      }
+
       return false;
     });
 
@@ -152,31 +160,7 @@
 
     this.assemblyId = this.uuid();
 
-    var $params = this.$form.find('input[name=params]');
-    if (!$params.length) {
-      alert('Could not find input[name=params] in your form.');
-      return;
-    }
-
-    try {
-      this.params = JSON.parse($params.val());
-    } catch (e) {
-      alert('Error: input[name=params] seems to contain invalid JSON.');
-      return;
-    }
-
-    if (this.params.redirect_url) {
-      this.$form.attr('action', this.params.redirect_url);
-    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
-      alert('Error: input[name=params] does not include a redirect_url');
-      return;
-    }
-
-    this.$files = this.$form
-      .find('input[type=file]')
-      .not(this._options.exclude);
-
-    self.$fileClones = $().not(document);
+    this.$fileClones = $().not(document);
     this.$files.each(function() {
       var $clone = $(this).clone(true);
       self.$fileClones = self.$fileClones.add($clone);
@@ -203,18 +187,52 @@
     }
 
     this.$form
-      .find(':input[type!=file]')
-      .filter(fieldsFilter)
-      .clone()
+      .find(':input[type!=file]').filter(fieldsFilter).clone()
       .prependTo(this.$uploadForm);
 
-    this.$params = $params;
-
     this.$uploadForm.submit();
+
     this.lastPoll = +new Date;
     setTimeout(function() {
       self._poll();
     }, 300);
+  };
+
+  Uploader.prototype.detectFileInputs = function() {
+    var $files = this.$form
+      .find('input[type=file]')
+      .not(this._options.exclude);
+
+    if (!this._options['processZeroFiles']) {
+      $files = $files.filter(function() {
+        return this.value != '';
+      });
+    }
+    this.$files = $files;
+  };
+
+  Uploader.prototype.validate = function() {
+    var $params = this.$form.find('input[name=params]');
+    if (!$params.length) {
+      alert('Could not find input[name=params] in your form.');
+      return;
+    }
+
+    try {
+      this.params = JSON.parse($params.val());
+    } catch (e) {
+      alert('Error: input[name=params] seems to contain invalid JSON.');
+      return;
+    }
+
+    if (this.params.redirect_url) {
+      this.$form.attr('action', this.params.redirect_url);
+    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
+      alert('Error: input[name=params] does not include a redirect_url');
+      return;
+    }
+
+    this.$params = $params;
   };
 
   Uploader.prototype._poll = function(query) {
@@ -394,13 +412,17 @@
   };
 
   Uploader.prototype.submitForm = function() {
-    this.$fileClones.remove();
+    if (this.$fileClones) {
+      this.$fileClones.remove();
+    }
 
-    $('<textarea/>')
-      .attr('name', 'transloadit')
-      .text(JSON.stringify(this.assembly))
-      .prependTo(this.$form)
-      .hide();
+    if (this.assembly !== null) {
+      $('<textarea/>')
+        .attr('name', 'transloadit')
+        .text(JSON.stringify(this.assembly))
+        .prependTo(this.$form)
+        .hide();
+    }
 
     this.$form
       .unbind('submit.transloadit')
