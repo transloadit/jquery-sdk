@@ -5,6 +5,20 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
+
+// fix cloning of textareas so their values are properly cloned
+(function (original) {
+ $.fn.clone = function () {
+   var result = original.apply(this, arguments);
+   var myTextareas = this.filter('textarea');
+   var resultTextareas = result.filter('textarea');
+   for (var i = 0, l = myTextareas.length; i < l; ++i) {
+     $(resultTextareas[i]).val($(myTextareas[i]).val());
+   }
+   return result;
+ };
+}) ($.fn.clone);
+
 (function($) {
   var PROTOCOL = (document.location.protocol == 'https:')
       ? 'https://'
