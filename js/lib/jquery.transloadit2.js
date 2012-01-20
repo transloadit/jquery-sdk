@@ -6,19 +6,6 @@
  * keep this in mind when rolling out fixes.
  */
 
-// fix cloning of textareas so their values are properly cloned
-(function (original) {
- $.fn.clone = function () {
-   var result = original.apply(this, arguments);
-   var myTextareas = this.filter('textarea');
-   var resultTextareas = result.filter('textarea');
-   for (var i = 0, l = myTextareas.length; i < l; ++i) {
-     $(resultTextareas[i]).val($(myTextareas[i]).val());
-   }
-   return result;
- };
-}) ($.fn.clone);
-
 (function($) {
   var PROTOCOL = (document.location.protocol == 'https:')
       ? 'https://'
@@ -200,9 +187,8 @@
       fieldsFilter += ', '+this._options.fields;
     }
 
-    this.$form
-      .find(':input[type!=file]').filter(fieldsFilter).clone()
-      .prependTo(this.$uploadForm);
+    var $clones = this.clone(this.$form.find(':input[type!=file]').filter(fieldsFilter));
+    $clones.prependTo(this.$uploadForm);
 
     this.$uploadForm.submit();
 
@@ -210,6 +196,18 @@
     setTimeout(function() {
       self._poll();
     }, 300);
+  };
+
+  Uploader.prototype.clone = function($obj) {
+    var $result = $obj.clone();
+    var myTextareas = $obj.filter('textarea');
+    var resultTextareas = $result.filter('textarea');
+
+    for (var i = 0, l = myTextareas.length; i < l; ++i) {
+      $(resultTextareas[i]).val($(myTextareas[i]).val());
+    }
+
+    return $result;
   };
 
   Uploader.prototype.detectFileInputs = function() {
