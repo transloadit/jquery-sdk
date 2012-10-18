@@ -187,8 +187,25 @@
       fieldsFilter += ', '+this._options.fields;
     }
 
-    var $clones = this.clone(this.$form.find(':input[type!=file]').filter(fieldsFilter));
+    var $fieldsToClone = this.$form.find(':input[type!=file]').filter(fieldsFilter);
+
+    // remove selects from $clones, because we have to clone them as hidden input
+    // fields, otherwise their values are not transferred properly
+    var $selects = $fieldsToClone.filter('select');
+    $fieldsToClone = $fieldsToClone.filter(function() {
+      return !$(this).is('select');
+    });
+
+    var $clones = this.clone($fieldsToClone);
     $clones.prependTo(this.$uploadForm);
+
+    // now add all selects as hidden fields
+    $selects.each(function() {
+      $('<input type="hidden"/>')
+        .attr('name', $(this).attr('name'))
+        .attr('value', $(this).val())
+        .prependTo(self.$uploadForm);
+    });
 
     this.$uploadForm.submit();
 
