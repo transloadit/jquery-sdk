@@ -9,6 +9,27 @@ Feel free to fork this project. We will happily merge bug fixes or other small
 improvements. For bigger changes you should probably get in touch with us
 before you start to avoid not seeing them merged.
 
+## Versioning
+
+Discourse implements the Semantic Versioning guidelines.
+
+Releases will be numbered with the following format:
+
+`<major>.<minor>.<patch>`
+
+And constructed with the following guidelines:
+
+* Breaking backward compatibility bumps the major (and resets the minor and patch)
+* New additions without breaking backward compatibility bumps the minor (and resets the patch)
+* Bug fixes and misc changes bumps the patch
+
+For more information on SemVer, please visit http://semver.org/.
+
+`latest` points to the latest stable of a major version.
+
+Note that the **2** in jquery.transloadit**2**-latest.js refers to the Transloadit
+API version, not the client SDK version.
+
 ## Building
 
 Building your own compressed version requires a *nix operation system and curl.

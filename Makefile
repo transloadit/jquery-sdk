@@ -1,5 +1,5 @@
 install_dir = ../../crm/app/webroot
-build_name = jquery.transloadit2.js
+build_name = jquery.transloadit2-latest.js
 build_path = build/$(build_name)
 build_size = @ls -lh $(build_path) | awk '{print "$(1)", $$9, $$5}'
 css_name = transloadit2.css
