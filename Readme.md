@@ -27,7 +27,7 @@ For more information on SemVer, please visit http://semver.org/.
 
 `latest` points to the latest stable of a major version.
 
-Note that the **2** in jquery.transloadit**2**-latest.js refers to the Transloadit
+Note that the `2` in `jquery.transloadit2-latest.js` refers to the Transloadit
 API version, not the client SDK version.
 
 ## Versions
