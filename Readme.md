@@ -30,6 +30,14 @@ For more information on SemVer, please visit http://semver.org/.
 Note that the **2** in jquery.transloadit**2**-latest.js refers to the Transloadit
 API version, not the client SDK version.
 
+## Versions
+
+### v2.0.0
+
+* Introduce jQuery 1.9 support as discussed in [this issue](https://github.com/transloadit/jquery-sdk/issues/13#issuecomment-13645153)
+A big thanks to [Christian Pekeler](https://github.com/pekeler)
+
+
 ## Building
 
 Building your own compressed version requires a *nix operation system and curl.
