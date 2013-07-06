@@ -31,6 +31,7 @@
       , exclude: ''
       , fields: false
       , debug: true
+      , allowEmpty: false
       }
     , CSS_LOADED = false;
 
@@ -444,10 +445,6 @@
   };
 
   Uploader.prototype.submitForm = function() {
-    if (this.$fileClones) {
-      this.$fileClones.remove();
-    }
-
     if (this.assembly !== null) {
       $('<textarea/>')
         .attr('name', 'transloadit')
@@ -456,9 +453,23 @@
         .hide();
     }
 
-    this.$form
-      .unbind('submit.transloadit')
-      .submit();
+    if (this.$files.length === 0 && !this._options['allowEmpty']) {
+      this.ended = true;
+      var err =
+        { error: 'EMPTY_FILE_INPUT'
+        , message: 'No file is selected.'
+        , reason: '"allowEmpty" property is set to false.'
+        };
+      this._options.onError(err);
+      return;
+    } else {
+      if (this.$fileClones) {
+        this.$fileClones.remove();
+      }
+      this.$form
+        .unbind('submit.transloadit')
+        .submit();
+    }
   };
 
   Uploader.prototype.showModal = function() {
