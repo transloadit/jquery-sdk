@@ -6,39 +6,41 @@
  * keep this in mind when rolling out fixes.
  */
 
-(function($) {
-  var PROTOCOL = (document.location.protocol == 'https:')
-      ? 'https://'
-      : 'http://'
-    , OPTIONS =
-      { service: PROTOCOL+'api2.transloadit.com/'
-      , assets: PROTOCOL+'assets.transloadit.com/'
-      , onStart: function() {}
-      , onProgress: function() {}
-      , onUpload: function() {}
-      , onResult: function() {}
-      , onCancel: function() {}
-      , onError: function() {}
-      , onSuccess: function() {}
-      , interval: 2500
-      , pollTimeout: 8000
-      , poll404Retries: 15
-      , pollConnectionRetries: 3
-      , wait: false
-      , processZeroFiles: true
-      , autoSubmit: true
-      , modal: true
-      , exclude: ''
-      , fields: false
-      , debug: true
-      }
-    , CSS_LOADED = false;
+!function($) {
+  var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://';
+  var OPTIONS = {
+    service: PROTOCOL+'api2.transloadit.com/',
+    assets: PROTOCOL+'assets.transloadit.com/',
+    onFileSelect: function() {},
+    onUploadInit: function() {},
+    onStart: function() {},
+    onProgress: function() {},
+    onUpload: function() {},
+    onResult: function() {},
+    onCancel: function() {},
+    onError: function() {},
+    onSuccess: function() {},
+    interval: 2500,
+    pollTimeout: 8000,
+    poll404Retries: 15,
+    pollConnectionRetries: 3,
+    wait: false,
+    processZeroFiles: true,
+    triggerUploadOnFileSelection: false,
+    autoSubmit: true,
+    modal: true,
+    exclude: '',
+    fields: false,
+    params: null,
+    debug: true
+  };
+  var CSS_LOADED = false;
 
   $.fn.transloadit = function() {
-    var args = Array.prototype.slice.call(arguments)
-      , method
-      , uploader
-      , r;
+    var args = Array.prototype.slice.call(arguments);
+    var method;
+    var uploader;
+    var r;
 
     if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
       args.unshift('init');
@@ -58,9 +60,7 @@
     }
 
     r = uploader[method].apply(uploader, args);
-    return (r === undefined)
-      ? this
-      : r;
+    return (r === undefined) ? this : r;
   };
 
   function Uploader() {
@@ -99,13 +99,25 @@
     $form.bind('submit.transloadit', function() {
       self.validate();
       self.detectFileInputs();
+      self.checkFileTypes();
       if (!self._options['processZeroFiles'] && self.$files.length === 0) {
         self.submitForm();
       } else {
+        self._options.onUploadInit();
         self.getBoredInstance();
       }
 
       return false;
+    });
+
+    if (this._options['triggerUploadOnFileSelection']) {
+      $form.find('input[type="file"]').on('change', function() {
+        $form.trigger('submit.transloadit');
+      });
+    }
+
+    $form.find('input[type="file"]').on('change', function() {
+      self._options.onFileSelect($(this).val(), $(this));
     });
 
     this.includeCss();
@@ -133,11 +145,11 @@
       },
       error: function(xhr, status) {
         self.ended = true;
-        var err =
-          { error: 'CONNECTION_ERROR'
-          , message: 'There was a problem connecting to the upload server'
-          , reason: 'JSONP request status: '+status
-          };
+        var err = {
+          error: 'CONNECTION_ERROR',
+          message: 'There was a problem connecting to the upload server',
+          reason: 'JSONP request status: '+status
+        };
         self.renderError(err);
         self._options.onError(err);
       }
@@ -203,7 +215,11 @@
       });
 
       var $clones = this.clone($fieldsToClone);
+      if (this._options.params && !this.$params) {
+        $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
+      }
       $clones.prependTo(this.$uploadForm);
+
 
       // now add all selects as hidden fields
       $selects.each(function() {
@@ -234,6 +250,44 @@
     return $result;
   };
 
+  Uploader.prototype.checkFileTypes = function() {
+    var self = this;
+
+    function typeStringToArray(types) {
+      if (types == 'video/*') {
+        types = 'video/mp4,video/flv,video/avi,video/mpg,video/mov,video/wmv,video/h264,video/mkv';
+      }
+      if (types == 'image/*') {
+        types = 'image/png,image/jpeg,image/gif,image/jpg,image/ico';
+      }
+      return types.split(',');
+    }
+
+    this.$files = this.$files.filter(function() {
+      var acceptedTypes = $(this).attr('accept');
+      if (!acceptedTypes) {
+        return true;
+      }
+
+      acceptedTypes = typeStringToArray(acceptedTypes);
+
+      var fileExt = this.value.split('.').pop().toLowerCase();
+      for (var i = 0; i < acceptedTypes.length; i++) {
+        if (fileExt == acceptedTypes[i].split('/')[1]) {
+          return true;
+        }
+      }
+
+      var err = {
+        error: 'INVALID_FILE_TYPE',
+        message: 'Sorry, we don\'t accept ' + fileExt + ' files.',
+        reason: 'Invalid file selected'
+      };
+      self._options.onError(err);
+      return false;
+    });
+  };
+
   Uploader.prototype.detectFileInputs = function() {
     var $files = this.$form
       .find('input[type=file]')
@@ -241,24 +295,27 @@
 
     if (!this._options['processZeroFiles']) {
       $files = $files.filter(function() {
-        return this.value != '';
+        return this.value !== '';
       });
     }
     this.$files = $files;
   };
 
   Uploader.prototype.validate = function() {
-    var $params = this.$form.find('input[name=params]');
-    if (!$params.length) {
-      alert('Could not find input[name=params] in your form.');
-      return;
-    }
-
-    try {
-      this.params = JSON.parse($params.val());
-    } catch (e) {
-      alert('Error: input[name=params] seems to contain invalid JSON.');
-      return;
+    if (!this._options.params) {
+      var $params = this.$form.find('input[name=params]');
+      if (!$params.length) {
+        alert('Could not find input[name=params] in your form.');
+        return;
+      }
+      try {
+        this.params = JSON.parse($params.val());
+      } catch (e) {
+        alert('Error: input[name=params] seems to contain invalid JSON.');
+        return;
+      }
+    } else {
+      this.params = this._options.params;
     }
 
     if (this.params.redirect_url) {
@@ -368,9 +425,7 @@
             self.cancel();
           }
 
-          if (self._options.autoSubmit) {
-            self.submitForm();
-          }
+          self.submitForm();
           return;
         }
 
@@ -423,7 +478,7 @@
 
     if (!this.ended) {
       var self = this;
-      this.$params.prependTo(this.$form);
+      if (this.$params) this.$params.prependTo(this.$form);
       this.$fileClones.each(function(i) {
         var $original = $(self.$files[i]), $clone = $(this);
         $original.insertAfter($clone);
@@ -463,34 +518,37 @@
         .hide();
     }
 
-    this.$form
-      .unbind('submit.transloadit')
-      .submit();
+    if (this._options.autoSubmit) {
+      this.$form
+        .unbind('submit.transloadit')
+        .submit();
+    }
   };
 
   Uploader.prototype.showModal = function() {
     this.$modal =
       $('<div id="transloadit">'+
         '<div class="content">'+
-          '<a href="#close" class="close"></a>'+
+          '<a href="#close" class="close">Cancel</a>'+
           '<p class="status"></p>'+
-          '<div class="progress"><label>starting upload ...</label><span></span></div>'+
+          '<div class="progress progress-striped active">' +
+            '<div class="bar"><span class="percent"></span></div>' +
+          '</div>' +
+          '<label>Starting upload ...</label>' +
           '<p class="error"></p>'+
         '</div>'+
       '</div>')
       .appendTo('body');
 
-    $.extend
-      ( this.$modal
-      , { '$status': this.$modal.find('.status')
-        , '$content': this.$modal.find('.content')
-        , '$close': this.$modal.find('.close')
-        , '$label': this.$modal.find('label')
-        , '$progress': this.$modal.find('.progress')
-        , '$progressSpan': this.$modal.find('.progress span')
-        , '$error': this.$modal.find('.error')
-        }
-      );
+    $.extend(this.$modal, {
+      '$content': this.$modal.find('.content'),
+      '$close': this.$modal.find('.close'),
+      '$label': this.$modal.find('label'),
+      '$progress': this.$modal.find('.progress'),
+      '$percent': this.$modal.find('.progress .percent'),
+      '$progressBar': this.$modal.find('.progress .bar'),
+      '$error': this.$modal.find('.error')
+    });
 
     var self = this;
     this.$modal.$close.click(function() {
@@ -524,14 +582,13 @@
 
     this.$modal.$content.addClass('content-error');
     this.$modal.$progress.hide();
+    this.$modal.$label.hide();
 
     var text = (this._options.debug)
       ? assembly.error+': '+assembly.message+'<br><br>'+(assembly.reason || '')
       : 'There was an internal error, please try your upload again.';
 
-    this.$modal.$error
-      .html(text)
-      .show();
+    this.$modal.$error.html(text).show();
   };
 
   Uploader.prototype.renderProgress = function(assembly) {
@@ -539,24 +596,40 @@
       return;
     }
 
-    var progress = assembly.bytes_received / assembly.bytes_expected
-      , bytesReceived = assembly.bytes_received - this.bytesReceivedBefore
-      , timeSinceLastPoll = (+new Date - this.lastPoll)
-      , duration = (progress == 1)
-        ? 1000
-        : this._options.interval * 2
-      , text = (progress == 1)
-        ? 'processing ...'
-        :   (assembly.bytes_received / 1024 / 1024).toFixed(2)+' MB / '
+    var self = this;
+    var progress = assembly.bytes_received / assembly.bytes_expected;
+    var bytesReceived = assembly.bytes_received - this.bytesReceivedBefore;
+    var timeSinceLastPoll = (+new Date - this.lastPoll);
+    var duration = (progress == 1) ? 1000 : this._options.interval * 2;
+    var text = 'Processing files';
+    if (progress != 1) {
+      text = (assembly.bytes_received / 1024 / 1024).toFixed(2)+' MB / '
           + (assembly.bytes_expected / 1024 / 1024).toFixed(2)+' MB '
           + '('+((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1)+' kB / sec)';
+    }
 
     this.bytesReceivedBefore = assembly.bytes_received;
     this.$modal.$label.text(text);
+    var totalWidth = parseInt(self.$modal.$progress.css('width'), 10);
 
-    this.$modal.$progressSpan
-      .stop()
-      .animate({width: (progress * 100)+'%'}, duration, 'easeOutCubic');
+    if (bytesReceived > 0) {
+      this.$modal.$progressBar
+        .stop()
+        .animate(
+          {width: (progress * 100)+'%'},
+          {
+            duration: duration,
+            easing: 'linear',
+            progress: function(promise, currPercent, remainingMs) {
+              var width = parseInt(self.$modal.$progressBar.css('width'), 10);
+              var percent = (width * 100 / totalWidth).toFixed(0);
+              if (percent > 13) {
+                self.$modal.$percent.text(percent + '%');
+              }
+            }
+          }
+        );
+    }
   };
 
   Uploader.prototype.includeCss = function() {
@@ -592,4 +665,5 @@
 
     this._options[key] = val;
   };
-})(jQuery);
+
+}(window.jQuery);
