@@ -218,6 +218,14 @@
       if (this._options.params && !this.$params) {
         $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
       }
+
+      if (typeof this._options.fields == 'object') {
+        for (var fieldName in this._options.fields) {
+          var fieldValue = this._options.fields[fieldName];
+          $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>');
+        }
+      }
+
       $clones.prependTo(this.$uploadForm);
 
 
