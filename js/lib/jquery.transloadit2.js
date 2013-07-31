@@ -111,12 +111,12 @@
     });
 
     if (this._options['triggerUploadOnFileSelection']) {
-      $form.find('input[type="file"]').on('change', function() {
+      $form.on('change', 'input[type="file"]', function() {
         $form.trigger('submit.transloadit');
       });
     }
 
-    $form.find('input[type="file"]').on('change', function() {
+    $form.on('change', 'input[type="file"]', function() {
       self._options.onFileSelect($(this).val(), $(this));
     });
 
