@@ -12,7 +12,6 @@
     service: PROTOCOL+'api2.transloadit.com/',
     assets: PROTOCOL+'assets.transloadit.com/',
     onFileSelect: function() {},
-    onUploadInit: function() {},
     onStart: function() {},
     onProgress: function() {},
     onUpload: function() {},
@@ -103,7 +102,6 @@
       if (!self._options['processZeroFiles'] && self.$files.length === 0) {
         self.submitForm();
       } else {
-        self._options.onUploadInit();
         self.getBoredInstance();
       }
 
