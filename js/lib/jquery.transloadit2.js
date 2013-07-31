@@ -318,6 +318,8 @@
         alert('Could not find input[name=params] in your form.');
         return;
       }
+
+      this.$params = $params;
       try {
         this.params = JSON.parse($params.val());
       } catch (e) {
@@ -334,8 +336,6 @@
       alert('Error: input[name=params] does not include a redirect_url');
       return;
     }
-
-    this.$params = $params;
   };
 
   Uploader.prototype._poll = function(query) {
@@ -396,10 +396,10 @@
         }
 
         self.pollRetries = 0;
-        var isUploading = (assembly.ok == 'ASSEMBLY_UPLOADING')
-          , isExecuting = (assembly.ok == 'ASSEMBLY_EXECUTING')
-          , isCanceled = (assembly.ok == 'ASSEMBLY_CANCELED')
-          , isComplete = (assembly.ok == 'ASSEMBLY_COMPLETED');
+        var isUploading = (assembly.ok == 'ASSEMBLY_UPLOADING');
+        var isExecuting = (assembly.ok == 'ASSEMBLY_EXECUTING');
+        var isCanceled = (assembly.ok == 'ASSEMBLY_CANCELED');
+        var isComplete = (assembly.ok == 'ASSEMBLY_COMPLETED');
 
         self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
 
@@ -439,15 +439,13 @@
           return;
         }
 
-        var ping = (self.pollStarted - +new Date)
-          , timeout = (ping < self._options.interval)
-            ? self._options.interval
-            : ping;
+        var ping = (self.pollStarted - +new Date());
+        var timeout = (ping < self._options.interval) ? self._options.interval : ping;
 
         self.timer = setTimeout(function() {
           self._poll();
         }, timeout);
-        self.lastPoll = +new Date;
+        self.lastPoll = +new Date();
       },
       error: function(xhr, status) {
         if (self.ended) {
@@ -458,11 +456,11 @@
         if (self.pollRetries > self._options.pollConnectionRetries) {
           document.title = self.documentTitle;
           self.ended = true;
-          var err =
-            { error: 'CONNECTION_ERROR'
-            , message: 'There was a problem connecting to the upload server'
-            , reason: 'JSONP request status: '+status
-            };
+          var err = {
+            error: 'CONNECTION_ERROR',
+            message: 'There was a problem connecting to the upload server',
+            reason: 'JSONP request status: '+status
+          };
           self.renderError(err);
           self._options.onError(err);
           return;
@@ -490,7 +488,8 @@
       var self = this;
       if (this.$params) this.$params.prependTo(this.$form);
       this.$fileClones.each(function(i) {
-        var $original = $(self.$files[i]), $clone = $(this);
+        var $original = $(self.$files[i]);
+        var $clone = $(this);
         $original.insertAfter($clone);
         $clone.remove();
       });
@@ -567,17 +566,15 @@
 
     this.$modal.$error.hide();
 
-    var self = this
-      , expose =
-          this.$modal.expose
-          ( { api: true
-            , maskId: 'transloadit_expose'
-            , opacity: 0.9
-            , loadSpeed: 250
-            , closeOnEsc: false
-            , closeOnClick: false
-            }
-          );
+    var self = this;
+    var expose = this.$modal.expose({
+      api: true,
+      maskId: 'transloadit_expose',
+      opacity: 0.9,
+      loadSpeed: 250,
+      closeOnEsc: false,
+      closeOnClick: false
+    });
 
     this.$modal.$close.click(function() {
       self.cancel();
@@ -609,7 +606,7 @@
     var self = this;
     var progress = assembly.bytes_received / assembly.bytes_expected;
     var bytesReceived = assembly.bytes_received - this.bytesReceivedBefore;
-    var timeSinceLastPoll = (+new Date - this.lastPoll);
+    var timeSinceLastPoll = (+new Date() - this.lastPoll);
     var duration = (progress == 1) ? 1000 : this._options.interval * 2;
     var text = 'Processing files';
     if (progress != 1) {
@@ -661,7 +658,7 @@
   };
 
   Uploader.prototype.options = function(options) {
-    if (arguments.length == 0) {
+    if (arguments.length === 0) {
       return this._options;
     }
 
