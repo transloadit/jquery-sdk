@@ -31,6 +31,7 @@
     exclude: '',
     fields: '*',
     params: null,
+    signature: null,
     debug: true
   };
   var CSS_LOADED = false;
@@ -214,8 +215,12 @@
       });
 
       var $clones = this.clone($fieldsToClone);
+
       if (this._options.params && !this.$params) {
         $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
+      }
+      if (this._options.signature) {
+        $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>');
       }
 
       if (typeof this._options.fields == 'object') {
