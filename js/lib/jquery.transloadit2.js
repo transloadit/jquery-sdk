@@ -29,7 +29,7 @@
     autoSubmit: true,
     modal: true,
     exclude: '',
-    fields: '*',
+    fields: false,
     params: null,
     signature: null,
     debug: true
@@ -199,7 +199,7 @@
         .hide();
 
       var fieldsFilter = '[name=params], [name=signature]';
-      if (this._options.fields === true || this._options.fields === '*') {
+      if (this._options.fields === true) {
         fieldsFilter = '*';
       } else if (typeof this._options.fields === 'string') {
         fieldsFilter += ', ' + this._options.fields;
