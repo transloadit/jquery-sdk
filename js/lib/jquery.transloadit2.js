@@ -1,4 +1,4 @@
-/** @license jquery.transloadit2.js: Copyright (c) 2010 Felix Geisendörfer | MIT License: http://www.opensource.org/licenses/mit-license.php
+/** @license jquery.transloadit2.js: Copyright (c) 2013 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
  *
  * Fork this on Github: http://github.com/transloadit/jquery-sdk
  *
