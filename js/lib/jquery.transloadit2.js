@@ -30,7 +30,7 @@
     autoSubmit: true,
     modal: true,
     exclude: '',
-    fields: false,
+    fields: '*',
     params: null,
     debug: true
   };
@@ -199,10 +199,10 @@
         .hide();
 
       var fieldsFilter = '[name=params], [name=signature]';
-      if (this._options.fields === true) {
+      if (this._options.fields === true || this._options.fields === '*') {
         fieldsFilter = '*';
-      } else if (typeof this._options.fields == 'string') {
-        fieldsFilter += ', '+this._options.fields;
+      } else if (typeof this._options.fields === 'string') {
+        fieldsFilter += ', ' + this._options.fields;
       }
 
       var $fieldsToClone = this.$form.find(':input[type!=file]').filter(fieldsFilter);
