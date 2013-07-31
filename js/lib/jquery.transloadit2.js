@@ -491,9 +491,12 @@
 
     if (!this.ended) {
       var self = this;
-      if (this.$params) this.$params.prependTo(this.$form);
+      if (this.$params) {
+        this.$params.prependTo(this.$form);
+      }
+
       this.$fileClones.each(function(i) {
-        var $original = $(self.$files[i]);
+        var $original = $(self.$files[i]).clone(true);
         var $clone = $(this);
         $original.insertAfter($clone);
         $clone.remove();
