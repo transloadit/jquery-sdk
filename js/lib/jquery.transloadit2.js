@@ -99,6 +99,7 @@
       self.validate();
       self.detectFileInputs();
       self.checkFileTypes();
+
       if (!self._options['processZeroFiles'] && self.$files.length === 0) {
         self.submitForm();
       } else {
@@ -265,6 +266,9 @@
       }
       if (types == 'image/*') {
         types = 'image/png,image/jpeg,image/gif,image/jpg,image/ico';
+      }
+      if (types == 'audio/*') {
+        types = 'audio/aac,audio/mp4,audio/mpeg,audio/ogg,audio/wav,audio/webm';
       }
       return types.split(',');
     }
