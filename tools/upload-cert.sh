@@ -1,4 +1,9 @@
 #!/bin/bash
+# With this helper you can upload SSL certificates to IAM
+# after which you can link them to a CloudFront Distribution.
+#
+# Can be cleaned up but this should function more as a manual
+# as this only needs to be done every 1 or 2 years.
 set -x
 set -e
 

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Uploads an asset to s3 & cloudfront. Shows headers on S3 and CloudFront.
+# Also shows md5sum of all different endpoints
 set -e
 
 # Set magic variables for current FILE & DIR

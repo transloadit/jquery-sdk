@@ -34,7 +34,4 @@ link:
 clean:
 	-rm build/*.*
 
-uploadssl:
-	iam-servercertupload -b public_key_certificate_file -k privatekey.pem -s certificate_object_name -c certificate_chain_file -p /cloudfront/path -v 
-
 .PHONY: clean install pushplugin
