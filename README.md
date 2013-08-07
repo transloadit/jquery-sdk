@@ -32,10 +32,25 @@ API version, not the client SDK version.
 
 ## Versions
 
+### Latest
+
+This is always the latest version, and for now points to v2.1.0. <strong>This is the recommended version to use:</strong><br />
+[https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
+
+### v2.1.0
+
+This is the current version, with a new progress bar design and new features. Supports jQuery 1.9+ but not IE6:<br />
+[https://assets.transloadit.com/js/jquery.transloadit2-v2.1.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v2.1.0.js)
+
 ### v2.0.0
 
-* Introduce jQuery 1.9 support as discussed in [this issue](https://github.com/transloadit/jquery-sdk/issues/13#issuecomment-13645153)
-A big thanks to [Christian Pekeler](https://github.com/pekeler)
+Has the old progressbar design and doesn't have the new features. Supports jQuery 1.9+ but not IE6:<br />
+[https://assets.transloadit.com/js/jquery.transloadit2-v2.0.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v2.0.0.js)
+
+### v1.0.0
+
+Has the old progressbar design. Supports IE6, but not jQuery 1.9+:<br />
+[https://assets.transloadit.com/js/jquery.transloadit2-v1.0.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v1.0.0.js)
 
 
 ## Building
