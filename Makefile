@@ -23,6 +23,9 @@ $(build_path): js/dep/*.js js/lib/*.js
 	$(call compile_js,$(build_path))
 	$(call build_size,after:)
 
+publish:
+	./tools/upload-file.sh build/jquery.transloadit2-latest.js js/jquery.transloadit2-latest.js
+
 # TRANSLOADIT INTERNAL
 install: $(build_path) $(css_path)
 	cp $(build_path) $(install_dir)/js/$(build_name)
@@ -34,4 +37,4 @@ link:
 clean:
 	-rm build/*.*
 
-.PHONY: clean install pushplugin
+.PHONY: clean install publish
