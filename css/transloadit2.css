@@ -48,11 +48,11 @@
 }
 
 #transloadit .content{
-  margin-left: -170px !important;
+  margin-left: -155px !important;
   position: absolute !important;
   top: -50px !important;
   left: 50% !important;
-  width: 340px !important;
+  width: 310px !important;
   height: 100px !important;
   visibility: visible !important;
   float: left !important;
@@ -121,8 +121,8 @@
 
 #transloadit .progress {
   height: 30px;
-  width: 340px;
-  margin: 15px 0 20px 0!important;
+  width: 310px;
+  margin: 15px 0 10px 0!important;
   position: relative;
   overflow: hidden;
   background-color: #f7f7f7;
@@ -196,7 +196,7 @@
 }
 
 #transloadit label{
-  margin: 20px 0 0 0!important;
+  margin: 0!important;
   z-index: 999!important;
   padding: 0 !important;
   width: 100% !important;
