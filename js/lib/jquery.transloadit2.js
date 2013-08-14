@@ -385,7 +385,8 @@
             self._poll();
           }, 400);
           return;
-        } else if (assembly.error) {
+        }
+        if (assembly.error) {
           self.ended = true;
           self.renderError(assembly);
           document.title = self.documentTitle;
@@ -514,19 +515,13 @@
       }, 500);
     }
 
-    if (!this._options.modal) {
-      return;
+    if (this._options.modal) {
+      $.mask.close();
+      this.$modal.remove();
     }
-
-    $.mask.close();
-    this.$modal.remove();
   };
 
   Uploader.prototype.submitForm = function() {
-    if (this.$fileClones) {
-      this.$fileClones.remove();
-    }
-
     if (this.assembly !== null) {
       $('<textarea/>')
         .attr('name', 'transloadit')
