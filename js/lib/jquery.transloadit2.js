@@ -266,6 +266,13 @@
     var self = this;
 
     function typeStringToArray(types) {
+      if (/image\/jpg/g.test(types) && !/image\/jpeg/g.test(types)) {
+        types += ',image/jpeg';
+      }
+      if (/image\/jpeg/g.test(types) && !/image\/jpg/g.test(types)) {
+        types += ',image/jpg';
+      }
+
       if (types.indexOf('video/*') !== -1) {
         types = types.replace(/video\/\*/g, 'video/mp4,video/flv,video/avi,video/mpg,video/mov,video/wmv,video/h264,video/mkv');
       }
