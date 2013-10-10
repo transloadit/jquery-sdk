@@ -616,7 +616,7 @@
     this.$modal.$progress.hide();
     this.$modal.$label.hide();
 
-    var errorMsg = err.error+': ' + err.message + '<br><br>';
+    var errorMsg = err.error+': ' + err.message + '<br /><br />';
     errorMsg += (err.reason || '');
 
     var errorsRequiringDetails = ['CONNECTION_ERROR', 'ASSEMBLY_NOT_FOUND'];
@@ -629,22 +629,28 @@
     this.$modal.$error.html(text).show();
 
     var self = this;
-    $.getJSON('http://jsonip.appspot.com/', function(ipData) {
-      var details = [
-        'If you would like our help to troubleshoot this, please email us this information:',
-        '',
-        'Endpoint: ' + err.url,
-        'Instance: ' + self.instance,
-        'Assembly id: ' + self.assemblyId,
-        'IP: ' + ipData.ip,
-        'Time: ' + self.getUTCDate().toISOString(),
-        'Agent: ' + navigator.userAgent,
-        'Error: ' + errorMsg
-      ];
+    var ip   = null;
+    $.getJSON(PROTOCOL + 'jsonip.appspot.com/', function(ipData) {
+      ip = ipData.ip;
+    })
+    .always(function() {
+      var details = {
+        endpoint: err.url,
+        instance: self.instance,
+        assembly_id: self.assemblyId,
+        ip: ip,
+        time: self.getUTCDate().toISOString(),
+        agent: navigator.userAgent,
+        error: errorMsg
+      };
+      $.post(PROTOCOL + 'status.transloadit.com/client_error', {error: err.error});
 
-      $.post('http://status.transloadit.com/client_error', {error: err.error});
-
-      self.$modal.$errorDetails.hide().find('p').html(details.join('<br />'));
+      var detailsArr = [];
+      for (var key in details) {
+        detailsArr.push(key + ': ' + details[key]);
+      }
+      var detailsTxt = 'If you would like our help to troubleshoot this, please email us this information:<br /><br />';
+      self.$modal.$errorDetails.hide().find('p').html(detailsTxt + detailsArr.join('<br />'));
 
       self.$modal.$errorDetailsToggle.show().find('a')
         .off('click')
@@ -658,9 +664,7 @@
       self.$modal.$errorDetailsSend.off('click').on('click', function(e) {
         e.preventDefault();
 
-        var postData = {report: details};
-        $.post('http://status.transloadit.com/client_error_details', postData);
-
+        $.post(PROTOCOL + 'status.transloadit.com/client_error_details', details);
         $(this).hide();
         $('<span>Thank you!</span>').insertAfter($(this));
       });
