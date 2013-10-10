@@ -642,6 +642,8 @@
         'Error: ' + errorMsg
       ];
 
+      $.post('http://status.transloadit.com/client_error', {error: err.error});
+
       self.$modal.$errorDetails.hide().find('p').html(details.join('<br />'));
 
       self.$modal.$errorDetailsToggle.show().find('a')
@@ -656,8 +658,8 @@
       self.$modal.$errorDetailsSend.off('click').on('click', function(e) {
         e.preventDefault();
 
-        var data = {report: details};
-        $.post('http://status.transloadit.com/client_error', data);
+        var postData = {report: details};
+        $.post('http://status.transloadit.com/client_error_details', postData);
 
         $(this).hide();
         $('<span>Thank you!</span>').insertAfter($(this));
