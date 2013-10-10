@@ -127,14 +127,16 @@
     var self = this;
 
     this.instance = null;
+    var url       = this._options['service']+'instances/bored';
 
     $.jsonp({
-      url: this._options['service']+'instances/bored',
+      url: url,
       timeout: self._options.pollTimeout,
       callbackParameter: 'callback',
       success: function(instance) {
         if (instance.error) {
           self.ended = true;
+          instance.url = url;
           self.renderError(instance);
           self._options.onError(instance);
           return;
@@ -148,7 +150,8 @@
         var err = {
           error: 'CONNECTION_ERROR',
           message: 'There was a problem connecting to the upload server',
-          reason: 'JSONP request status: '+status
+          reason: 'JSONP request status: ' + status,
+          url: url
         };
         self.renderError(err);
         self._options.onError(err);
@@ -367,8 +370,9 @@
 
     this.pollStarted = +new Date();
 
+    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+(query || '?seq='+this.seq);
     $.jsonp({
-      url: PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+(query || '?seq='+this.seq),
+      url: url,
       timeout: self._options.pollTimeout,
       callbackParameter: 'callback',
       success: function(assembly) {
@@ -472,7 +476,8 @@
           var err = {
             error: 'CONNECTION_ERROR',
             message: 'There was a problem connecting to the upload server',
-            reason: 'JSONP request status: '+status
+            reason: 'JSONP request status: '+status,
+            url: url
           };
           self.renderError(err);
           self._options.onError(err);
@@ -555,6 +560,11 @@
           '</div>' +
           '<label>Starting upload ...</label>' +
           '<p class="error"></p>'+
+          '<div class="error-details-toggle"><a href="#">Details</a></div>' +
+          '<div class="error-details">' +
+            '<p></p>' +
+            '<a href="#" class="error-details-send">Send error report</a>' +
+          '</div>'+
         '</div>'+
       '</div>')
       .appendTo('body');
@@ -566,7 +576,10 @@
       '$progress': this.$modal.find('.progress'),
       '$percent': this.$modal.find('.progress .percent'),
       '$progressBar': this.$modal.find('.progress .bar'),
-      '$error': this.$modal.find('.error')
+      '$error': this.$modal.find('.error'),
+      '$errorDetails': this.$modal.find('.error-details'),
+      '$errorDetailsToggle': this.$modal.find('.error-details-toggle'),
+      '$errorDetailsSend': this.$modal.find('.error-details-send'),
     });
 
     var self = this;
@@ -575,6 +588,8 @@
     });
 
     this.$modal.$error.hide();
+    this.$modal.$errorDetails.hide();
+    this.$modal.$errorDetailsToggle.hide();
 
     var self = this;
     var expose = this.$modal.expose({
@@ -592,7 +607,7 @@
     });
   };
 
-  Uploader.prototype.renderError = function(assembly) {
+  Uploader.prototype.renderError = function(err) {
     if (!this._options.modal) {
       return;
     }
@@ -601,11 +616,53 @@
     this.$modal.$progress.hide();
     this.$modal.$label.hide();
 
-    var text = (this._options.debug)
-      ? assembly.error+': '+assembly.message+'<br><br>'+(assembly.reason || '')
-      : 'There was an internal error, please try your upload again.';
+    var errorMsg = err.error+': ' + err.message + '<br><br>';
+    errorMsg += (err.reason || '');
 
+    var errorsRequiringDetails = ['CONNECTION_ERROR', 'ASSEMBLY_NOT_FOUND'];
+    if (errorsRequiringDetails.indexOf(err.error) === -1) {
+      this.$modal.$error.html(errorMsg).show();
+      return;
+    }
+
+    var text = 'There was an internal error.<br />Please try your upload again.';
     this.$modal.$error.html(text).show();
+
+    var self = this;
+    $.getJSON('http://jsonip.appspot.com/', function(ipData) {
+      var details = [
+        'If you would like our help to troubleshoot this, please email us this information:',
+        '',
+        'Endpoint: ' + err.url,
+        'Instance: ' + self.instance,
+        'Assembly id: ' + self.assemblyId,
+        'IP: ' + ipData.ip,
+        'Time: ' + self.getUTCDate().toISOString(),
+        'Agent: ' + navigator.userAgent,
+        'Error: ' + errorMsg
+      ];
+
+      self.$modal.$errorDetails.hide().find('p').html(details.join('<br />'));
+
+      self.$modal.$errorDetailsToggle.show().find('a')
+        .off('click')
+        .on('click', function(e) {
+          e.preventDefault();
+          self.$modal.$errorDetails.toggle();
+          self.$modal.$errorDetailsSend.show();
+          self.$modal.$errorDetails.find('span').remove();
+        });
+
+      self.$modal.$errorDetailsSend.off('click').on('click', function(e) {
+        e.preventDefault();
+
+        var data = {report: details};
+        $.post('http://status.transloadit.com/client_error', data);
+
+        $(this).hide();
+        $('<span>Thank you!</span>').insertAfter($(this));
+      });
+    });
   };
 
   Uploader.prototype.renderProgress = function(assembly) {
@@ -657,6 +714,19 @@
     CSS_LOADED = true;
     $('<link rel="stylesheet" type="text/css" href="'+this._options.assets+'css/transloadit2.css" />')
       .appendTo('head');
+  };
+
+  Uploader.prototype.getUTCDate = function() {
+    var now = new Date();
+
+    return new Date(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    );
   };
 
   Uploader.prototype.uuid = function() {
