@@ -561,10 +561,7 @@
           '<label>Starting upload ...</label>' +
           '<p class="error"></p>'+
           '<div class="error-details-toggle"><a href="#">Details</a></div>' +
-          '<div class="error-details">' +
-            '<p></p>' +
-            '<a href="#" class="error-details-send">Send error report</a>' +
-          '</div>'+
+          '<p class="error-details"></p>'+
         '</div>'+
       '</div>')
       .appendTo('body');
@@ -578,8 +575,7 @@
       '$progressBar': this.$modal.find('.progress .bar'),
       '$error': this.$modal.find('.error'),
       '$errorDetails': this.$modal.find('.error-details'),
-      '$errorDetailsToggle': this.$modal.find('.error-details-toggle'),
-      '$errorDetailsSend': this.$modal.find('.error-details-send'),
+      '$errorDetailsToggle': this.$modal.find('.error-details-toggle')
     });
 
     var self = this;
@@ -643,31 +639,22 @@
         agent: navigator.userAgent,
         error: errorMsg
       };
-      $.post(PROTOCOL + 'status.transloadit.com/client_error', {error: err.error});
+      $.post(PROTOCOL + 'status.transloadit.com/client_error', details);
 
       var detailsArr = [];
       for (var key in details) {
         detailsArr.push(key + ': ' + details[key]);
       }
-      var detailsTxt = 'If you would like our help to troubleshoot this, please email us this information:<br /><br />';
-      self.$modal.$errorDetails.hide().find('p').html(detailsTxt + detailsArr.join('<br />'));
+      var detailsTxt = 'If you would like our help to troubleshoot this, ';
+      detailsTxt += 'please email us this information:<br /><br />';
+      self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'));
 
       self.$modal.$errorDetailsToggle.show().find('a')
         .off('click')
         .on('click', function(e) {
           e.preventDefault();
           self.$modal.$errorDetails.toggle();
-          self.$modal.$errorDetailsSend.show();
-          self.$modal.$errorDetails.find('span').remove();
         });
-
-      self.$modal.$errorDetailsSend.off('click').on('click', function(e) {
-        e.preventDefault();
-
-        $.post(PROTOCOL + 'status.transloadit.com/client_error_details', details);
-        $(this).hide();
-        $('<span>Thank you!</span>').insertAfter($(this));
-      });
     });
   };
 

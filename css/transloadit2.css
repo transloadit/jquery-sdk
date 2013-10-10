@@ -61,29 +61,17 @@
   text-align: center !important;
   margin: 25px 0 0 0 !important;
 }
-#transloadit .error-details p{
+#transloadit .error-details{
   font-size: 11px!important;
   line-height: 12px!important;
   margin-top: 10px!important;
   padding-top: 10px!important;
   border-top: 1px solid #666!important;
 }
-#transloadit .error-details span{
-  font-size: 11px!important;
-  line-height: 12px!important;
-}
 #transloadit .error-details-toggle{
   display: none;
   text-align: center!important;
   margin-top: 10px!important;
-}
-#transloadit .error-details-send{
-  font-size: 10px!important;
-  color: #666!important;
-}
-#transloadit .error-details-send:hover{
-  cursor: pointer !important;
-  color: #333!important;
 }
 #transloadit .error-details-toggle a{
   font-size: 10px!important;
