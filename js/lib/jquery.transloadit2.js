@@ -637,6 +637,7 @@
         ip: ip,
         time: self.getUTCDate().toISOString(),
         agent: navigator.userAgent,
+        poll_retries: self.pollRetries,
         error: errorMsg
       };
       $.post(PROTOCOL + 'status.transloadit.com/client_error', details);
