@@ -9,30 +9,30 @@
 !function($) {
   var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://';
   var OPTIONS = {
-    service: PROTOCOL+'api2.transloadit.com/',
-    assets: PROTOCOL+'assets.transloadit.com/',
-    onFileSelect: function() {},
-    onStart: function() {},
-    onProgress: function() {},
-    onUpload: function() {},
-    onResult: function() {},
-    onCancel: function() {},
-    onError: function() {},
-    onSuccess: function() {},
-    interval: 2500,
-    pollTimeout: 8000,
-    poll404Retries: 15,
-    pollConnectionRetries: 3,
-    wait: false,
-    processZeroFiles: true,
-    triggerUploadOnFileSelection: false,
-    autoSubmit: true,
-    modal: true,
-    exclude: '',
-    fields: false,
-    params: null,
-    signature: null,
-    debug: true
+    service                      : PROTOCOL+'api2.transloadit.com/',
+    assets                       : PROTOCOL+'assets.transloadit.com/',
+    onFileSelect                 : function() {},
+    onStart                      : function() {},
+    onProgress                   : function() {},
+    onUpload                     : function() {},
+    onResult                     : function() {},
+    onCancel                     : function() {},
+    onError                      : function() {},
+    onSuccess                    : function() {},
+    interval                     : 2500,
+    pollTimeout                  : 8000,
+    poll404Retries               : 15,
+    pollConnectionRetries        : 3,
+    wait                         : false,
+    processZeroFiles             : true,
+    triggerUploadOnFileSelection : false,
+    autoSubmit                   : true,
+    modal                        : true,
+    exclude                      : '',
+    fields                       : false,
+    params                       : null,
+    signature                    : null,
+    debug                        : true
   };
   var CSS_LOADED = false;
 
@@ -427,9 +427,9 @@
 
         for (var step in assembly.results) {
           self.results[step] = self.results[step] || [];
-          for (var i = 0; i < assembly.results[step].length; i++) {
-            self._options.onResult(step, assembly.results[step][i], assembly);
-            self.results[step].push(assembly.results[step][i]);
+          for (var j = 0; j < assembly.results[step].length; j++) {
+            self._options.onResult(step, assembly.results[step][j], assembly);
+            self.results[step].push(assembly.results[step][j]);
           }
         }
 
@@ -587,7 +587,6 @@
     this.$modal.$errorDetails.hide();
     this.$modal.$errorDetailsToggle.hide();
 
-    var self = this;
     var expose = this.$modal.expose({
       api: true,
       maskId: 'transloadit_expose',
@@ -664,40 +663,50 @@
       return;
     }
 
-    var self = this;
-    var progress = assembly.bytes_received / assembly.bytes_expected;
-    var bytesReceived = assembly.bytes_received - this.bytesReceivedBefore;
-    var timeSinceLastPoll = (+new Date() - this.lastPoll);
-    var duration = (progress == 1) ? 1000 : this._options.interval * 2;
-    var text = 'Processing files';
-    if (progress != 1) {
-      text = (assembly.bytes_received / 1024 / 1024).toFixed(2)+' MB / '
-          + (assembly.bytes_expected / 1024 / 1024).toFixed(2)+' MB '
-          + '('+((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1)+' kB / sec)';
+    var progress = assembly.bytes_received / assembly.bytes_expected * 100;
+    if (progress > 100) {
+      progress = 0;
     }
 
+    var bytesReceived     = assembly.bytes_received - this.bytesReceivedBefore;
+    var timeSinceLastPoll = +new Date() - this.lastPoll;
+    var duration          = progress === 100 ? 1000 : this._options.interval * 2;
+
+    var txt = 'Processing files';
+    if (progress != 100) {
+      txt = (assembly.bytes_received / 1024 / 1024).toFixed(2) + ' MB / ' +
+          (assembly.bytes_expected / 1024 / 1024).toFixed(2) + ' MB ' +
+          '(' + ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1) +
+          ' kB / sec)';
+    }
+    this.$modal.$label.text(txt);
+
+    var totalWidth           = parseInt(this.$modal.$progress.css('width'), 10);
     this.bytesReceivedBefore = assembly.bytes_received;
-    this.$modal.$label.text(text);
-    var totalWidth = parseInt(self.$modal.$progress.css('width'), 10);
 
-    if (bytesReceived > 0) {
-      this.$modal.$progressBar
-        .stop()
-        .animate(
-          {width: (progress * 100)+'%'},
-          {
-            duration: duration,
-            easing: 'linear',
-            progress: function(promise, currPercent, remainingMs) {
-              var width = parseInt(self.$modal.$progressBar.css('width'), 10);
-              var percent = (width * 100 / totalWidth).toFixed(0);
-              if (percent > 13) {
-                self.$modal.$percent.text(percent + '%');
-              }
-            }
-          }
-        );
+    if (bytesReceived <= 0) {
+      return;
     }
+
+    var self = this;
+    this.$modal.$progressBar.stop().animate(
+      {width: progress + '%'},
+      {
+        duration: duration,
+        easing: 'linear',
+        progress: function(promise, currPercent, remainingMs) {
+          var width   = parseInt(self.$modal.$progressBar.css('width'), 10);
+
+          var percent = (width * 100 / totalWidth).toFixed(0);
+          if (percent > 100) {
+            percent = 100;
+          }
+          if (percent > 13) {
+            self.$modal.$percent.text(percent + '%');
+          }
+        }
+      }
+    );
   };
 
   Uploader.prototype.includeCss = function() {
