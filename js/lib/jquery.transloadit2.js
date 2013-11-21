@@ -635,7 +635,7 @@
         instance: self.instance,
         assembly_id: self.assemblyId,
         ip: ip,
-        time: self.getUTCDate().toISOString(),
+        time: self.getUTCDatetime(),
         agent: navigator.userAgent,
         poll_retries: self.pollRetries,
         error: errorMsg
@@ -710,10 +710,9 @@
       .appendTo('head');
   };
 
-  Uploader.prototype.getUTCDate = function() {
+  Uploader.prototype.getUTCDatetime = function() {
     var now = new Date();
-
-    return new Date(
+    var d = new Date(
       now.getUTCFullYear(),
       now.getUTCMonth(),
       now.getUTCDate(),
@@ -721,6 +720,27 @@
       now.getUTCMinutes(),
       now.getUTCSeconds()
     );
+
+    var pad = function (n) {
+      return n < 10 ? '0' + n : n;
+    };
+    var tz = d.getTimezoneOffset();
+    var tzs = (tz > 0 ? "-" : "+") + pad(parseInt(tz / 60, 10));
+
+    if (tz % 60 !== 0) {
+      tzs += pad(tz % 60);
+    }
+
+    if (tz === 0) {
+      tzs = 'Z';
+    }
+
+    return d.getFullYear() + '-' +
+        pad(d.getMonth() + 1) + '-' +
+        pad(d.getDate()) + 'T' +
+        pad(d.getHours()) + ':' +
+        pad(d.getMinutes()) + ':' +
+        pad(d.getSeconds()) + tzs;
   };
 
   Uploader.prototype.uuid = function() {
