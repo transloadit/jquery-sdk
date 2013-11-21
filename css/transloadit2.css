@@ -162,9 +162,9 @@
 }
 
 #transloadit .progress span {
-  float: right;
-  margin: 7px 7px 0 0;
-  color: #fff;
+  float: right!important;
+  margin: 7px 7px 0 0!important;
+  color: #fff!important;
 }
 
 #transloadit .progress .bar {
@@ -192,6 +192,10 @@
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
+  -webkit-transition: none!important;
+     -moz-transition: none!important;
+       -o-transition: none!important;
+          transition: none!important;
 }
 
 #transloadit .progress-striped .bar {
