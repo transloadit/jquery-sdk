@@ -8,8 +8,11 @@
 
 !function($) {
   var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://';
+
+  var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/';
+
   var OPTIONS = {
-    service                      : PROTOCOL+'api2.transloadit.com/',
+    service                      : DEFAULT_SERVICE,
     assets                       : PROTOCOL+'assets.transloadit.com/',
     onFileSelect                 : function() {},
     onStart                      : function() {},
@@ -32,6 +35,7 @@
     fields                       : false,
     params                       : null,
     signature                    : null,
+    region                       : 'us-east-1',
     debug                        : true
   };
   var CSS_LOADED = false;
@@ -126,41 +130,119 @@
   Uploader.prototype.getBoredInstance = function() {
     var self = this;
 
-    this.instance = null;
-    var url       = this._options['service']+'instances/bored';
+    this.instance              = null;
+    var url                    = this._options['service'] + 'instances/bored';
+    var canUseCustomBoredLogic = true;
 
-    $.jsonp({
-      url: url,
-      timeout: self._options.pollTimeout,
-      callbackParameter: 'callback',
-      success: function(instance) {
-        if (instance.error) {
+    function proceed() {
+      $.jsonp({
+        url: url,
+        timeout: self._options.pollTimeout,
+        callbackParameter: 'callback',
+        success: function(instance) {
+          if (instance.error) {
+            self.ended = true;
+            instance.url = url;
+            self.renderError(instance);
+            self._options.onError(instance);
+            return;
+          }
+
+          self.instance = instance.api2_host;
+          self.start();
+        },
+        error: function(xhr, status) {
+          if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE && PROTOCOL !== 'https://') {
+            canUseCustomBoredLogic = false;
+
+            self._findBoredInstanceUrl(function(err, theUrl) {
+              if (err) {
+                self.ended = true;
+                err = {
+                  error: 'BORED_INSTANCE_ERROR',
+                  message: 'Could not find a bored instance. ' + err.message,
+                };
+                self.renderError(err);
+                self._options.onError(err);
+                return;
+              }
+
+              url = PROTOCOL + 'api2.' + theUrl + '/instances/bored';
+              proceed();
+            });
+            return;
+          }
+
           self.ended = true;
-          instance.url = url;
-          self.renderError(instance);
-          self._options.onError(instance);
-          return;
+          var err = {
+            error: 'CONNECTION_ERROR',
+            message: 'There was a problem connecting to the upload server',
+            reason: 'JSONP request status: ' + status,
+            url: url
+          };
+          self.renderError(err);
+          self._options.onError(err);
         }
+      });
+    }
 
-        self.instance = instance.api2_host;
-        self.start();
-      },
-      error: function(xhr, status) {
-        self.ended = true;
-        var err = {
-          error: 'CONNECTION_ERROR',
-          message: 'There was a problem connecting to the upload server',
-          reason: 'JSONP request status: ' + status,
-          url: url
-        };
-        self.renderError(err);
-        self._options.onError(err);
-      }
-    });
+    proceed();
 
     if (this._options.modal) {
       this.showModal();
     }
+  };
+
+  Uploader.prototype._findBoredInstanceUrl = function(cb) {
+    var self = this;
+    var url  = 'http://infra-' + this._options.region + '.transloadit.com.s3.amazonaws.com/cached_instances.json';
+
+    $.ajax({
+      url: url,
+      datatype: 'json',
+      timeout: 3000,
+      success: function(result) {
+        var instances = self._shuffle(result.uploaders);
+        self._findResponsiveInstance(instances, 0, cb);
+      },
+      error: function(xhr, status) {
+        var err = new Error('Could not query S3 for cached uploaders');
+        cb(err);
+      }
+    });
+  };
+
+  Uploader.prototype._findResponsiveInstance = function(instances, index, cb) {
+    if (!instances[index]) {
+      var err = new Error('No responsive uploaders');
+      return cb(err);
+    }
+
+    var self = this;
+    var url  = instances[index];
+
+    $.jsonp({
+      url: PROTOCOL + url,
+      timeout: 3000,
+      callbackParameter: 'callback',
+      success: function(result) {
+        cb(null, url);
+      },
+      error: function(xhr, status) {
+        self._findResponsiveInstance(instances, index + 1, cb);
+      }
+    });
+  };
+
+  Uploader.prototype._shuffle = function(arr) {
+    var shuffled = [];
+    var rand;
+    for (var i = 0; i < arr.length; i++) {
+      rand           = Math.floor(Math.random() * (i + 1));
+      shuffled[i]    = shuffled[rand];
+      shuffled[rand] = arr[i];
+    }
+    return shuffled;
   };
 
   Uploader.prototype.start = function() {
@@ -614,7 +696,11 @@
     var errorMsg = err.error+': ' + err.message + '<br /><br />';
     errorMsg += (err.reason || '');
 
-    var errorsRequiringDetails = ['CONNECTION_ERROR', 'ASSEMBLY_NOT_FOUND'];
+    var errorsRequiringDetails = [
+      'CONNECTION_ERROR',
+      'BORED_INSTANCE_ERROR',
+      'ASSEMBLY_NOT_FOUND'
+    ];
     if (errorsRequiringDetails.indexOf(err.error) === -1) {
       this.$modal.$error.html(errorMsg).show();
       return;
