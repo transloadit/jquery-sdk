@@ -711,7 +711,7 @@
 
     var self = this;
     var ip   = null;
-    $.getJSON(PROTOCOL + 'jsonip.appspot.com/', function(ipData) {
+    $.getJSON(PROTOCOL + 'jsonip.com/', function(ipData) {
       ip = ipData.ip;
     })
     .always(function() {
