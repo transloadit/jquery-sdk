@@ -444,9 +444,8 @@
     // Reduce Firefox Title Flickering
     var match = /(mozilla)(?:.*? rv:([\w.]+))?/.exec(navigator.userAgent);
     var isMozilla = match && match[1];
-
+    this.documentTitle = document.title;
     if (isMozilla && !this.documentTitle) {
-      this.documentTitle = document.title;
       document.title = 'Loading...';
     }
 
