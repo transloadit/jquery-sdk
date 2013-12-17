@@ -160,7 +160,7 @@
                 self.ended = true;
                 err = {
                   error: 'BORED_INSTANCE_ERROR',
-                  message: 'Could not find a bored instance. ' + err.message,
+                  message: 'Could not find a bored instance. ' + err.message
                 };
                 self.renderError(err);
                 self._options.onError(err);
