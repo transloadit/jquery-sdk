@@ -198,9 +198,9 @@
     var url  = 'http://infra-' + this._options.region + '.transloadit.com.s3.amazonaws.com/cached_instances.json';
 
     $.ajax({
-      url: url,
-      datatype: 'json',
-      timeout: 3000,
+      url      : url,
+      datatype : 'json',
+      timeout  : 3000,
       success: function(result) {
         var instances = self._shuffle(result.uploaders);
         self._findResponsiveInstance(instances, 0, cb);
@@ -222,9 +222,9 @@
     var url  = instances[index];
 
     $.jsonp({
-      url: PROTOCOL + url,
-      timeout: 3000,
-      callbackParameter: 'callback',
+      url               : PROTOCOL + url,
+      timeout           : 3000,
+      callbackParameter : 'callback',
       success: function(result) {
         cb(null, url);
       },
@@ -555,10 +555,10 @@
           document.title = self.documentTitle;
           self.ended = true;
           var err = {
-            error: 'CONNECTION_ERROR',
-            message: 'There was a problem connecting to the upload server',
-            reason: 'JSONP request status: '+status,
-            url: url
+            error   : 'CONNECTION_ERROR',
+            message : 'There was a problem connecting to the upload server',
+            reason  : 'JSONP request status: '+status,
+            url     : url
           };
           self.renderError(err);
           self._options.onError(err);
@@ -580,7 +580,7 @@
 
   Uploader.prototype.cancel = function() {
     // @todo this has still a race condition if a new upload is started
-    // while a the cancel request is still being executed. Shouldn't happen
+    // while the cancel request is still being executed. Shouldn't happen
     // in real life, but needs fixing.
 
     if (!this.ended) {
