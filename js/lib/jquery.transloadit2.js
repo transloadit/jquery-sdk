@@ -256,7 +256,7 @@
     this.uploads             = [];
     this.results             = {};
 
-    this.assemblyId = this.uuid();
+    this.assemblyId = uuid.v1().replace(/\-/g, '');
 
     this.$fileClones = $().not(document);
     this.$files.each(function() {
@@ -836,15 +836,6 @@
         pad(d.getHours()) + ':' +
         pad(d.getMinutes()) + ':' +
         pad(d.getSeconds()) + tzs;
-  };
-
-  Uploader.prototype.uuid = function() {
-    var uuid = '';
-    var i;
-    for (i = 0; i < 32; i++) {
-      uuid += Math.floor(Math.random() * 16).toString(16);
-    }
-    return uuid;
   };
 
   Uploader.prototype.options = function(options) {
