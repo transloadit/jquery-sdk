@@ -70,29 +70,29 @@
   function Uploader() {
     this.assemblyId = null;
 
-    this.instance = null;
+    this.instance      = null;
     this.documentTitle = null;
-    this.timer = null;
-    this._options = {};
-    this.uploads = [];
-    this.results = {};
-    this.ended = null;
-    this.pollStarted = null;
-    this.pollRetries = 0;
-    this.seq = 0;
-    this.started = false;
-    this.assembly = null;
-    this.params = null;
+    this.timer         = null;
+    this._options      = {};
+    this.uploads       = [];
+    this.results       = {};
+    this.ended         = null;
+    this.pollStarted   = null;
+    this.pollRetries   = 0;
+    this.seq           = 0;
+    this.started       = false;
+    this.assembly      = null;
+    this.params        = null;
 
     this.bytesReceivedBefore = 0;
-    this.lastPoll = 0;
+    this.lastPoll            = 0;
 
-    this.$params = null;
-    this.$form = null;
-    this.$files = null;
+    this.$params     = null;
+    this.$form       = null;
+    this.$files      = null;
     this.$fileClones = null;
-    this.$iframe = null;
-    this.$modal = null;
+    this.$iframe     = null;
+    this.$modal      = null;
   }
 
   Uploader.prototype.init = function($form, options) {
@@ -141,7 +141,7 @@
         callbackParameter: 'callback',
         success: function(instance) {
           if (instance.error) {
-            self.ended = true;
+            self.ended   = true;
             instance.url = url;
             self.renderError(instance);
             self._options.onError(instance);
@@ -159,8 +159,8 @@
               if (err) {
                 self.ended = true;
                 err = {
-                  error: 'BORED_INSTANCE_ERROR',
-                  message: 'Could not find a bored instance. ' + err.message
+                  error   : 'BORED_INSTANCE_ERROR',
+                  message : 'Could not find a bored instance. ' + err.message
                 };
                 self.renderError(err);
                 self._options.onError(err);
@@ -175,10 +175,10 @@
 
           self.ended = true;
           var err = {
-            error: 'CONNECTION_ERROR',
-            message: 'There was a problem connecting to the upload server',
-            reason: 'JSONP request status: ' + status,
-            url: url
+            error   : 'CONNECTION_ERROR',
+            message : 'There was a problem connecting to the upload server',
+            reason  : 'JSONP request status: ' + status,
+            url     : url
           };
           self.renderError(err);
           self._options.onError(err);
@@ -248,13 +248,13 @@
   Uploader.prototype.start = function() {
     var self = this;
 
-    this.started = false;
-    this.ended = false;
+    this.started             = false;
+    this.ended               = false;
     this.bytesReceivedBefore = 0;
-    this.pollRetries = 0;
-    this.seq = 0;
-    this.uploads = [];
-    this.results = {};
+    this.pollRetries         = 0;
+    this.seq                 = 0;
+    this.uploads             = [];
+    this.results             = {};
 
     this.assemblyId = this.uuid();
 
@@ -336,11 +336,11 @@
   };
 
   Uploader.prototype.clone = function($obj) {
-    var $result = $obj.clone();
-    var myTextareas = $obj.filter('textarea');
+    var $result         = $obj.clone();
+    var myTextareas     = $obj.filter('textarea');
     var resultTextareas = $result.filter('textarea');
 
-    for (var i = 0, l = myTextareas.length; i < l; ++i) {
+    for (var i = 0; i < myTextareas.length; ++i) {
       $(resultTextareas[i]).val($(myTextareas[i]).val());
     }
 
@@ -386,9 +386,9 @@
       }
 
       var err = {
-        error: 'INVALID_FILE_TYPE',
-        message: 'Sorry, we don\'t accept ' + fileExt + ' files.',
-        reason: 'Invalid file selected'
+        error   : 'INVALID_FILE_TYPE',
+        message : 'Sorry, we don\'t accept ' + fileExt + ' files.',
+        reason  : 'Invalid file selected'
       };
       self._options.onError(err);
       return false;
@@ -494,10 +494,10 @@
         }
 
         self.pollRetries = 0;
-        var isUploading = (assembly.ok == 'ASSEMBLY_UPLOADING');
-        var isExecuting = (assembly.ok == 'ASSEMBLY_EXECUTING');
-        var isCanceled = (assembly.ok == 'ASSEMBLY_CANCELED');
-        var isComplete = (assembly.ok == 'ASSEMBLY_COMPLETED');
+        var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING';
+        var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING';
+        var isCanceled  = assembly.ok === 'ASSEMBLY_CANCELED';
+        var isComplete  = assembly.ok === 'ASSEMBLY_COMPLETED';
 
         self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
 
@@ -537,8 +537,8 @@
           return;
         }
 
-        var ping = (self.pollStarted - +new Date());
-        var timeout = (ping < self._options.interval) ? self._options.interval : ping;
+        var ping    = self.pollStarted - +new Date();
+        var timeout = ping < self._options.interval ? self._options.interval : ping;
 
         self.timer = setTimeout(function() {
           self._poll();
@@ -648,15 +648,15 @@
       .appendTo('body');
 
     $.extend(this.$modal, {
-      '$content': this.$modal.find('.content'),
-      '$close': this.$modal.find('.close'),
-      '$label': this.$modal.find('label'),
-      '$progress': this.$modal.find('.progress'),
-      '$percent': this.$modal.find('.progress .percent'),
-      '$progressBar': this.$modal.find('.progress .bar'),
-      '$error': this.$modal.find('.error'),
-      '$errorDetails': this.$modal.find('.error-details'),
-      '$errorDetailsToggle': this.$modal.find('.error-details-toggle')
+      '$content'            : this.$modal.find('.content'),
+      '$close'              : this.$modal.find('.close'),
+      '$label'              : this.$modal.find('label'),
+      '$progress'           : this.$modal.find('.progress'),
+      '$percent'            : this.$modal.find('.progress .percent'),
+      '$progressBar'        : this.$modal.find('.progress .bar'),
+      '$error'              : this.$modal.find('.error'),
+      '$errorDetails'       : this.$modal.find('.error-details'),
+      '$errorDetailsToggle' : this.$modal.find('.error-details-toggle')
     });
 
     var self = this;
@@ -669,12 +669,12 @@
     this.$modal.$errorDetailsToggle.hide();
 
     var expose = this.$modal.expose({
-      api: true,
-      maskId: 'transloadit_expose',
-      opacity: 0.9,
-      loadSpeed: 250,
-      closeOnEsc: false,
-      closeOnClick: false
+      api          : true,
+      maskId       : 'transloadit_expose',
+      opacity      : 0.9,
+      loadSpeed    : 250,
+      closeOnEsc   : false,
+      closeOnClick : false
     });
 
     this.$modal.$close.click(function() {
@@ -715,14 +715,14 @@
     })
     .always(function() {
       var details = {
-        endpoint: err.url,
-        instance: self.instance,
-        assembly_id: self.assemblyId,
-        ip: ip,
-        time: self.getUTCDatetime(),
-        agent: navigator.userAgent,
-        poll_retries: self.pollRetries,
-        error: errorMsg
+        endpoint     : err.url,
+        instance     : self.instance,
+        assembly_id  : self.assemblyId,
+        ip           : ip,
+        time         : self.getUTCDatetime(),
+        agent        : navigator.userAgent,
+        poll_retries : self.pollRetries,
+        error        : errorMsg
       };
       $.post(PROTOCOL + 'status.transloadit.com/client_error', details);
 
@@ -730,6 +730,7 @@
       for (var key in details) {
         detailsArr.push(key + ': ' + details[key]);
       }
+
       var detailsTxt = 'If you would like our help to troubleshoot this, ';
       detailsTxt += 'please email us this information:<br /><br />';
       self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'));
@@ -795,12 +796,12 @@
   };
 
   Uploader.prototype.includeCss = function() {
-    if (CSS_LOADED || (!this._options.modal)) {
+    if (CSS_LOADED || !this._options.modal) {
       return;
     }
 
     CSS_LOADED = true;
-    $('<link rel="stylesheet" type="text/css" href="'+this._options.assets+'css/transloadit2.css" />')
+    $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2.css" />')
       .appendTo('head');
   };
 
@@ -838,7 +839,8 @@
   };
 
   Uploader.prototype.uuid = function() {
-    var uuid = '', i;
+    var uuid = '';
+    var i;
     for (i = 0; i < 32; i++) {
       uuid += Math.floor(Math.random() * 16).toString(16);
     }
