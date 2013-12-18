@@ -46,6 +46,17 @@
     var uploader;
     var r;
 
+    if (this.length === 0) {
+      return;
+    }
+
+    if (this.length > 1) {
+      this.each(function() {
+        $.fn.transloadit.apply($(this), args);
+      });
+      return;
+    }
+
     if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
       args.unshift('init');
     }
