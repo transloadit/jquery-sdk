@@ -267,7 +267,7 @@
     this.uploads             = [];
     this.results             = {};
 
-    this.assemblyId = uuid.v1().replace(/\-/g, '');
+    this.assemblyId = transloadit_uuid.v1().replace(/\-/g, '');
 
     this.$fileClones = $().not(document);
     this.$files.each(function() {

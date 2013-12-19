@@ -240,6 +240,6 @@
       return uuid;
     };
 
-    _global.uuid = uuid;
+    _global.transloadit_uuid = uuid;
   }
 }).call(this);
