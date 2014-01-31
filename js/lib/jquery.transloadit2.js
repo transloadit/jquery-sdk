@@ -374,13 +374,13 @@
       }
 
       if (types.indexOf('video/*') !== -1) {
-        types = types.replace(/video\/\*/g, 'video/mp4,video/flv,video/avi,video/mpg,video/mov,video/wmv,video/h264,video/mkv');
+        types = types.replace(/video\/\*/g, 'video/mp4,video/flv,video/avi,video/mpg,video/mov,video/wmv,video/h264,video/mkv,video/ogv');
       }
       if (types.indexOf('image/*') !== -1) {
         types = types.replace(/image\/\*/g, 'image/png,image/jpeg,image/gif,image/jpg,image/ico');
       }
       if (types.indexOf('audio/*') !== -1) {
-        types = types.replace(/audio\/\*/g, 'audio/aac,audio/mp4,audio/mpeg,audio/ogg,audio/wav,audio/webm');
+        types = types.replace(/audio\/\*/g, 'audio/aac,audio/mp3,audio/flac,audio/m4a,audio/mmf,audio/3gp,audio/mp4,audio/mpeg,audio/ogg,audio/wav,audio/webm');
       }
       return types.split(',');
     }
