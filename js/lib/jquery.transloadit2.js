@@ -115,7 +115,7 @@
     this.options($.extend({}, OPTIONS, options || {}));
 
     var self = this;
-    $form.bind('submit.transloadit', function() {
+    $form.on('change', 'input[type="file"]', function() {
       self.validate();
       self.detectFileInputs();
       self.checkFileTypes();
@@ -127,16 +127,6 @@
       }
 
       return false;
-    });
-
-    if (this._options['triggerUploadOnFileSelection']) {
-      $form.on('change', 'input[type="file"]', function() {
-        $form.trigger('submit.transloadit');
-      });
-    }
-
-    $form.on('change', 'input[type="file"]', function() {
-      self._options.onFileSelect($(this).val(), $(this));
     });
 
     this.includeCss();
