@@ -310,9 +310,15 @@
       // remove selects from $clones, because we have to clone them as hidden input
       // fields, otherwise their values are not transferred properly
       var $selects = $fieldsToClone.filter('select');
+
       $fieldsToClone = $fieldsToClone.filter(function() {
         return !$(this).is('select');
       });
+
+      // filter out submit elements as they will cause funny behavior in the
+      // shadow form
+      $fieldsToClone = $fieldsToClone.filter('[type!=submit]');
+
 
       var $clones = this.clone($fieldsToClone);
 
