@@ -284,14 +284,16 @@
       .appendTo('body')
       .hide();
 
+    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false';
+
     if (this._options.formData) {
       this._options.formData.append("params", this.$form.find("input[name=params]").val());
       var f = new XMLHttpRequest();
-      f.open("POST", b);
+      f.open("POST", url);
       f.send(this._options.formData);
     } else {
       this.$uploadForm = $('<form enctype="multipart/form-data" />')
-        .attr('action', PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false')
+        .attr('action', url)
         .attr('target', 'transloadit-' + this.assemblyId)
         .attr('method', 'POST')
         .append(this.$files)
