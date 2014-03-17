@@ -273,6 +273,9 @@
 
     this.assemblyId = this._genUuid();
 
+    // add a clone, so that we can restore the file input fields
+    // when the user hits cancel and so that we can .append(this.$files) to
+    // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
     this.$fileClones = $().not(document);
     this.$files.each(function() {
       var $clone = $(this).clone(true);
@@ -296,6 +299,11 @@
         .attr('action', url)
         .attr('target', 'transloadit-' + this.assemblyId)
         .attr('method', 'POST')
+
+        // using .append(this.$files.clone(true)) does not work here as it does
+        // not carry over the selected file value :/
+        // hence we need to clone file input fields beforehand and store them
+        // in self.$fileClones
         .append(this.$files)
         .appendTo('body')
         .hide();
