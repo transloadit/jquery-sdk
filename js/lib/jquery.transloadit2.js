@@ -118,7 +118,6 @@
     $form.bind('submit.transloadit', function() {
       self.validate();
       self.detectFileInputs();
-      self.checkFileTypes();
 
       if (!self._options['processZeroFiles'] && self.$files.length === 0) {
         self.submitForm();
@@ -378,54 +377,6 @@
     return $result;
   };
 
-  Uploader.prototype.checkFileTypes = function() {
-    var self = this;
-
-    function typeStringToArray(types) {
-      if (/image\/jpg/g.test(types) && !/image\/jpeg/g.test(types)) {
-        types += ',image/jpeg';
-      }
-      if (/image\/jpeg/g.test(types) && !/image\/jpg/g.test(types)) {
-        types += ',image/jpg';
-      }
-
-      if (types.indexOf('video/*') !== -1) {
-        types = types.replace(/video\/\*/g, 'video/mp4,video/flv,video/avi,video/mpg,video/mov,video/wmv,video/h264,video/mkv,video/ogv');
-      }
-      if (types.indexOf('image/*') !== -1) {
-        types = types.replace(/image\/\*/g, 'image/png,image/jpeg,image/gif,image/jpg,image/ico');
-      }
-      if (types.indexOf('audio/*') !== -1) {
-        types = types.replace(/audio\/\*/g, 'audio/aac,audio/mp3,audio/flac,audio/m4a,audio/mmf,audio/3gp,audio/mp4,audio/mpeg,audio/ogg,audio/wav,audio/webm');
-      }
-      return types.split(',');
-    }
-
-    this.$files = this.$files.filter(function() {
-      var acceptedTypes = $(this).attr('accept');
-      if (!acceptedTypes) {
-        return true;
-      }
-
-      acceptedTypes = typeStringToArray(acceptedTypes);
-
-      var fileExt = this.value.split('.').pop().toLowerCase();
-      for (var i = 0; i < acceptedTypes.length; i++) {
-        if (fileExt == acceptedTypes[i].split('/')[1]) {
-          return true;
-        }
-      }
-
-      var err = {
-        error   : 'INVALID_FILE_TYPE',
-        message : 'Sorry, we don\'t accept ' + fileExt + ' files.',
-        reason  : 'Invalid file selected'
-      };
-      self._options.onError(err);
-      return false;
-    });
-  };
-
   Uploader.prototype.detectFileInputs = function() {
     var $files = this.$form
       .find('input[type=file]')
@@ -646,6 +597,12 @@
   };
 
   Uploader.prototype.submitForm = function() {
+    // prevent that files are uploaded to the final destination
+    // after all that is what we use this plugin for :)
+    if (this.$form.attr('enctype') === 'multipart/form-data') {
+      this.$form.removeAttr('enctype');
+    }
+
     if (this.assembly !== null) {
       $('<textarea/>')
         .attr('name', 'transloadit')
