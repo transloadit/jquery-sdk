@@ -433,7 +433,9 @@
 
     this.pollStarted = +new Date();
 
-    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+(query || '?seq='+this.seq);
+    var instance = this.instance.replace(/\.transloadit\.com/, '') + '-status.transloadit.com';
+    var url = PROTOCOL + instance + '/assemblies/'+this.assemblyId+(query || '?seq='+this.seq);
+
     $.jsonp({
       url: url,
       timeout: self._options.pollTimeout,
