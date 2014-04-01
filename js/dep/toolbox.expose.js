@@ -51,17 +51,19 @@
 				left: 0,
 				width: "100%",
 				height: "100%",
-				display: 'none',
-				opacity: conf.startOpacity,
+				display: 'block',
+				opacity: conf.opacity,
 				zIndex: conf.zIndex,
 				backgroundColor: conf.color
 			});
+
 			if (els && els.length) {
 				overlayIndex = els.eq(0).css("zIndex");
 				exposed = els.css({ zIndex: Math.max(conf.zIndex + 1, overlayIndex == 'auto' ? 0 : overlayIndex)});
 			}
-			mask.css({display: 'block'}).fadeTo(conf.loadSpeed, conf.opacity);
+
 			loaded = true;
+
 			return this;
 		},
 		close: function() {
