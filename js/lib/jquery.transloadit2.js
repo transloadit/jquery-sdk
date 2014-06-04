@@ -678,6 +678,10 @@
       return;
     }
 
+    if (!this._options.debug) {
+      return this.cancel();
+    }
+
     this.$modal.$content.addClass('content-error');
     this.$modal.$progress.hide();
     this.$modal.$label.hide();
