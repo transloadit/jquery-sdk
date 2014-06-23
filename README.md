@@ -34,12 +34,12 @@ API version, not the client SDK version.
 
 ### Latest
 
-This is always the latest version of any major release, and for now points to v2.1.0. If you use this, it may break backwards compatibility for you when we release 3.0.<br />
+This is always the latest version of any major release, and for now points to v2.4.1. If you use this, it may break backwards compatibility for you when we release 3.0.<br />
 [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
 ### v2-latest
 
-This is always the latest major 2 version, and for now points to v2.1.0. <strong>This is the recommended version to use:</strong><br />
+This is always the latest major 2 version, and for now points to v2.4.1. <strong>This is the recommended version to use:</strong><br />
 [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
 ### v2.1.0
