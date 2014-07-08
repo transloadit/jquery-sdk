@@ -215,7 +215,7 @@
     $.ajax({
       url      : url,
       datatype : 'json',
-      timeout  : 3000,
+      timeout  : 5000,
       success: function(result) {
         var instances = self._shuffle(result.uploaders);
         self._findResponsiveInstance(instances, 0, cb);
