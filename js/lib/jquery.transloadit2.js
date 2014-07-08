@@ -166,7 +166,7 @@
           self.start();
         },
         error: function(xhr, status) {
-          if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE && PROTOCOL !== 'https://') {
+          if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
             canUseCustomBoredLogic = false;
 
             self._findBoredInstanceUrl(function(err, theUrl) {
@@ -209,7 +209,8 @@
 
   Uploader.prototype._findBoredInstanceUrl = function(cb) {
     var self = this;
-    var url  = 'http://infra-' + this._options.region + '.transloadit.com.s3.amazonaws.com/cached_instances.json';
+    var url  = PROTOCOL + 's3.amazonaws.com/infra-' + this._options.region;
+    url     += '.transloadit.com/cached_instances.json';
 
     $.ajax({
       url      : url,
