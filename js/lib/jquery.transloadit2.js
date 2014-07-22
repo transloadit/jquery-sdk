@@ -703,8 +703,10 @@
     var text = 'There was an internal error.<br />Please try your upload again.';
     this.$modal.$error.html(text).show();
 
-    var self = this;
-    var ip   = null;
+    var assemblyId = err.assemblyId ? err.assemblyId : this.assemblyId;
+    var self       = this;
+    var ip         = null;
+
     $.getJSON(PROTOCOL + 'jsonip.com/', function(ipData) {
       ip = ipData.ip;
     })
@@ -712,7 +714,7 @@
       var details = {
         endpoint     : err.url,
         instance     : self.instance,
-        assembly_id  : self.assemblyId,
+        assembly_id  : assemblyId,
         ip           : ip,
         time         : self.getUTCDatetime(),
         agent        : navigator.userAgent,
