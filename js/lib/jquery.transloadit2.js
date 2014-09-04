@@ -36,9 +36,37 @@
     params                       : null,
     signature                    : null,
     region                       : 'us-east-1',
-    debug                        : true
+    debug                        : true,
+    locale                       : 'en'
+  };
+
+  var I18N = {
+    en: {
+      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
+      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
+      'errors.unknown': 'There was an internal error.',
+      'errors.tryAgain': 'Please try your upload again.',
+      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
+          'please email us this information:',
+      cancel: 'Cancel',
+      details: 'Details',
+      startingUpload: 'Starting upload ...',
+      processingFiles: 'Processing files',
+      uploadProgress: '%s MB / %s MB (%s kB / sec)'
+    }
   };
   var CSS_LOADED = false;
+
+  function sprintf(str, args) {
+    args = args || [];
+    return str.replace(/(%[s])/g, function(m, i, s) {
+      var arg = args.shift();
+      if (!arg && arg !== 0) {
+        return '';
+      }
+      return arg + '';
+    });
+  }
 
   $.fn.transloadit = function() {
     var args = Array.prototype.slice.call(arguments);
@@ -77,6 +105,8 @@
     r = uploader[method].apply(uploader, args);
     return (r === undefined) ? this : r;
   };
+
+  $.fn.transloadit.i18n = I18N;
 
   function Uploader() {
     this.assemblyId = null;
@@ -174,7 +204,7 @@
                 self.ended = true;
                 err = {
                   error   : 'BORED_INSTANCE_ERROR',
-                  message : 'Could not find a bored instance. ' + err.message
+                  message : self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
                 };
                 self.renderError(err);
                 self._options.onError(err);
@@ -190,7 +220,7 @@
           self.ended = true;
           var err = {
             error   : 'CONNECTION_ERROR',
-            message : 'There was a problem connecting to the upload server',
+            message : self.i18n('errors.CONNECTION_ERROR'),
             reason  : 'JSONP request status: ' + status,
             url     : url
           };
@@ -541,7 +571,7 @@
           self.ended = true;
           var err = {
             error   : 'CONNECTION_ERROR',
-            message : 'There was a problem connecting to the upload server',
+            message : self.i18n('errors.CONNECTION_ERROR'),
             reason  : 'JSONP request status: '+status,
             url     : url
           };
@@ -629,14 +659,14 @@
     this.$modal =
       $('<div id="transloadit">'+
         '<div class="content">'+
-          '<a href="#close" class="close">Cancel</a>'+
+          '<a href="#close" class="close">'+ this.i18n('cancel') +'</a>'+
           '<p class="status"></p>'+
           '<div class="progress progress-striped active">' +
             '<div class="bar"><span class="percent"></span></div>' +
           '</div>' +
-          '<label>Starting upload ...</label>' +
+          '<label>'+ this.i18n('startingUpload')+'</label>' +
           '<p class="error"></p>'+
-          '<div class="error-details-toggle"><a href="#">Details</a></div>' +
+          '<div class="error-details-toggle"><a href="#">'+ this.i18n('details') +'</a></div>' +
           '<p class="error-details"></p>'+
         '</div>'+
       '</div>')
@@ -704,7 +734,7 @@
       return;
     }
 
-    var text = 'There was an internal error.<br />Please try your upload again.';
+    var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain');
     this.$modal.$error.html(text).show();
 
     var assemblyId = err.assemblyId ? err.assemblyId : this.assemblyId;
@@ -732,8 +762,7 @@
         detailsArr.push(key + ': ' + details[key]);
       }
 
-      var detailsTxt = 'If you would like our help to troubleshoot this, ';
-      detailsTxt += 'please email us this information:<br /><br />';
+      var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />';
       self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'));
 
       self.$modal.$errorDetailsToggle.show().find('a')
@@ -759,12 +788,13 @@
     var timeSinceLastPoll = +new Date() - this.lastPoll;
     var duration          = progress === 100 ? 1000 : this._options.interval * 2;
 
-    var txt = 'Processing files';
+    var txt = this.i18n('processingFiles');
     if (progress != 100) {
-      txt = (assembly.bytes_received / 1024 / 1024).toFixed(2) + ' MB / ' +
-          (assembly.bytes_expected / 1024 / 1024).toFixed(2) + ' MB ' +
-          '(' + ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1) +
-          ' kB / sec)';
+      txt = this.i18n('uploadProgress',
+        (assembly.bytes_received / 1024 / 1024).toFixed(2),
+        (assembly.bytes_expected / 1024 / 1024).toFixed(2),
+        ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1)
+      );
     }
     this.$modal.$label.text(txt);
 
@@ -966,6 +996,18 @@
     }
 
     this._options[key] = val;
+  };
+
+  Uploader.prototype.i18n = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var key  = args.shift();
+    var locale = this._options.locale;
+    var translated = I18N[locale] && I18N[locale][key] || I18N.en[key];
+    if(!translated) {
+      throw new Error('Unknown i18n key: ' + key);
+    }
+
+    return sprintf(translated, args);
   };
 
 }(window.jQuery);
