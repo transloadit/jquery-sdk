@@ -39,13 +39,13 @@ This is always the latest version of any major release, and for now points to v2
 
 ### v2-latest
 
-This is always the latest major 2 version, and for now points to v2.4.1. <strong>This is the recommended version to use:</strong><br />
+This is always the latest major 2 version, and for now points to v2.4.3. <strong>This is the recommended version to use:</strong><br />
 [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
-### v2.1.0
+### v2.4.3
 
-This is the current version, with a new progress bar design and new features. Supports jQuery 1.9+ but not IE6:<br />
-[https://assets.transloadit.com/js/jquery.transloadit2-v2.1.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v2.1.0.js)
+This is the current version:<br />
+[https://assets.transloadit.com/js/jquery.transloadit2-v2.4.3.js](https://assets.transloadit.com/js/jquery.transloadit2-v2.4.3.js)
 
 ### v2.0.0
 
