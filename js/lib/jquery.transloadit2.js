@@ -594,8 +594,7 @@
     }
 
     if (this._options.modal) {
-      $.mask.close();
-      this.$modal.remove();
+      this.hideModal();
     }
   };
 
@@ -619,6 +618,11 @@
         .unbind('submit.transloadit')
         .submit();
     }
+  };
+
+  Uploader.prototype.hideModal = function() {
+    $.mask.close();
+    this.$modal.remove();
   };
 
   Uploader.prototype.showModal = function() {
