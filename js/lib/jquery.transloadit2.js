@@ -120,7 +120,6 @@
     this.ended         = null;
     this.pollStarted   = null;
     this.pollRetries   = 0;
-    this.seq           = 0;
     this.started       = false;
     this.assembly      = null;
     this.params        = null;
@@ -138,6 +137,9 @@
     this._lastMSecs = 0;
     this._lastNSecs = 0;
     this._clockseq  = 0;
+
+    this._uploadFileIds = [];
+    this._resultFileIds = [];
   }
 
   Uploader.prototype.init = function($form, options) {
@@ -297,8 +299,9 @@
     this.ended               = false;
     this.bytesReceivedBefore = 0;
     this.pollRetries         = 0;
-    this.seq                 = 0;
     this.uploads             = [];
+    this._uploadFileIds      = [];
+    this._resultFileIds      = [];
     this.results             = {};
 
     this.assemblyId = this._genUuid();
@@ -465,7 +468,7 @@
     this.pollStarted = +new Date();
 
     var instance = this.instance.replace(/\.transloadit\.com/, '') + '-status.transloadit.com';
-    var url = PROTOCOL + instance + '/assemblies/'+this.assemblyId+(query || '?seq='+this.seq);
+    var url = PROTOCOL + instance + '/assemblies/'+this.assemblyId + query;
 
     $.jsonp({
       url: url,
@@ -501,8 +504,6 @@
           return;
         }
 
-        self.seq = assembly.last_seq;
-
         if (!self.started) {
           self.started = true;
           self._options.onStart(assembly);
@@ -517,15 +518,26 @@
         self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
 
         for (var i = 0; i < assembly.uploads.length; i++) {
-          self._options.onUpload(assembly.uploads[i], assembly);
-          self.uploads.push(assembly.uploads[i]);
+          var upload = assembly.uploads[i];
+
+          if (self._uploadFileIds.indexOf(upload.id) === -1) {
+            self._options.onUpload(upload, assembly);
+            self.uploads.push(upload);
+            self._uploadFileIds.push(upload.id);
+          }
         }
 
         for (var step in assembly.results) {
           self.results[step] = self.results[step] || [];
+
           for (var j = 0; j < assembly.results[step].length; j++) {
-            self._options.onResult(step, assembly.results[step][j], assembly);
-            self.results[step].push(assembly.results[step][j]);
+            var result = assembly.results[step][j];
+
+            if (self._resultFileIds.indexOf(result.id) === -1) {
+              self._options.onResult(step, result, assembly);
+              self.results[step].push(assembly.results[step][j]);
+              self._resultFileIds.push(result.id);
+            }
           }
         }
 
