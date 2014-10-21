@@ -468,7 +468,11 @@
     this.pollStarted = +new Date();
 
     var instance = this.instance.replace(/\.transloadit\.com/, '') + '-status.transloadit.com';
-    var url = PROTOCOL + instance + '/assemblies/'+this.assemblyId + query;
+    var url = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
+
+    if (query) {
+      url += query;
+    }
 
     $.jsonp({
       url: url,
@@ -844,7 +848,7 @@
     }
 
     CSS_LOADED = true;
-    $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2.css" />')
+    $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2-latest.css" />')
       .appendTo('head');
   };
 
