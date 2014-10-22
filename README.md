@@ -28,35 +28,19 @@ For more information on SemVer, please visit http://semver.org/.
 `latest` points to the latest stable of a major version.
 
 Note that the `2` in `jquery.transloadit2-latest.js` refers to the Transloadit
-API version, not the client SDK version.
+API2 version, not the client SDK version.
 
-## Versions
+## Releases
 
-### Latest
+We have two *magic* releases:
 
-This is always the latest version of any major release, and for now points to v2.4.1. If you use this, it may break backwards compatibility for you when we release 3.0.<br />
-[https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
+ - `jquery.transloadit2-latest.js`  
+   This is always the latest version of any major release. If you use this, it may break backwards compatibility for you once we release the next major version. [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
+ 
+ - `jquery.transloadit2-v2-latest.js`
+   This is always the latest major 2.0 version, and is **the recommended version to use:** [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
-### v2-latest
-
-This is always the latest major 2 version, and for now points to v2.4.3. <strong>This is the recommended version to use:</strong><br />
-[https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
-
-### v2.4.3
-
-This is the current version:<br />
-[https://assets.transloadit.com/js/jquery.transloadit2-v2.4.3.js](https://assets.transloadit.com/js/jquery.transloadit2-v2.4.3.js)
-
-### v2.0.0
-
-Has the old progressbar design and doesn't have the new features. Supports jQuery 1.9+ but not IE6:<br />
-[https://assets.transloadit.com/js/jquery.transloadit2-v2.0.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v2.0.0.js)
-
-### v1.0.0
-
-Has the old progressbar design. Supports IE6, but not jQuery 1.9+:<br />
-[https://assets.transloadit.com/js/jquery.transloadit2-v1.0.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v1.0.0.js)
-
+Here's an overview of [all our releases](https://github.com/transloadit/jquery-sdk/releases).
 
 ## Building
 
