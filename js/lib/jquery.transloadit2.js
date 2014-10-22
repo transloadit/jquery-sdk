@@ -14,6 +14,7 @@
   var OPTIONS = {
     service                      : DEFAULT_SERVICE,
     assets                       : PROTOCOL+'assets.transloadit.com/',
+    beforeStart                  : function() {return true;},
     onFileSelect                 : function() {},
     onStart                      : function() {},
     onProgress                   : function() {},
@@ -152,9 +153,13 @@
       self.detectFileInputs();
 
       if (!self._options['processZeroFiles'] && self.$files.length === 0) {
-        self.submitForm();
+        if (self._options.beforeStart()) {
+          self.submitForm();
+        }
       } else {
-        self.getBoredInstance();
+        if (self._options.beforeStart()) {
+          self.getBoredInstance();
+        }
       }
 
       return false;
