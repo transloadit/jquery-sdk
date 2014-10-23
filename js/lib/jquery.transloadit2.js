@@ -540,12 +540,13 @@
           self.results[step] = self.results[step] || [];
 
           for (var j = 0; j < assembly.results[step].length; j++) {
-            var result = assembly.results[step][j];
+            var result   = assembly.results[step][j];
+            var resultId = step + '_' + result.id;
 
-            if (self._resultFileIds.indexOf(result.id) === -1) {
+            if (self._resultFileIds.indexOf(resultId) === -1) {
               self._options.onResult(step, result, assembly);
-              self.results[step].push(assembly.results[step][j]);
-              self._resultFileIds.push(result.id);
+              self.results[step].push(result);
+              self._resultFileIds.push(resultId);
             }
           }
         }
