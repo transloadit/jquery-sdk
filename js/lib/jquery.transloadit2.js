@@ -52,7 +52,7 @@
       cancel: 'Cancel',
       details: 'Details',
       startingUpload: 'Starting upload ...',
-      processingFiles: 'Processing files',
+      processingFiles: 'Upload done, now processing files ...',
       uploadProgress: '%s MB / %s MB (%s kB / sec)'
     }
   };
@@ -558,7 +558,7 @@
           return;
         }
 
-        self.renderProgress(assembly);
+        self.renderProgress(assembly, isComplete);
 
         if (isComplete || (!self._options['wait'] && isExecuting)) {
           self.ended = true;
@@ -566,11 +566,14 @@
           assembly.uploads = self.uploads;
           assembly.results = self.results;
           self._options.onSuccess(assembly);
-          if (self._options.modal) {
-            self.cancel();
-          }
 
-          self.submitForm();
+          // give the progressbar some time to finish to 100%
+          setTimeout(function() {
+            if (self._options.modal) {
+              self.cancel();
+            }
+            self.submitForm();
+          }, 600);
           return;
         }
 
@@ -796,7 +799,7 @@
     });
   };
 
-  Uploader.prototype.renderProgress = function(assembly) {
+  Uploader.prototype.renderProgress = function(assembly, isAssemblyComplete) {
     if (!this._options.modal) {
       return;
     }
@@ -823,18 +826,30 @@
     var totalWidth           = parseInt(this.$modal.$progress.css('width'), 10);
     this.bytesReceivedBefore = assembly.bytes_received;
 
-    if (bytesReceived <= 0) {
+    if (bytesReceived <= 0 && !isAssemblyComplete) {
       return;
     }
 
     var self = this;
+
+    // If just the upload is finished, keep the progress at 90%.
+    // When the whole assembly is finished, set it to 100%.
+    var progressToUse = progress;
+    if (progressToUse === 100 && !isAssemblyComplete) {
+      progressToUse = 90;
+    }
+
+    if (isAssemblyComplete) {
+      duration = 500;
+    }
+
     this.$modal.$progressBar.stop().animate(
-      {width: progress + '%'},
+      {width: progressToUse + '%'},
       {
         duration: duration,
         easing: 'linear',
         progress: function(promise, currPercent, remainingMs) {
-          var width   = parseInt(self.$modal.$progressBar.css('width'), 10);
+          var width = parseInt(self.$modal.$progressBar.css('width'), 10);
 
           var percent = (width * 100 / totalWidth).toFixed(0);
           if (percent > 100) {
