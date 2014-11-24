@@ -53,7 +53,7 @@
       details: 'Details',
       startingUpload: 'Starting upload ...',
       processingFiles: 'Upload done, now processing files ...',
-      uploadProgress: '%s MB / %s MB (%s kB / sec)'
+      uploadProgress: '%s MB / %s MB (%s kB / sec, %s left)'
     }
   };
   var CSS_LOADED = false;
@@ -815,10 +815,16 @@
 
     var txt = this.i18n('processingFiles');
     if (progress != 100) {
+      var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2);
+      var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2);
+      var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1);
+
+      var outstanding  = assembly.bytes_expected - assembly.bytes_received;
+      var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1);
+      var durationLeft = this._duration(outstanding / speedInBytes);
+
       txt = this.i18n('uploadProgress',
-        (assembly.bytes_received / 1024 / 1024).toFixed(2),
-        (assembly.bytes_expected / 1024 / 1024).toFixed(2),
-        ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1)
+        mbReceived, mbExpected, uploadRate, durationLeft
       );
     }
     this.$modal.$label.text(txt);
@@ -835,7 +841,7 @@
     // If just the upload is finished, keep the progress at 90%.
     // When the whole assembly is finished, set it to 100%.
     var progressToUse = progress;
-    if (progressToUse === 100 && !isAssemblyComplete) {
+    if (progressToUse > 90 && !isAssemblyComplete) {
       progressToUse = 90;
     }
 
@@ -904,6 +910,35 @@
         pad(d.getHours()) + ':' +
         pad(d.getMinutes()) + ':' +
         pad(d.getSeconds()) + tzs;
+  };
+
+  Uploader.prototype._duration = function(t) {
+    var min   = 60;
+    var h     = 60 * min;
+    var hours = Math.floor(t / h);
+
+    t -= hours * h;
+
+    var minutes = Math.floor(t / min);
+    t -= minutes * min;
+
+    var r = '';
+    if (hours > 0) {
+      r += hours + 'h ';
+    }
+    if (minutes > 0) {
+      r += minutes + 'min ';
+    }
+    if (t > 0) {
+      t = t.toFixed(0);
+      r += t + 's';
+    }
+
+    if (r === '') {
+      r = '0s';
+    }
+
+    return r;
   };
 
   Uploader.prototype._genUuid = function(options, buf, offset) {
