@@ -34,9 +34,9 @@ API2 version, not the client SDK version.
 
 We have two *magic* releases:
 
- - `jquery.transloadit2-latest.js`  
+ - `jquery.transloadit2-latest.js`
    This is always the latest version of any major release. If you use this, it may break backwards compatibility for you once we release the next major version. [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
- 
+
  - `jquery.transloadit2-v2-latest.js`
    This is always the latest major 2.0 version, and is **the recommended version to use:** [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
@@ -51,6 +51,20 @@ for minification.
     make
 
 The minified output file can be found in: `build/jquery.transloadit2.js`.
+
+## Tests
+
+To run the tests, install [casperjs](http://casperjs.org/) and [nodeJS](http://nodejs.org). Then run the test server:
+
+```
+node tests/server.js
+```
+
+Then you can run
+
+```
+make test
+```
 
 ## Dependencies
 
