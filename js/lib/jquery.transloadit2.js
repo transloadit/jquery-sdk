@@ -558,9 +558,11 @@
           return;
         }
 
-        self.renderProgress(assembly, isComplete);
+        var isEnded = isComplete || (!self._options['wait'] && isExecuting);
 
-        if (isComplete || (!self._options['wait'] && isExecuting)) {
+        self.renderProgress(assembly, isEnded, self._options['wait']);
+
+        if (isEnded) {
           self.ended = true;
           document.title = self.documentTitle;
           assembly.uploads = self.uploads;
@@ -799,7 +801,7 @@
     });
   };
 
-  Uploader.prototype.renderProgress = function(assembly, isAssemblyComplete) {
+  Uploader.prototype.renderProgress = function(assembly, isAssemblyComplete, waitIsTrue) {
     if (!this._options.modal) {
       return;
     }
@@ -841,11 +843,11 @@
     // If just the upload is finished, keep the progress at 90%.
     // When the whole assembly is finished, set it to 100%.
     var progressToUse = progress;
-    if (progressToUse > 90 && !isAssemblyComplete) {
+    if (progressToUse > 90 && !isAssemblyComplete && waitIsTrue) {
       progressToUse = 90;
     }
 
-    if (isAssemblyComplete) {
+    if (isAssemblyComplete && waitIsTrue) {
       duration = 500;
     }
 
