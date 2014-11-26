@@ -1,15 +1,10 @@
-casper.start "http://#{testhost}", ->
+casper.start "http://#{testhost}/trigger-on-file-select", ->
   curr = @getCurrentUrl()
 
   fixturePath = @fetchText "#fixture_path"
 
   @fill "#entryForm",
     "my_file": fixturePath + "/1.jpg"
-    "width_field": "400",
-    "height_field": "400"
-
-  @evaluate ->
-    $("#entryForm").submit()
 
   @waitFor ->
     curr != @getCurrentUrl()

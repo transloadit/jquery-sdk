@@ -26,10 +26,10 @@ function processPost(request, response, cb) {
 }
 
 function respondHtml(res, content) {
-  var headerFile = __dirname + '/header.html';
+  var headerFile = __dirname + '/fixtures/header.html';
   fs.readFile(headerFile, function(err, header) {
 
-    var footerFile = __dirname + '/footer.html';
+    var footerFile = __dirname + '/fixtures/footer.html';
     fs.readFile(footerFile, function(err, footer) {
       var body = header + content + footer;
       res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
@@ -38,14 +38,17 @@ function respondHtml(res, content) {
   });
 }
 
-function handleIndex(res) {
-  var fileName = __dirname + '/index.html';
+function addFixturePath(content) {
+  var toReplace = '<span id="fixture_path">' + __dirname + '/fixtures</span>';
+  return content.replace(/<span id="fixture_path"><\/span>/, toReplace);
+}
+
+function handleHtmlFile(res, filename) {
+  var fileName = __dirname + '/fixtures/' + filename;
 
   fs.readFile(fileName, function(err, content) {
     content = content.toString();
-
-    var toReplace = '<span id="fixture_path">' + __dirname + '/fixtures</span>';
-    content = content.replace(/<span id="fixture_path"><\/span>/, toReplace);
+    content = addFixturePath(content);
     respondHtml(res, content);
   });
 }
@@ -71,10 +74,15 @@ http.createServer(function (req, res) {
   }
 
   if (req.url == '/build.js') {
-    handleBuildJs(res);
-  } else {
-    handleIndex(res);
+    return handleBuildJs(res);
   }
+
+  if (req.url === '/trigger-on-file-select') {
+    return handleHtmlFile(res, 'trigger_on_file_select.html');
+  }
+
+  handleHtmlFile(res, 'standard_resize.html');
+
 }).listen(3000, '127.0.0.1');
 
 console.log('Server running at http://127.0.0.1:3000/');
