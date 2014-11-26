@@ -1,9 +1,12 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>Transloadit test</title>
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<body>
+  <span id="fixture_path"></span>
+  <form id="entryForm" action="http://localhost:3000/upload" enctype="multipart/form-data" method="POST">
+    <input type="file" name="my_file" multiple="multiple" id="file" /><br />
+    <input name="width_field" type="text" placeholder="width" /><br />
+    <input name="height_field" type="text" placeholder="height" /><br />
+    <input type="submit" value="Submit" />
+  </form>
+
   <script type="text/javascript" src="/build.js"></script>
   <script type="text/javascript">
   $(function () {
@@ -20,22 +23,12 @@
             robot           : '/image/resize',
             use             : ':original',
             resize_strategy : 'pad',
-            width           : '${fields.width}',
-            height          : '${fields.height}'
+            width           : '${fields.width_field}',
+            height          : '${fields.height_field}'
           }
         }
       }
     });
   });
   </script>
-</head>
-<span id="fixture_path"></span>
-<body>
-  <form id="entryForm" action="http://localhost:3000/upload" enctype="multipart/form-data" method="POST">
-    <input type="file" name="my_file" multiple="multiple" id="file" /><br />
-    <input name="width" id="width_field" type="text" placeholder="width" /><br />
-    <input name="height" id="height_field" type="text" placeholder="height" /><br />
-    <input type="submit" value="Submit" />
-  </form>
 </body>
-</html>

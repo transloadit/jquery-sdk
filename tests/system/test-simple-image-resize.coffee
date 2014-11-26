@@ -1,17 +1,20 @@
 casper.start "http://#{testhost}", ->
   curr = @getCurrentUrl()
 
-  @evaluate ->
-    $("#width_field").val("500")
-    $("#height_field").val("600")
+  fixturePath = @fetchText "#fixture_path"
+  console.log fixturePath
 
-    fixturePath = $("#fixture_path").text();
-    $("#my_file").val(fixturePath + "/1.jpg")
-    $("#width_field").closest("form").submit()
+  @fill "#entryForm",
+    "my_file": fixturePath + "/1.jpg"
+    "width_field": "400",
+    "height_field": "400"
+
+  @evaluate ->
+    $("#entryForm").submit()
 
   @waitFor ->
     curr != @getCurrentUrl()
 
 casper.then ->
-  @test.assertTextExists "{\"width\":500"
-  @test.assertTextExists "\"height\":600"
+  @test.assertTextExists "{\\\"width\\\":400"
+  @test.assertTextExists "\\\"height\\\":400"

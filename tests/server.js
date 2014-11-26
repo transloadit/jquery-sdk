@@ -25,34 +25,56 @@ function processPost(request, response, cb) {
   }
 }
 
+function respondHtml(res, content) {
+  var headerFile = __dirname + '/header.html';
+  fs.readFile(headerFile, function(err, header) {
+
+    var footerFile = __dirname + '/footer.html';
+    fs.readFile(footerFile, function(err, footer) {
+      var body = header + content + footer;
+      res.writeHead(200, 'OK', {'Content-Type': 'text/html'});
+      res.end(body);
+    });
+  });
+}
+
+function handleIndex(res) {
+  var fileName = __dirname + '/index.html';
+
+  fs.readFile(fileName, function(err, content) {
+    content = content.toString();
+
+    var toReplace = '<span id="fixture_path">' + __dirname + '/fixtures</span>';
+    content = content.replace(/<span id="fixture_path"><\/span>/, toReplace);
+    respondHtml(res, content);
+  });
+}
+
+function handleBuildJs(res) {
+  var fileName = __dirname + '/../build/jquery.transloadit2-latest.js';
+
+  fs.readFile(fileName, function(err, content) {
+    content = content.toString();
+
+    res.writeHead(200, 'OK', {'Content-Type': 'text/javascript'});
+    res.end(content);
+  });
+}
+
 http.createServer(function (req, res) {
   if (req.method == 'POST') {
     processPost(req, res, function() {
       var stringified = JSON.stringify(req.post);
-      res.writeHead(200, 'OK', {'Content-Type': 'text/plain'});
-      res.end(stringified);
+      respondHtml(res, '<body>' + stringified + '</body>');
     });
     return;
   }
 
-  var fileName = __dirname + '/index.html';
-  var mime     = 'text/html';
-
   if (req.url == '/build.js') {
-    fileName = __dirname + '/../build/jquery.transloadit2-latest.js';
-    mime     = 'text/javascript';
+    handleBuildJs(res);
+  } else {
+    handleIndex(res);
   }
-  // serve our html file
-  fs.readFile(fileName, function(err, content) {
-    content = content.toString();
-
-    if (mime === 'text/html') {
-      var toReplace = '<span id="fixture_path">' + __dirname + '/fixtures</span>';
-      content = content.replace(/<span id="fixture_path"><\/span>/, toReplace);
-    }
-    res.writeHead(200, 'OK', {'Content-Type': mime});
-    res.end(content);
-  });
 }).listen(3000, '127.0.0.1');
 
 console.log('Server running at http://127.0.0.1:3000/');
