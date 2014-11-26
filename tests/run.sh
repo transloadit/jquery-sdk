@@ -26,15 +26,13 @@ set -o nounset
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(dirname "${__dir}")"
-__hardroot="/www/transloadit/sdks/jquery-sdk"
 pattern="${1:-system/test-*.coffee}"
-testhost="${2:-localhost:${NGINX_PORT:-8080}}"
+testhost="${2:-localhost:3000}"
 exitcode=0
-if [[ "${OSTYPE}" == "darwin"* ]]; then
-  __hardroot="."
-fi
+
 for file in `find ${__dir}/*${pattern}*`; do
   basename="$(basename "${file}")"
+
   if [ "${basename}" = "_pre.coffee" ]; then
     continue;
   fi
@@ -42,7 +40,7 @@ for file in `find ${__dir}/*${pattern}*`; do
     continue;
   fi
 
-  rm -f ${__hardroot}/tests/screen-* 2>/dev/null  || true
+  rm -f ${__dir}/screen-* 2>/dev/null  || true
 
   tmpfile="/tmp/casper-${basename}"
   cat "${__dir}/_pre.coffee" "${file}" "${__dir}/_post.coffee" > "${tmpfile}"
@@ -51,7 +49,7 @@ for file in `find ${__dir}/*${pattern}*`; do
     "${tmpfile}" \
     --ignore-ssl-errors=yes \
     --testhost=${testhost} \
-    --failscreen=${__hardroot}/tests/screen-fail.png || exitcode=$?
+    --failscreen=${__dir}/screen-fail.png || exitcode=$?
   rm ${tmpfile}
 
   if [ "${exitcode}" -gt 0 ]; then

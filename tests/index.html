@@ -29,11 +29,12 @@
   });
   </script>
 </head>
+<span id="fixture_path"></span>
 <body>
-  <form id="entryForm" action="http://127.0.0.1:3000" enctype="multipart/form-data" method="POST">
+  <form id="entryForm" action="http://localhost:3000/upload" enctype="multipart/form-data" method="POST">
     <input type="file" name="my_file" multiple="multiple" id="file" /><br />
-    <input name="width" type="text" placeholder="width" /><br />
-    <input name="height" type="text" placeholder="height" /><br />
+    <input name="width" id="width_field" type="text" placeholder="width" /><br />
+    <input name="height" id="height_field" type="text" placeholder="height" /><br />
     <input type="submit" value="Submit" />
   </form>
 </body>

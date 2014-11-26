@@ -44,6 +44,12 @@ http.createServer(function (req, res) {
   }
   // serve our html file
   fs.readFile(fileName, function(err, content) {
+    content = content.toString();
+
+    if (mime === 'text/html') {
+      var toReplace = '<span id="fixture_path">' + __dirname + '/fixtures</span>';
+      content = content.replace(/<span id="fixture_path"><\/span>/, toReplace);
+    }
     res.writeHead(200, 'OK', {'Content-Type': mime});
     res.end(content);
   });
