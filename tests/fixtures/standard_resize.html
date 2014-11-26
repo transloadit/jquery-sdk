@@ -1,0 +1,34 @@
+<body>
+  <span id="fixture_path"></span>
+  <form id="entryForm" action="http://localhost:3000/upload" enctype="multipart/form-data" method="POST">
+    <input type="file" name="my_file" multiple="multiple" id="file" /><br />
+    <input name="width_field" type="text" placeholder="width" /><br />
+    <input name="height_field" type="text" placeholder="height" /><br />
+    <input type="submit" value="Submit" />
+  </form>
+
+  <script type="text/javascript" src="/build.js"></script>
+  <script type="text/javascript">
+  $(function () {
+    $('#entryForm').transloadit({
+      wait       : true,
+      autoSubmit : true,
+      fields     : true,
+      params     : {
+        auth: {
+          key: 'e946b570757b11e4a6ed718c26049668'
+        },
+        steps: {
+          resize: {
+            robot           : '/image/resize',
+            use             : ':original',
+            resize_strategy : 'pad',
+            width           : '${fields.width_field}',
+            height          : '${fields.height_field}'
+          }
+        }
+      }
+    });
+  });
+  </script>
+</body>
