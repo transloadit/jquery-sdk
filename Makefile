@@ -23,6 +23,12 @@ $(build_path): js/dep/*.js js/lib/*.js
 	$(call compile_js,$(build_path))
 	$(call build_size,after:)
 
+test: $(build_path)
+	tests/run.sh $(filter)
+
+test-bare:
+	tests/run.sh $(filter)
+
 # TRANSLOADIT INTERNAL
 install: $(build_path) $(css_path)
 	cp $(build_path) $(install_dir)/js/$(build_name)
