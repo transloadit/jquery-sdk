@@ -53,7 +53,7 @@
       details: 'Details',
       startingUpload: 'Starting upload ...',
       processingFiles: 'Upload done, now processing files ...',
-      uploadProgress: '%s MB / %s MB (%s kB / sec, %s left)'
+      uploadProgress: '%s / %s MB at %s kB/s | %s left'
     }
   };
   var CSS_LOADED = false;
