@@ -24,6 +24,8 @@ $(build_path): js/dep/*.js js/lib/*.js
 	$(call build_size,after:)
 
 test: $(build_path)
+	$(MAKE) flow || true
+	$(MAKE) jshint || true
 	# On travis there won't be an env.sh so allow `source` fails:
 	source env.sh; tests/run.sh $(filter)
 
