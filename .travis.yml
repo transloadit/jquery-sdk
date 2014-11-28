@@ -19,5 +19,4 @@ env:
   # travis encrypt TRANSLOADIT_ACCESS_KEY=xxx
   - secure: "szhzwrsC10cdjrHYH4XPXBcMvFcSpxxL5bDQxcthcRXeV1m89wy89Fbr96BQ+HIRM/jYvsHCcOgkYmwzrgj9WiJFpwSlSNCDhv0cLmFih2oHZC+xMsXiWkiT4q3eyXwibisZVHx1QHWw8lSldWKYBXR6Vjex3CfNMwhui3RPFpo="
 
-
-
+script: make test
