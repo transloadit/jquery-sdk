@@ -1,5 +1,8 @@
 node_modules/
 /build/
+/flow/
 /tests/screen-*
 env.sh
 
+
+flow-osx-latest.zip

@@ -27,6 +27,13 @@ test: $(build_path)
 	# On travis there won't be an env.sh so allow `source` fails:
 	source env.sh; tests/run.sh $(filter)
 
+flow:
+	[ -f flow-osx-latest.zip ] || wget http://flowtype.org/downloads/flow-osx-latest.zip
+	[ -d flow ] || unzip -o flow-osx-latest.zip
+	[ -f .flowconfig ] || ./flow/flow init
+	cat ./js/lib/jquery.transloadit2.js | ./flow/flow check-contents --show-all-errors
+
+
 # TRANSLOADIT INTERNAL
 install: $(build_path) $(css_path)
 	cp $(build_path) $(install_dir)/js/$(build_name)
@@ -41,5 +48,6 @@ clean:
 .PHONY: \
 	clean \
 	install \
+	flow \
 	link \
 	test \
