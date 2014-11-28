@@ -1,6 +1,8 @@
 var http        = require('http');
 var querystring = require('querystring');
 var fs          = require('fs');
+var debug       = require('debug')('tlj:testserver');
+var util        = require('util');
 
 function processPost(request, response, cb) {
   var queryData = '';
