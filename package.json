@@ -2,5 +2,8 @@
   "dependencies": {
     "debug": "^2.1.0",
     "jshint": "^2.5.10"
+  },
+  "scripts": {
+    "test" : "make test"
   }
 }
