@@ -51,6 +51,8 @@ function serveHtmlFile(res, filename) {
   fs.readFile(fileName, function(err, content) {
     content = content.toString();
     content = addFixturePath(content);
+
+    content = content.replace(/{TRANSLOADIT_ACCESS_KEY}/g, (process.env['TRANSLOADIT_ACCESS_KEY'] + '').trim());
     respondHtml(res, content);
   });
 }

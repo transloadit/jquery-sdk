@@ -24,7 +24,7 @@ $(build_path): js/dep/*.js js/lib/*.js
 	$(call build_size,after:)
 
 test: $(build_path)
-	tests/run.sh $(filter)
+	source env.sh; tests/run.sh $(filter)
 
 # TRANSLOADIT INTERNAL
 install: $(build_path) $(css_path)
