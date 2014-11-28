@@ -24,6 +24,7 @@ $(build_path): js/dep/*.js js/lib/*.js
 	$(call build_size,after:)
 
 test: $(build_path)
+	# On travis there won't be an env.sh so allow `source` fails:
 	source env.sh; tests/run.sh $(filter)
 
 # TRANSLOADIT INTERNAL

@@ -1,0 +1,23 @@
+language: node_js
+
+node_js:
+  - "0.10"
+
+before_install:
+  - npm install -g npm@1.4
+
+notifications:
+  email: false
+  campfire:
+    rooms:
+      # travis encrypt [subdomain]:[api token]@[room id]
+      secure: "Gg2x/iah5qTgklcjGIsknDTJwG8kF5qk97S7vXB+hIDiZsVdtj9xyoD/t7FSlmZbbYvDKQmMrOmfI+cGnt6u3E2jO7s8IZRphmnGCLpU0dvR92vGsS5HrTua8YTc8xoNXTkB0q5OhXpr3K4J8FNLrQVq6gUBD8m2gH+9RZioZig="
+    on_failure: always
+    on_success: always
+
+env:
+  # travis encrypt TRANSLOADIT_ACCESS_KEY=xxx
+  - secure: "szhzwrsC10cdjrHYH4XPXBcMvFcSpxxL5bDQxcthcRXeV1m89wy89Fbr96BQ+HIRM/jYvsHCcOgkYmwzrgj9WiJFpwSlSNCDhv0cLmFih2oHZC+xMsXiWkiT4q3eyXwibisZVHx1QHWw8lSldWKYBXR6Vjex3CfNMwhui3RPFpo="
+
+
+
