@@ -6,14 +6,14 @@ css_name = transloadit2.css
 css_path = css/$(css_name)
 compile_js =\
 	@curl \
-	-s \
-	-X POST \
-	-H 'Expect: ' \
+	--silent \
+	--request POST \
+	--header 'Expect: ' \
 	--data-urlencode compilation_level="SIMPLE_OPTIMIZATIONS" \
 	--data-urlencode output_format="text" \
 	--data-urlencode output_info="compiled_code" \
 	--data-urlencode js_code@$(build_path) \
-	-o $(1) \
+	--output $(1) \
 	http://closure-compiler.appspot.com/compile
 
 $(build_path): js/dep/*.js js/lib/*.js
