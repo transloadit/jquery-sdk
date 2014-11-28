@@ -26,39 +26,44 @@ set -o nounset
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(dirname "${__dir}")"
+
 pattern="${1:-system/test-*.coffee}"
 testhost="${2:-localhost:3000}"
-exitcode=0
 
-for file in `find ${__dir}/*${pattern}*`; do
-  basename="$(basename "${file}")"
+pushd "${__dir}"
+  exitcode=0
+  for file in `find ./*${pattern}*`; do
+    basename="$(basename "${file}")"
 
-  if [ "${basename}" = "_pre.coffee" ]; then
-    continue;
-  fi
-  if [ "${basename}" = "_post.coffee" ]; then
-    continue;
-  fi
+    if [ "${basename}" = "_pre.coffee" ]; then
+      continue;
+    fi
+    if [ "${basename}" = "_post.coffee" ]; then
+      continue;
+    fi
 
-  rm -f ${__dir}/screen-* 2>/dev/null  || true
+    rm -f ./screen-* 2>/dev/null  || true
 
-  tmpfile="/tmp/casper-${basename}"
-  cat "${__dir}/_pre.coffee" "${file}" "${__dir}/_post.coffee" > "${tmpfile}"
-  casperjs \
-    test \
-    "${tmpfile}" \
-    --ignore-ssl-errors=yes \
-    --testhost=${testhost} \
-    --failscreen=${__dir}/screen-fail.png || exitcode=$?
-  rm ${tmpfile}
+    tmpfile="/tmp/casper-${basename}"
+    cat "./_pre.coffee" "${file}" "./_post.coffee" > "${tmpfile}"
+    casperjs \
+      test \
+      "${tmpfile}" \
+      --ignore-ssl-errors=yes \
+      --testhost=${testhost} \
+      --failscreen=./screen-fail.png || exitcode=$?
+    rm ${tmpfile}
 
-  if [ "${exitcode}" -gt 0 ]; then
-    echo "--> Please \`open tests/screen-fail.png\` for the fail screen"
-    echo "--> Please \`open tests/screen-*.png\` for all screens"
-    echo "--> Type \`make test filter=${basename}\` to isolate this test"
-    break
-  fi
-done
+    if [ "${exitcode}" -gt 0 ]; then
+      echo "--> Please \`open tests/screen-fail.png\` for the fail screen"
+      echo "--> Please \`open tests/screen-*.png\` for all screens"
+      echo "--> Type \`make test filter=${basename}\` to isolate this test"
+      break
+    fi
+  done
+
+popd "${__dir}"
+
 
 exit $exitcode
 
