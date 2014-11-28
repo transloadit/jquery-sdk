@@ -30,6 +30,11 @@ __root="$(dirname "${__dir}")"
 pattern="${1:-system/test-*.coffee}"
 testhost="${2:-localhost:3000}"
 
+# Start server
+node tests/server.js &
+serverPid=${?}
+sleep 2
+
 pushd "${__dir}"
   exitcode=0
   for file in `find ./*${pattern}*`; do
@@ -64,6 +69,7 @@ pushd "${__dir}"
 
 popd "${__dir}"
 
+kill -9 ${serverPid}
 
 exit $exitcode
 
