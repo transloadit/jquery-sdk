@@ -50,21 +50,17 @@ Building your own compressed version requires a *nix operation system and curl.
 We are using the [Google Closure REST API](http://code.google.com/closure/compiler/docs/gettingstarted_api.html)
 for minification.
 
-    make
+```bash
+make
+```
 
 The minified output file can be found in: `build/jquery.transloadit2.js`.
 
 ## Tests
 
-To run the tests, install [casperjs](http://casperjs.org/) and [nodeJS](http://nodejs.org). Then run the test server:
+To run the tests, install `make` (via Xcode or build-essentials), [CasperJS](http://casperjs.org/) and [Node.js](http://nodejs.org). Then run
 
-```
-node tests/server.js
-```
-
-Then you can run
-
-```
+```bash
 make test
 ```
 
