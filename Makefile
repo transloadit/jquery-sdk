@@ -1,4 +1,4 @@
-install_dir = /opt/local/htdocs/transloadit-crm/app/webroot
+install_dir = ../crm
 build_name = jquery.transloadit2-latest.js
 build_path = build/$(build_name)
 build_size = @ls -lh $(build_path) | awk '{print "$(1)", $$9, $$5}'
