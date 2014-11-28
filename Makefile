@@ -37,4 +37,8 @@ link:
 clean:
 	-rm build/*.*
 
-.PHONY: clean install
+.PHONY: \
+	clean \
+	install \
+	link \
+	test \
