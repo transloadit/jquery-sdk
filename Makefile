@@ -1,3 +1,5 @@
+SHELL := /usr/bin/env bash
+
 install_dir = ../crm
 build_name = jquery.transloadit2-latest.js
 build_path = build/$(build_name)
