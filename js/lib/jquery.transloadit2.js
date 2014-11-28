@@ -337,8 +337,8 @@
         formData.append("params", paramsFieldVal);
 
         for (var i = 0; i < this._options.formData.length; i++) {
-          var pair = this._options.formData[i];
-          formData.append(pair[0], pair[1]);
+          var tupel = this._options.formData[i];
+          formData.append(tupel[0], tupel[1], tupel[2]);
         }
 
         this._options.formData = formData;
