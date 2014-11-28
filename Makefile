@@ -33,6 +33,8 @@ flow:
 	[ -f .flowconfig ] || ./flow/flow init
 	cat ./js/lib/jquery.transloadit2.js | ./flow/flow check-contents --show-all-errors
 
+jshint:
+	jshint ./js/lib
 
 # TRANSLOADIT INTERNAL
 install: $(build_path) $(css_path)
@@ -49,5 +51,6 @@ clean:
 	clean \
 	install \
 	flow \
+	jshint \
 	link \
 	test \
