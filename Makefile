@@ -35,7 +35,7 @@ link:
 	ln -s `pwd` ${install_dir}/jquery-sdk
 
 clean:
-	-rm build/*.*
+	rm build/*.*
 
 .PHONY: \
 	clean \
