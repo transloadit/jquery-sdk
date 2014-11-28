@@ -43,7 +43,7 @@ function addFixturePath(content) {
   return content.replace(/<span id="fixture_path"><\/span>/, toReplace);
 }
 
-function handleHtmlFile(res, filename) {
+function serveHtmlFile(res, filename) {
   var fileName = __dirname + '/fixtures/' + filename;
 
   fs.readFile(fileName, function(err, content) {
@@ -53,7 +53,7 @@ function handleHtmlFile(res, filename) {
   });
 }
 
-function handleBuildJs(res) {
+function serveBuildJs(res) {
   var fileName = __dirname + '/../build/jquery.transloadit2-latest.js';
 
   fs.readFile(fileName, function(err, content) {
@@ -74,14 +74,14 @@ http.createServer(function (req, res) {
   }
 
   if (req.url == '/build.js') {
-    return handleBuildJs(res);
+    return serveBuildJs(res);
   }
 
   if (req.url === '/trigger-on-file-select') {
-    return handleHtmlFile(res, 'trigger_on_file_select.html');
+    return serveHtmlFile(res, 'trigger_on_file_select.html');
   }
 
-  handleHtmlFile(res, 'standard_resize.html');
+  serveHtmlFile(res, 'standard_resize.html');
 
 }).listen(3000, '127.0.0.1');
 
