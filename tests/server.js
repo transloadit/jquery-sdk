@@ -7,7 +7,7 @@ var util        = require('util');
 function processPost(request, response, cb) {
   var queryData = '';
 
-  if (request.method == 'POST') {
+  if (request.method === 'POST') {
     request.on('data', function(data) {
       queryData += data;
         if (queryData.length > 1e6) {
@@ -69,7 +69,7 @@ function serveBuildJs(res) {
 }
 
 http.createServer(function (req, res) {
-  if (req.method == 'POST') {
+  if (req.method === 'POST') {
     processPost(req, res, function() {
       var stringified = JSON.stringify(req.post);
       respondHtml(res, '<body>' + stringified + '</body>');
@@ -77,8 +77,14 @@ http.createServer(function (req, res) {
     return;
   }
 
-  if (req.url == '/build.js') {
+  if (req.url === '/build.js') {
     return serveBuildJs(res);
+  }
+
+  if (req.url === '/shutdown') {
+    res.writeHead(200, 'OK', {'Content-Type': 'text/javascript'});
+    res.end('{"status":"OK"}');
+    process.exit(0);
   }
 
   if (req.url === '/trigger-on-file-select') {

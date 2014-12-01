@@ -22,17 +22,16 @@
 set -o pipefail
 # set -o errexit
 set -o nounset
-set -o xtrace
+# set -o xtrace
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(dirname "${__dir}")"
 
 pattern="${1:-system/test-*.coffee}"
-testhost="${2:-localhost:3000}"
+testhost="${2:-127.0.0.1:3000}"
 
 # Start server
 node tests/server.js &
-serverPid=${?}
 sleep 2
 
 pushd "${__dir}"
@@ -69,7 +68,7 @@ pushd "${__dir}"
 
 popd "${__dir}"
 
-kill -9 ${serverPid}
+curl http://${testhost}/shutdown || true
 
-exit $exitcode
+exit ${exitcode}
 
