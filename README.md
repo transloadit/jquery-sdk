@@ -40,7 +40,7 @@ We have two *magic* releases:
    This is always the latest version of any major release. If you use this, it may break backwards compatibility for you once we release the next major version. [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
  - `jquery.transloadit2-v2-latest.js`
-   This is always the latest major 2.0 version, and is **the recommended version to use:** [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
+   This is always the latest major 2.0 version, and is **the recommended version to use:** [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
 
 Here's an overview of [all our releases](https://github.com/transloadit/jquery-sdk/releases).
 
