@@ -328,7 +328,22 @@
     var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false';
 
     if (this._options.formData) {
-      this._options.formData.append("params", this.$form.find("input[name=params]").val());
+      var paramsFieldVal = this.$form.find("input[name=params]").val();
+
+      if (this._options.formData instanceof FormData) {
+        this._options.formData.append("params", paramsFieldVal);
+      } else {
+        var formData = new FormData(this.$form);
+        formData.append("params", paramsFieldVal);
+
+        for (var i = 0; i < this._options.formData.length; i++) {
+          var tupel = this._options.formData[i];
+          formData.append(tupel[0], tupel[1], tupel[2]);
+        }
+
+        this._options.formData = formData;
+      }
+
       var f = new XMLHttpRequest();
       f.open("POST", url);
       f.send(this._options.formData);
