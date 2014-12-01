@@ -5,7 +5,7 @@ node_js:
 
 before_install:
   - npm install -g npm@1.4
-  - apt-get -qqfy --force-yes install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev
+  - sudo apt-get -qqfy --force-yes install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev
   - ruby -e "$(wget -O- https://raw.github.com/Homebrew/linuxbrew/go/install)"
   - brew install casperjs
 
