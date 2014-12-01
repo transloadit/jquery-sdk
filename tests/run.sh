@@ -22,7 +22,7 @@
 set -o pipefail
 # set -o errexit
 set -o nounset
-# set -o xtrace
+set -o xtrace
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(dirname "${__dir}")"
@@ -69,7 +69,6 @@ pushd "${__dir}"
 
 popd "${__dir}"
 
-set -x
 kill -9 ${serverPid}
 
 exit $exitcode
