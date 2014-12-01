@@ -69,6 +69,7 @@ pushd "${__dir}"
 
 popd "${__dir}"
 
+set -x
 kill -9 ${serverPid}
 
 exit $exitcode
