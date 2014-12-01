@@ -5,13 +5,12 @@ node_js:
 
 before_install:
   - npm install -g npm@1.4
-  - sudo apt-get -qqfy --force-yes update
-  - sudo apt-get -qqfy --force-yes install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev pkg-config
-  - yes '' | ruby -e "$(wget -O- https://raw.github.com/Homebrew/linuxbrew/go/install)"
-  - export PATH="$HOME/.linuxbrew/bin:$PATH"
-  - export MANPATH="$HOME/.linuxbrew/share/man:$MANPATH"
-  - export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
-  - brew install casperjs
+  - wget --retry-connrefused http://phantomjs.googlecode.com/files/phantomjs-1.8.0-linux-x86_64.tar.bz2
+  - tar jxf phantomjs-1.8.0-linux-x86_64.tar.bz2
+  - sudo cp -Raf phantomjs-*/* /usr/local/
+  - wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.0.3
+  - tar zvxf 1.0.3
+  - sudo cp -Raf n1k0-casperjs-*/* /usr/local/
 
 notifications:
   email: false
