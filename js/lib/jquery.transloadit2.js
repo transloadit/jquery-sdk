@@ -487,8 +487,8 @@
 
     this.pollStarted = +new Date();
 
-    var instance = this.instance.replace(/\.transloadit\.com/, '') + '-status.transloadit.com';
-    var url = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
+    var instance = 'status-' + this.instance;
+    var url      = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
 
     if (query) {
       url += query;
