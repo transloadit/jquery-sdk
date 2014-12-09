@@ -544,7 +544,7 @@
         for (var i = 0; i < assembly.uploads.length; i++) {
           var upload = assembly.uploads[i];
 
-          if (self._uploadFileIds.indexOf(upload.id) === -1) {
+          if ($.inArray(upload.id, self._uploadFileIds) === -1) {
             self._options.onUpload(upload, assembly);
             self.uploads.push(upload);
             self._uploadFileIds.push(upload.id);
@@ -558,7 +558,7 @@
             var result   = assembly.results[step][j];
             var resultId = step + '_' + result.id;
 
-            if (self._resultFileIds.indexOf(resultId) === -1) {
+            if ($.inArray(resultId, self._resultFileIds) === -1) {
               self._options.onResult(step, result, assembly);
               self.results[step].push(result);
               self._resultFileIds.push(resultId);
@@ -771,7 +771,7 @@
       'BORED_INSTANCE_ERROR',
       'ASSEMBLY_NOT_FOUND'
     ];
-    if (errorsRequiringDetails.indexOf(err.error) === -1) {
+    if ($.inArray(err.error, errorsRequiringDetails) === -1) {
       this.$modal.$error.html(errorMsg).show();
       return;
     }
