@@ -14,12 +14,8 @@ before_install:
 
 notifications:
   email: false
-  campfire:
-    rooms:
-      # travis encrypt [subdomain]:[api token]@[room id]
-      secure: "Gg2x/iah5qTgklcjGIsknDTJwG8kF5qk97S7vXB+hIDiZsVdtj9xyoD/t7FSlmZbbYvDKQmMrOmfI+cGnt6u3E2jO7s8IZRphmnGCLpU0dvR92vGsS5HrTua8YTc8xoNXTkB0q5OhXpr3K4J8FNLrQVq6gUBD8m2gH+9RZioZig="
-    on_failure: always
-    on_success: always
+  slack:
+    secure: U+RtmtVJEzEoZf+/VVuon9qNC4GXKzXoTqdYThP57ZTzqoDAJDnuZ/qUrMGrMYpYg38ikxtK3qJhBMfffzHXc3KS9hcA7Ay/yPz4QiCBMy3M9EBPWt8iGP6n2T3KUw4WG/hSBUtnJqmwPdzRfVUIqOMgchiN9eWwEbEmSYTvOqA=    on_success: always
 
 env:
   # travis encrypt TRANSLOADIT_ACCESS_KEY=xxx
