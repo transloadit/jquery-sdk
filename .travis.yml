@@ -15,7 +15,7 @@ before_install:
 notifications:
   email: false
   slack:
-    secure: U+RtmtVJEzEoZf+/VVuon9qNC4GXKzXoTqdYThP57ZTzqoDAJDnuZ/qUrMGrMYpYg38ikxtK3qJhBMfffzHXc3KS9hcA7Ay/yPz4QiCBMy3M9EBPWt8iGP6n2T3KUw4WG/hSBUtnJqmwPdzRfVUIqOMgchiN9eWwEbEmSYTvOqA=    on_success: always
+    secure: U+RtmtVJEzEoZf+/VVuon9qNC4GXKzXoTqdYThP57ZTzqoDAJDnuZ/qUrMGrMYpYg38ikxtK3qJhBMfffzHXc3KS9hcA7Ay/yPz4QiCBMy3M9EBPWt8iGP6n2T3KUw4WG/hSBUtnJqmwPdzRfVUIqOMgchiN9eWwEbEmSYTvOqA=
 
 env:
   # travis encrypt TRANSLOADIT_ACCESS_KEY=xxx
