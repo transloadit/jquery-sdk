@@ -3,7 +3,7 @@
 # Transloadit jQuery SDK
 
 The official docs for our jQuery plugin / SDK are on the
-[transloadit website](https://transloadit.com/docs/jquery-plugin).
+[transloadit website](https://transloadit.com/docs/#jquery-plugin).
 
 ## Contributing
 
