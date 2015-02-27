@@ -528,7 +528,7 @@
           return;
         }
 
-        if (!self.started) {
+        if (!self.started && assembly.bytes_expected > 0) {
           self.started = true;
           self._options.onStart(assembly);
         }
@@ -539,7 +539,9 @@
         var isCanceled  = assembly.ok === 'ASSEMBLY_CANCELED';
         var isComplete  = assembly.ok === 'ASSEMBLY_COMPLETED';
 
-        self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
+        if (assembly.bytes_expected > 0) {
+          self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
+        }
 
         for (var i = 0; i < assembly.uploads.length; i++) {
           var upload = assembly.uploads[i];
