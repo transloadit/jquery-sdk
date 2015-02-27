@@ -729,9 +729,6 @@
     });
 
     var self = this;
-    this.$modal.$close.click(function() {
-      self.cancel();
-    });
 
     this.$modal.$error.hide();
     this.$modal.$errorDetails.hide();
