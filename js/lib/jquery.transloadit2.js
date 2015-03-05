@@ -577,7 +577,9 @@
 
         var isEnded = isComplete || (!self._options['wait'] && isExecuting);
 
-        self.renderProgress(assembly, isEnded, self._options['wait']);
+        if (assembly.bytes_expected > 0) {
+          self.renderProgress(assembly, isEnded, self._options['wait']);
+        }
 
         if (isEnded) {
           self.ended = true;
@@ -837,7 +839,11 @@
 
       var outstanding  = assembly.bytes_expected - assembly.bytes_received;
       var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1);
-      var durationLeft = this._duration(outstanding / speedInBytes);
+
+      var durationLeft = '';
+      if (speedInBytes > 0) {
+        durationLeft = this._duration(outstanding / speedInBytes);
+      }
 
       txt = this.i18n('uploadProgress',
         mbReceived, mbExpected, uploadRate, durationLeft
@@ -854,19 +860,12 @@
 
     var self = this;
 
-    // If just the upload is finished, keep the progress at 90%.
-    // When the whole assembly is finished, set it to 100%.
-    var progressToUse = progress;
-    if (progressToUse > 90 && !isAssemblyComplete && waitIsTrue) {
-      progressToUse = 90;
-    }
-
     if (isAssemblyComplete && waitIsTrue) {
       duration = 500;
     }
 
     this.$modal.$progressBar.stop().animate(
-      {width: progressToUse + '%'},
+      {width: progress + '%'},
       {
         duration: duration,
         easing: 'linear',
