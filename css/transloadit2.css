@@ -212,6 +212,7 @@
 }
 
 #transloadit .progress.active .bar {
+  opacity: 0.7;
   -webkit-animation: progress-bar-stripes 2s linear infinite;
      -moz-animation: progress-bar-stripes 2s linear infinite;
       -ms-animation: progress-bar-stripes 2s linear infinite;

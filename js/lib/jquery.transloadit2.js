@@ -5,7 +5,6 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
-
 !function($) {
   var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://';
 
@@ -139,6 +138,7 @@
     this._lastNSecs = 0;
     this._clockseq  = 0;
 
+    this._animatedTo100 = false;
     this._uploadFileIds = [];
     this._resultFileIds = [];
   }
@@ -305,6 +305,7 @@
     this.bytesReceivedBefore = 0;
     this.pollRetries         = 0;
     this.uploads             = [];
+    this._animatedTo100      = false;
     this._uploadFileIds      = [];
     this._resultFileIds      = [];
     this.results             = {};
@@ -707,7 +708,7 @@
         '<div class="content">'+
           '<a href="#close" class="close">'+ this.i18n('cancel') +'</a>'+
           '<p class="status"></p>'+
-          '<div class="progress progress-striped active">' +
+          '<div class="progress progress-striped">' +
             '<div class="bar"><span class="percent"></span></div>' +
           '</div>' +
           '<label>'+ this.i18n('startingUpload')+'</label>' +
@@ -831,25 +832,25 @@
     var timeSinceLastPoll = +new Date() - this.lastPoll;
     var duration          = progress === 100 ? 1000 : this._options.interval * 2;
 
-    var txt = this.i18n('processingFiles');
-    if (progress != 100) {
-      var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2);
-      var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2);
-      var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1);
+    var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2);
+    var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2);
+    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1);
 
-      var outstanding  = assembly.bytes_expected - assembly.bytes_received;
-      var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1);
+    var outstanding  = assembly.bytes_expected - assembly.bytes_received;
+    var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1);
 
-      var durationLeft = '';
-      if (speedInBytes > 0) {
-        durationLeft = this._duration(outstanding / speedInBytes);
-      }
-
-      txt = this.i18n('uploadProgress',
-        mbReceived, mbExpected, uploadRate, durationLeft
-      );
+    var durationLeft = '';
+    if (speedInBytes > 0) {
+      durationLeft = this._duration(outstanding / speedInBytes);
     }
-    this.$modal.$label.text(txt);
+
+    txt = this.i18n('uploadProgress',
+      mbReceived, mbExpected, uploadRate, durationLeft
+    );
+
+    if (!this._animatedTo100) {
+      this.$modal.$label.text(txt);
+    }
 
     var totalWidth           = parseInt(this.$modal.$progress.css('width'), 10);
     this.bytesReceivedBefore = assembly.bytes_received;
@@ -876,8 +877,18 @@
           if (percent > 100) {
             percent = 100;
           }
-          if (percent > 13) {
+          if (percent > 13 && !self._animatedTo100) {
             self.$modal.$percent.text(percent + '%');
+          }
+
+          if (percent == 100 && !self._animatedTo100) {
+            self._animatedTo100 = true;
+
+            setTimeout(function() {
+              self.$modal.$label.text(self.i18n('processingFiles'));
+              self.$modal.$progress.addClass('active');
+              self.$modal.$percent.text('');
+            }, 500);
           }
         }
       }
