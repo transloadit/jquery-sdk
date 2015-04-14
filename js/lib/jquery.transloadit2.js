@@ -53,6 +53,19 @@
       startingUpload: 'Starting upload ...',
       processingFiles: 'Upload done, now processing files ...',
       uploadProgress: '%s / %s MB at %s kB/s | %s left'
+    },
+    ja: {
+      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
+      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
+      'errors.unknown': '通信環境に問題があります',
+      'errors.tryAgain': 'しばらくしてから再度投稿してください',
+      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
+          '下記の情報をメールでお送りください:',
+      cancel: 'キャンセル',
+      details: '詳細',
+      startingUpload: '投稿中 ...',
+      processingFiles: '接続中',
+      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
     }
   };
   var CSS_LOADED = false;
