@@ -241,7 +241,7 @@
           var err = {
             error   : 'CONNECTION_ERROR',
             message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : 'JSONP request status: ' + status,
+            reason  : 'JSONP bored instance request status: ' + status,
             url     : url
           };
           self.renderError(err);
@@ -640,7 +640,7 @@
           var err = {
             error   : 'CONNECTION_ERROR',
             message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : 'JSONP request status: '+status,
+            reason  : 'JSONP status poll request status: '+status,
             url     : url
           };
           self.renderError(err);
