@@ -25,7 +25,7 @@
     interval                     : 2500,
     pollTimeout                  : 8000,
     poll404Retries               : 15,
-    pollConnectionRetries        : 3,
+    pollConnectionRetries        : 5,
     wait                         : false,
     processZeroFiles             : true,
     triggerUploadOnFileSelection : false,
