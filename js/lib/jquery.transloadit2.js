@@ -258,9 +258,16 @@
   };
 
   Uploader.prototype._findBoredInstanceUrl = function(cb) {
-    var self = this;
-    var url  = PROTOCOL + 's3.amazonaws.com/infra-' + this._options.region;
-    url     += '.transloadit.com/cached_instances.json';
+    var self   = this;
+    var region = this._options.region;
+    var domain = 's3';
+
+    if (region !== 'us-east-1') {
+      domain = 's3-' + region;
+    }
+
+    var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region;
+    url    += '.transloadit.com/cached_instances.json';
 
     $.ajax({
       url      : url,
@@ -272,6 +279,7 @@
       },
       error: function(xhr, status) {
         var err = new Error('Could not query S3 for cached uploaders');
+        err.url = url;
         cb(err);
       }
     });
