@@ -200,10 +200,10 @@
 
     function proceed() {
       $.jsonp({
-        url: url,
-        timeout: self._options.pollTimeout,
-        callbackParameter: 'callback',
-        success: function(instance) {
+        url               : url,
+        timeout           : self._options.pollTimeout,
+        callbackParameter : 'callback',
+        success           : function(instance) {
           if (instance.error) {
             self.ended   = true;
             instance.url = url;
@@ -215,7 +215,7 @@
           self.instance = instance.api2_host;
           self.start();
         },
-        error: function(xhr, status) {
+        error: function(xhr, status, jsonpErr) {
           if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
             canUseCustomBoredLogic = false;
 
@@ -238,10 +238,14 @@
           }
 
           self.ended = true;
+
+          var reason = 'JSONP bored instance request status: ' + status;
+          reason += ', err: ' + jsonpErr;
+
           var err = {
             error   : 'CONNECTION_ERROR',
             message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : 'JSONP bored instance request status: ' + status,
+            reason  : reason,
             url     : url
           };
           self.renderError(err);
@@ -278,8 +282,8 @@
         self._findResponsiveInstance(instances, 0, cb);
       },
       error: function(xhr, status) {
-        var err = new Error('Could not query S3 for cached uploaders');
-        err.url = url;
+        var msg = 'Could not query S3 for cached uploaders from url: ' + url;
+        var err = new Error(msg);
         cb(err);
       }
     });
@@ -517,10 +521,10 @@
     }
 
     $.jsonp({
-      url: url,
-      timeout: self._options.pollTimeout,
-      callbackParameter: 'callback',
-      success: function(assembly) {
+      url               : url,
+      timeout           : self._options.pollTimeout,
+      callbackParameter : 'callback',
+      success           : function(assembly) {
         if (self.ended) {
           return;
         }
@@ -628,7 +632,7 @@
         }, timeout);
         self.lastPoll = +new Date();
       },
-      error: function(xhr, status) {
+      error: function(xhr, status, jsonpErr) {
         if (self.ended) {
           return;
         }
@@ -637,10 +641,14 @@
         if (self.pollRetries > self._options.pollConnectionRetries) {
           document.title = self.documentTitle;
           self.ended = true;
+
+          var reason = 'JSONP status poll request status: ' + status;
+          reason += ', err: ' + jsonpErr;
+
           var err = {
             error   : 'CONNECTION_ERROR',
             message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : 'JSONP status poll request status: '+status,
+            reason  : reason,
             url     : url
           };
           self.renderError(err);
