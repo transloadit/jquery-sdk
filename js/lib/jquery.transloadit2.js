@@ -41,31 +41,31 @@
   };
 
   var I18N = {
-    en: {
-      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
-      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
-      'errors.unknown': 'There was an internal error.',
-      'errors.tryAgain': 'Please try your upload again.',
-      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
+    en : {
+      'errors.BORED_INSTANCE_ERROR' : 'Could not find a bored instance.',
+      'errors.CONNECTION_ERROR'     : 'There was a problem connecting to the upload server',
+      'errors.unknown'              : 'There was an internal error.',
+      'errors.tryAgain'             : 'Please try your upload again.',
+      'errors.troubleshootDetails'  : 'If you would like our help to troubleshoot this, ' +
           'please email us this information:',
-      cancel: 'Cancel',
-      details: 'Details',
-      startingUpload: 'Starting upload ...',
-      processingFiles: 'Upload done, now processing files ...',
-      uploadProgress: '%s / %s MB at %s kB/s | %s left'
+      cancel                        : 'Cancel',
+      details                       : 'Details',
+      startingUpload                : 'Starting upload ...',
+      processingFiles               : 'Upload done, now processing files ...',
+      uploadProgress                : '%s / %s MB at %s kB/s | %s left'
     },
-    ja: {
-      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
-      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
-      'errors.unknown': '通信環境に問題があります',
-      'errors.tryAgain': 'しばらくしてから再度投稿してください',
-      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
+    ja : {
+      'errors.BORED_INSTANCE_ERROR' : 'サーバー接続に問題があります',
+      'errors.CONNECTION_ERROR'     : 'サーバー接続に問題があります',
+      'errors.unknown'              : '通信環境に問題があります',
+      'errors.tryAgain'             : 'しばらくしてから再度投稿してください',
+      'errors.troubleshootDetails'  : '解決できない場合は、こちらにお問い合わせください ' +
           '下記の情報をメールでお送りください:',
-      cancel: 'キャンセル',
-      details: '詳細',
-      startingUpload: '投稿中 ...',
-      processingFiles: '接続中',
-      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
+      cancel                        : 'キャンセル',
+      details                       : '詳細',
+      startingUpload                : '投稿中 ...',
+      processingFiles               : '接続中',
+      uploadProgress                : '%s MB / %s MB (%s kB / 秒)'
     }
   };
   var CSS_LOADED = false;
@@ -215,7 +215,7 @@
           self.instance = instance.api2_host;
           self.start();
         },
-        error: function(xhr, status, jsonpErr) {
+        error             : function(xhr, status, jsonpErr) {
           if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
             canUseCustomBoredLogic = false;
 
@@ -277,11 +277,11 @@
       url      : url,
       datatype : 'json',
       timeout  : 5000,
-      success: function(result) {
+      success  : function(result) {
         var instances = self._shuffle(result.uploaders);
         self._findResponsiveInstance(instances, 0, cb);
       },
-      error: function(xhr, status) {
+      error    : function(xhr, status) {
         var msg = 'Could not query S3 for cached uploaders from url: ' + url;
         var err = new Error(msg);
         cb(err);
@@ -302,10 +302,10 @@
       url               : PROTOCOL + url,
       timeout           : 3000,
       callbackParameter : 'callback',
-      success: function(result) {
+      success           : function(result) {
         cb(null, url);
       },
-      error: function(xhr, status) {
+      error             : function(xhr, status) {
         self._findResponsiveInstance(instances, index + 1, cb);
       }
     });
@@ -632,7 +632,7 @@
         }, timeout);
         self.lastPoll = +new Date();
       },
-      error: function(xhr, status, jsonpErr) {
+      error             : function(xhr, status, jsonpErr) {
         if (self.ended) {
           return;
         }
@@ -897,9 +897,9 @@
     this.$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
-        duration: duration,
-        easing: 'linear',
-        progress: function(promise, currPercent, remainingMs) {
+        duration : duration,
+        easing   : 'linear',
+        progress : function(promise, currPercent, remainingMs) {
           var width = parseInt(self.$modal.$progressBar.css('width'), 10);
 
           var percent = (width * 100 / totalWidth).toFixed(0);

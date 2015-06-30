@@ -18,9 +18,9 @@ function processPost(request, response, cb) {
     });
 
     request.on('end', function() {
-        request.post = querystring.parse(queryData);
-        cb();
-      });
+      request.post = querystring.parse(queryData);
+      cb();
+    });
   } else {
     response.writeHead(405, {'Content-Type': 'text/plain'});
     response.end();

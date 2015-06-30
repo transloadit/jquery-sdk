@@ -1,5 +1,5 @@
 {
 	"preset": "node-style-guide",
-	"requireAlignedObjectValues": "all",
-	"disallowSpaceAfterObjectKeys": "ignoreSingleLine"
+	"requireAlignedObjectValues": "ignoreFunction",
+	"disallowSpaceAfterObjectKeys": "ignoreMultiLine"
 }
