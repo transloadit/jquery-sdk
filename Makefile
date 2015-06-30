@@ -27,7 +27,7 @@ $(build_path): js/dep/*.js js/lib/*.js
 
 .PHONY: test
 test: $(build_path)
-	@$(MAKE) jscs
+	@$(MAKE) jscs || true
 	@source env.sh; tests/run.sh $(filter)
 
 .PHONY: jscs-fix
