@@ -52,7 +52,7 @@ function serveHtmlFile(res, filename) {
     content = content.toString();
     content = addFixturePath(content);
 
-    content = content.replace(/{TRANSLOADIT_ACCESS_KEY}/g, (process.env['TRANSLOADIT_ACCESS_KEY'] + '').trim());
+    content = content.replace(/{TRANSLOADIT_ACCESS_KEY}/g, (process.env.TRANSLOADIT_ACCESS_KEY + '').trim());
     respondHtml(res, content);
   });
 }
@@ -66,6 +66,11 @@ function serveBuildJs(res) {
     res.writeHead(200, 'OK', {'Content-Type': 'text/javascript'});
     res.end(content);
   });
+}
+
+if (!process.env.TRANSLOADIT_ACCESS_KEY) {
+  console.err('Found no TRANSLOADIT_ACCESS_KEY in env');
+  process.exit(1);
 }
 
 http.createServer(function(req, res) {
