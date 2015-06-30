@@ -36,7 +36,7 @@ sleep 2
 
 pushd "${__dir}"
   exitcode=0
-  for file in `find ./*${pattern}*`; do
+  for file in `find ./system/*${pattern}*`; do
     basename="$(basename "${file}")"
 
     if [ "${basename}" = "_pre.coffee" ]; then
@@ -71,4 +71,3 @@ popd "${__dir}"
 curl http://${testhost}/shutdown || true
 
 exit ${exitcode}
-
