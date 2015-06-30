@@ -1,4 +1,5 @@
 {
 	"preset": "node-style-guide",
-	"requireAlignedObjectValues": "ignoreLineBreak"
+	"requireAlignedObjectValues": "all",
+	"disallowSpaceAfterObjectKeys": "ignoreSingleLine"
 }

@@ -12,7 +12,7 @@
 
   var OPTIONS = {
     service                      : DEFAULT_SERVICE,
-    assets                       : PROTOCOL+'assets.transloadit.com/',
+    assets                       : PROTOCOL + 'assets.transloadit.com/',
     beforeStart                  : function() {return true;},
     onFileSelect                 : function() {},
     onStart                      : function() {},
@@ -347,11 +347,11 @@
       $clone.insertAfter(this);
     });
 
-    this.$iframe = $('<iframe id="transloadit-'+this.assemblyId+'" name="transloadit-'+this.assemblyId+'"/>')
+    this.$iframe = $('<iframe id="transloadit-' + this.assemblyId + '" name="transloadit-' + this.assemblyId + '"/>')
       .appendTo('body')
       .hide();
 
-    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false';
+    var url = PROTOCOL + this.instance + '/assemblies/' + this.assemblyId + '?redirect=false';
 
     if (this._options.formData) {
       var paramsFieldVal = this.$form.find("input[name=params]").val();
@@ -491,7 +491,7 @@
 
     if (this.params.redirect_url) {
       this.$form.attr('action', this.params.redirect_url);
-    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
+    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service + 'assemblies')) {
       alert('Error: input[name=params] does not include a redirect_url');
       return;
     }
@@ -514,7 +514,7 @@
     this.pollStarted = +new Date();
 
     var instance = 'status-' + this.instance;
-    var url      = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
+    var url      = PROTOCOL + instance + '/assemblies/' + this.assemblyId;
 
     if (query) {
       url += query;
@@ -733,18 +733,18 @@
 
   Uploader.prototype.showModal = function() {
     this.$modal =
-      $('<div id="transloadit">'+
-        '<div class="content">'+
-          '<a href="#close" class="close">'+ this.i18n('cancel') +'</a>'+
-          '<p class="status"></p>'+
+      $('<div id="transloadit">' +
+        '<div class="content">' +
+          '<a href="#close" class="close">' + this.i18n('cancel') + '</a>' +
+          '<p class="status"></p>' +
           '<div class="progress progress-striped">' +
             '<div class="bar"><span class="percent"></span></div>' +
           '</div>' +
-          '<label>'+ this.i18n('startingUpload')+'</label>' +
-          '<p class="error"></p>'+
-          '<div class="error-details-toggle"><a href="#">'+ this.i18n('details') +'</a></div>' +
-          '<p class="error-details"></p>'+
-        '</div>'+
+          '<label>' + this.i18n('startingUpload') + '</label>' +
+          '<p class="error"></p>' +
+          '<div class="error-details-toggle"><a href="#">' + this.i18n('details') + '</a></div>' +
+          '<p class="error-details"></p>' +
+        '</div>' +
       '</div>')
       .appendTo('body');
 
@@ -794,7 +794,7 @@
     this.$modal.$progress.hide();
     this.$modal.$label.hide();
 
-    var errorMsg = err.error+': ' + err.message + '<br /><br />';
+    var errorMsg = err.error + ': ' + err.message + '<br /><br />';
     errorMsg += (err.reason || '');
 
     var errorsRequiringDetails = [
@@ -945,7 +945,7 @@
       now.getUTCSeconds()
     );
 
-    var pad = function (n) {
+    var pad = function(n) {
       return n < 10 ? '0' + n : n;
     };
     var tz = d.getTimezoneOffset();
@@ -1039,7 +1039,7 @@
     var nsecs = options.nsecs != null ? options.nsecs : this._lastNSecs + 1;
 
     // Time since last uuid creation (in msecs)
-    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs)/10000;
+    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs) / 10000;
 
     // Per 4.2.1.2, Bump clockseq on clock regression
     if (dt < 0 && options.clockseq == null) {
@@ -1096,7 +1096,7 @@
     function unparse(_buf, offset) {
       var i = offset || 0, bth = _byteToHex;
 
-      return  bth[_buf[i++]] + bth[_buf[i++]] +
+      return bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
               bth[_buf[i++]] + bth[_buf[i++]] +
@@ -1130,7 +1130,7 @@
     var key  = args.shift();
     var locale = this._options.locale;
     var translated = I18N[locale] && I18N[locale][key] || I18N.en[key];
-    if(!translated) {
+    if (!translated) {
       throw new Error('Unknown i18n key: ' + key);
     }
 

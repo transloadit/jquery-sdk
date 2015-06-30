@@ -10,14 +10,14 @@ function processPost(request, response, cb) {
   if (request.method === 'POST') {
     request.on('data', function(data) {
       queryData += data;
-        if (queryData.length > 1e6) {
-          queryData = '';
-          response.writeHead(413, {'Content-Type': 'text/plain'}).end();
-          request.connection.destroy();
-        }
-      });
+      if (queryData.length > 1e6) {
+        queryData = '';
+        response.writeHead(413, {'Content-Type': 'text/plain'}).end();
+        request.connection.destroy();
+      }
+    });
 
-      request.on('end', function() {
+    request.on('end', function() {
         request.post = querystring.parse(queryData);
         cb();
       });
@@ -68,7 +68,7 @@ function serveBuildJs(res) {
   });
 }
 
-http.createServer(function (req, res) {
+http.createServer(function(req, res) {
   if (req.method === 'POST') {
     processPost(req, res, function() {
       var stringified = JSON.stringify(req.post);
