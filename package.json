@@ -4,6 +4,9 @@
     "jshint": "^2.5.10"
   },
   "scripts": {
-    "test" : "make test"
+    "test": "make test"
+  },
+  "devDependencies": {
+    "jscs": "^1.13.1"
   }
 }
