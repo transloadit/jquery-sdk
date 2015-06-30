@@ -4,6 +4,22 @@ var fs          = require('fs');
 var debug       = require('debug')('tlj:testserver');
 var util        = require('util');
 
+
+function escapeHtml(string) {
+  var entityMap = {
+     "&" : "&amp;",
+     "<" : "&lt;",
+     ">" : "&gt;",
+     '"' : '&quot;',
+     "'" : '&#39;',
+     "/" : '&#x2F;'
+   };
+
+  return String(string).replace(/[&<>"'\/]/g, function(s) {
+     return entityMap[s];
+   });
+}
+
 function processPost(request, response, cb) {
   var queryData = '';
 
@@ -77,7 +93,8 @@ http.createServer(function(req, res) {
   if (req.method === 'POST') {
     processPost(req, res, function() {
       var stringified = JSON.stringify(req.post);
-      respondHtml(res, '<body>' + stringified + '</body>');
+      var escaped     = escapeHtml(stringified);
+      respondHtml(res, '<body>' + escaped + '</body>');
     });
     return;
   }
