@@ -53,6 +53,10 @@ install: $(build_path) $(css_path)
 	cp $(build_path) $(install_dir)/js/$(build_name)
 	cp $(css_path) $(install_dir)/css/$(css_name)
 
+.PHONY: start-test-server
+start-test-server:
+	source env.sh && node tests/server.js
+
 .PHONY: link
 link:
 	ln -s `pwd` ${install_dir}/jquery-sdk
