@@ -27,11 +27,12 @@ $(build_path): js/dep/*.js js/lib/*.js
 
 .PHONY: test
 test: $(build_path)
-	# $(MAKE) flow || true
-	# $(MAKE) jshint || true
-	$(MAKE) jscs || true
-	# On travis there won't be an env.sh so allow `source` fails:
-	source env.sh; tests/run.sh $(filter)
+	@$(MAKE) jscs
+	@source env.sh; tests/run.sh $(filter)
+
+.PHONY: jscs-fix
+jscs-fix:
+	@./node_modules/.bin/jscs js/lib tests/
 
 .PHONY: jscs
 jscs:
@@ -39,28 +40,28 @@ jscs:
 
 .PHONY: flow
 flow:
-	[ -f flow-osx-latest.zip ] || wget http://flowtype.org/downloads/flow-osx-latest.zip
-	[ -d flow ] || unzip -o flow-osx-latest.zip
-	[ -f .flowconfig ] || ./flow/flow init
-	cat ./js/lib/jquery.transloadit2.js | ./flow/flow check-contents --show-all-errors
+	@[ -f flow-osx-latest.zip ] || wget http://flowtype.org/downloads/flow-osx-latest.zip
+	@[ -d flow ] || unzip -o flow-osx-latest.zip
+	@[ -f .flowconfig ] || ./flow/flow init
+	@cat ./js/lib/jquery.transloadit2.js | ./flow/flow check-contents --show-all-errors
 
 .PHONY: jshint
 jshint:
-	./node_modules/.bin/jshint ./js/lib
+	@./node_modules/.bin/jshint ./js/lib
 
 # TRANSLOADIT INTERNAL
 install: $(build_path) $(css_path)
-	cp $(build_path) $(install_dir)/js/$(build_name)
-	cp $(css_path) $(install_dir)/css/$(css_name)
+	@cp $(build_path) $(install_dir)/js/$(build_name)
+	@cp $(css_path) $(install_dir)/css/$(css_name)
 
 .PHONY: start-test-server
 start-test-server:
-	source env.sh && node tests/server.js
+	@source env.sh && node tests/server.js
 
 .PHONY: link
 link:
-	ln -s `pwd` ${install_dir}/jquery-sdk
+	@ln -s `pwd` ${install_dir}/jquery-sdk
 
 .PHONY: clean
 clean:
-	rm build/*.*
+	@rm build/*.*
