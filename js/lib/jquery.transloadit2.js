@@ -727,7 +727,7 @@
   };
 
   Uploader.prototype.hideModal = function() {
-    $.mask.close();
+    $.transloaditMask.close();
     this.$modal.remove();
   };
 
@@ -768,7 +768,7 @@
 
     var expose = this.$modal.expose({
       api          : true,
-      maskId       : 'transloadit_expose',
+      transloaditMaskId       : 'transloadit_expose',
       opacity      : 0.9,
       loadSpeed    : 250,
       closeOnEsc   : false,

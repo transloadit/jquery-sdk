@@ -25,7 +25,7 @@
 	$.tools = $.tools || {version: '2013-02-15'};
 	var tool = $.tools.expose = {
 		conf: {
-			maskId: 'exposeMask',
+			transloaditMaskId: 'exposeTransloaditMask',
 			loadSpeed: 'slow',
 			closeSpeed: 'fast',
 			zIndex: 9998,
@@ -34,18 +34,18 @@
 			color: '#fff'
 		}
 	};
-	var mask, exposed, loaded, config, overlayIndex;
-	$.mask = {
+	var transloaditMask, exposed, loaded, config, overlayIndex;
+	$.transloaditMask = {
 		load: function(conf, els) {
 			if (loaded) { return this; }
 			conf = conf || config;
 			config = conf = $.extend($.extend({}, tool.conf), conf);
-			mask = $("#" + conf.maskId);
-			if (!mask.length) {
-				mask = $('<div/>').attr("id", conf.maskId);
-				$("body").append(mask);
+			transloaditMask = $("#" + conf.transloaditMaskId);
+			if (!transloaditMask.length) {
+				transloaditMask = $('<div/>').attr("id", conf.transloaditMaskId);
+				$("body").append(transloaditMask);
 			}
-			mask.css({
+			transloaditMask.css({
 				position: 'fixed',
 				top: 0,
 				left: 0,
@@ -68,7 +68,7 @@
 		},
 		close: function() {
 			if (loaded) {
-				mask.fadeOut(config.closeSpeed, function() {
+				transloaditMask.fadeOut(config.closeSpeed, function() {
 					if (exposed) {
 						exposed.css({zIndex: overlayIndex});
 					}
@@ -78,12 +78,12 @@
 			return this;
 		}
 	};
-	$.fn.mask = function(conf) {
-		$.mask.load(conf);
+	$.fn.transloaditMask = function(conf) {
+		$.transloaditMask.load(conf);
 		return this;
 	};
 	$.fn.expose = function(conf) {
-		$.mask.load(conf, this);
+		$.transloaditMask.load(conf, this);
 		return this;
 	};
 })(jQuery);
