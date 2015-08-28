@@ -232,6 +232,11 @@
               }
 
               url = PROTOCOL + 'api2.' + theUrl + '/instances/bored';
+
+              if (PROTOCOL === 'https://') {
+                url = PROTOCOL + 'api2-' + theUrl + '/instances/bored';
+              }
+
               proceed();
             });
             return;
