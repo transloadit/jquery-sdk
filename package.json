@@ -1,12 +1,12 @@
 {
   "dependencies": {
-    "debug": "^2.1.0",
-    "jshint": "^2.5.10"
+    "debug": "2.2.0",
+    "jshint": "2.8.0"
   },
   "scripts": {
     "test": "make test"
   },
   "devDependencies": {
-    "jscs": "^1.13.1"
+    "jscs": "1.13.1"
   }
 }
