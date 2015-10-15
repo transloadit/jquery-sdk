@@ -7,6 +7,6 @@
     "test": "make test"
   },
   "devDependencies": {
-    "jscs": "2.2.1"
+    "jscs": "2.3.2"
   }
 }
