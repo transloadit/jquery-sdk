@@ -5,6 +5,346 @@
 The official docs for our jQuery plugin / SDK are on the
 [transloadit website](https://transloadit.com/docs/#jquery-plugin).
 
+### Basics
+
+The Transloadit jQuery plugin allows you to
+
+- show file upload progress,
+- get uploaded results directly without further API queries, and
+- wait for upload processing to complete before redirecting to the result page.
+
+Assuming a form with the ID `"upload-form"` (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
+
+```markup
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
+<script type="text/javascript">
+// We call .transloadit() after the DOM is initialized:
+$(function() {
+  $('#upload-form').transloadit();
+});
+</script>
+```
+
+By default, this will display an overlay with a progress bar.
+
+<span class="label label-danger">Important</span> Your file input fields must each have a proper `name` attribute for our jQuery SDK to work properly.
+
+### Customize the progress bar
+
+If you don't like the Transloadit progress bar, you can render your own, like this:
+
+```javascript
+$('#upload-form').transloadit({
+  modal: false,
+  onProgress: function(bytesReceived, bytesExpected) {
+    // render your own progress bar!
+    $('#progress')
+      .text((bytesReceived / bytesExpected * 100).toFixed(2) + '%');
+  },
+  onError: function(assembly) {
+    alert(assembly.error + ': ' + Assembly.message);
+  }
+});
+```
+
+If you like the default Transloadit progress bar but just want to change a few colors, customize [these css selectors](https://github.com/transloadit/jquery-sdk/blob/master/css/transloadit2.css) in your own css.
+
+### Unbinding the plugin
+
+You can unbind the plugin by calling
+
+```javascript
+$('#upload-form').unbind('submit.transloadit');
+```
+
+### How to use XMLHttpRequest
+
+You can either set the `formData` parameter to true, or supply your own FormData
+object to it in order to enable xhr file uploads:
+
+```javascript
+$('#upload-form').transloadit({
+  formData: true
+});
+```
+
+### How to access the internal Transloadit object
+
+You can access the internal uploader object to call methods directly on it like so:
+
+```javascript
+var $el = $('#upload-form');
+$el.transloadit({
+  wait: true
+});
+
+var uploader = $el.data('transloadit.uploader');
+
+// then call some methods on the uploader object
+uploader.start();
+uploader.stop();
+
+// hide the modal if it exists
+uploader.hideModal();
+
+// alternatively you could also do it like this
+$el.transloadit('start');
+$el.transloadit('stop');
+```
+
+Please consult the [plugin's source code](https://github.com/transloadit/jquery-sdk) to see all available methods.
+
+### Available plugin versions
+
+#### Latest
+
+This is always the latest version, and for now points to v2.7.2. This is the **recommended version** to use.<br />
+<https://assets.transloadit.com/js/jquery.transloadit2-latest.js>
+
+#### Version 2 Latest
+
+This is always the latest version of the 2.x.x branch, and for now points to v2.7.2.<br />
+<https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js>
+
+### Plugin parameters
+
+The plugin supports several parameters.
+
+<table class="table table-striped table-bordered">
+<tr>
+ <th>Parameter</th>
+ <th>Description</th>
+</tr>
+<tr>
+ <td markdown="1">
+  `wait`
+ </td>
+ <td markdown="1">
+  Specifies whether the plugin should wait for files to be processed before submitting the form. This is `false` by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `params`
+ </td>
+ <td markdown="1">
+
+An object of Assembly instructions that should be executed. For examples please check [the minimal integration](#the-minimal-integration). This is `null` by default, which means the instructions are read from the hidden input field named `params`.
+
+Here is an example:
+
+```javascript
+$('#upload-form').transloadit({
+  wait   : true,
+  params : {
+    auth  : { key : 'YOUR_TRANSLOADIT_AUTH_KEY' },
+    steps : {
+      resize_to_75: {
+        robot  : '/image/resize',
+        use    : ':original',
+        width  : 75,
+        height : 75
+      },
+      // more Steps here
+    }
+  }
+});
+```
+
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `signature`
+ </td>
+ <td markdown="1">
+  Specifies the signature string, which is required if signature authentication is enabled in your account. This is `null` by default. The old way of providing this in a hidden input field named `signature` is still valid and will not be deprecated.
+
+  Please make sure the signature is calculated in your back-end code, so that your Transloadit Auth Secret is not exposed in your public JavaScript code!
+ </td>
+</tr>
+
+<tr>
+ <td markdown="1">
+  `modal`
+ </td>
+ <td markdown="1">
+  Specifies whether to render the Transloadit overlay and progress bar automatically. This is `true` by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `autoSubmit`
+ </td>
+ <td markdown="1">
+  Specifies whether to submit the original form automatically once the upload and processing have completed. This is `true` by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `formData`
+ </td>
+ <td markdown="1">
+  Specifies whether to use XMLHttpRequest (XHR) for file uploading. This is `false` by default. Can either be a FormData object or `true`, in which case the plugin builds the FormData object.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `processZeroFiles`
+ </td>
+ <td markdown="1">
+  Specifies whether to perform processing when the form is submitted with no files selected using the form inputs. This is `true` by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `triggerUploadOnFileSelection`
+ </td>
+ <td markdown="1">
+  When set to `true` this triggers the upload to Transloadit as soon as the user has selected a file in any of the form's file input fields. This is `false` by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `exclude`
+ </td>
+ <td markdown="1">
+  Specifies a selector for which any matching `input[type=file]` elements in the current form will <em>not</em> be uploaded through Transloadit. This is `""` by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `fields`
+ </td>
+ <td markdown="1">
+
+A CSS selector that specifies the form fields to be sent to Transloadit. This is `false` by default, which means no form fields are submitted with an upload.
+
+For example:
+
+```javascript
+$('form').transloadit({
+  // send no form fields; this is the default
+  fields: false
+});
+```
+
+If you would like to only send some fields, set this parameter to a CSS selector string matching the fields to be sent:
+
+```javascript
+$('form').transloadit({
+  // only send the fields named "field1" &amp; "field2"
+  fields: 'input[name=field1], input[name=field2]'
+});
+```
+
+If you would like to send all form fields, set this to true:
+
+```javascript
+$('form').transloadit({
+  fields: true
+});
+```
+
+You can also set this to an object of key/value pairs:
+
+```javascript
+$('form').transloadit({
+  fields: {
+    name : 'John Doe',
+    age  : 26
+  }
+});
+```
+
+The fields that you send here will be available as `${fields.*}` variables in your Assembly instructions. Learn more about that [here](#form-fields-in-assembly-instructions).
+ </td>
+</tr>
+
+<tr>
+ <td markdown="1">
+  `debug`
+ </td>
+ <td markdown="1">
+  Specifies whether Transloadit errors are displayed to end users. If this is set to `false`, no Transloadit errors will be displayed. Use the `onError` callback to perform your own logging or presentation. This is `true` by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `onStart(assembly)`
+ </td>
+ <td markdown="1">
+  This is fired whenever an upload begins.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `onFileSelect(fileName, $fileInputField)`
+ </td>
+ <td markdown="1">
+  This is fired whenever a user selects a file in file input field.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  <code>onProgress(<br />bytesReceived, bytesExpected<br />)</code>
+ </td>
+ <td markdown="1">
+  This is fired whenever the upload progress is updated, allowing you to render your own upload progress bar.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `onUpload(upload)`
+ </td>
+ <td markdown="1">
+  This is fired once for each file uploaded. This is useful for custom renderings of multiple file uploads.
+
+  Each upload here has an ID field. You can map that back to the `original_id` field of results on the `onResult` callback.
+ </td>
+</tr>
+
+<tr>
+ <td markdown="1">
+  `onResult(step, result)`
+ </td>
+ <td markdown="1">
+  This is fired each time a result becomes available for a given Step, and is only available when `wait` is set to `true`. This can be used
+  to show thumbnails for videos or images once they are uploaded.
+
+  Results here contain a key `original_id`, which maps them back to the ID of the originally uploaded file's ID.
+ </td>
+</tr>
+
+<tr>
+ <td markdown="1">
+  `onCancel()`
+ </td>
+ <td markdown="1">
+  This is fired after an upload has been canceled by the user.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `onError(assembly)`
+ </td>
+ <td markdown="1">
+  This is fired when upload errors occur.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  `onSuccess(assembly)`
+ </td>
+ <td markdown="1">
+  This is fired when the plugin has completed an upload. If `wait` is set to `false`, this is fired after the upload finishes. If `wait` is `true`, this is fired once all files have been processed.
+ </td>
+</tr>
+</table>
+
+<span class="label label-danger">Important</span> For very specific use-cases it may help to
+take a look at the [plugin's source code](https://github.com/transloadit/jquery-sdk). You can also always [ask us](/support) to clarify something or help you with integration.
+
 ## Contributing
 
 Feel free to fork this project. We will happily merge bug fixes or other small
