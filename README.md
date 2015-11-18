@@ -13,7 +13,7 @@ The Transloadit jQuery plugin allows you to
 - get uploaded results directly without further API queries, and
 - wait for upload processing to complete before redirecting to the result page.
 
-Assuming a form with the ID `"upload-form"` (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
+Assuming a form with the ID <code>"upload-form"</code> (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
 
 ```markup
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
@@ -27,7 +27,7 @@ $(function() {
 
 By default, this will display an overlay with a progress bar.
 
-<span class="label label-danger">Important</span> Your file input fields must each have a proper `name` attribute for our jQuery SDK to work properly.
+<span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
 
 ### Customize the progress bar
 
@@ -59,7 +59,7 @@ $('#upload-form').unbind('submit.transloadit');
 
 ### How to use XMLHttpRequest
 
-You can either set the `formData` parameter to true, or supply your own FormData
+You can either set the <code>formData</code> parameter to true, or supply your own FormData
 object to it in order to enable xhr file uploads:
 
 ```javascript
@@ -120,16 +120,16 @@ The plugin supports several parameters.
   <code>wait</code>
  </td>
  <td markdown="1">
-  Specifies whether the plugin should wait for files to be processed before submitting the form. This is `false` by default.
+  Specifies whether the plugin should wait for files to be processed before submitting the form. This is <code>false</code> by default.
  </td>
 </tr>
 <tr>
  <td markdown="1">
-  `params`
+  <code>params</code>
  </td>
  <td markdown="1">
 
-An object of Assembly instructions that should be executed. For examples please check [the minimal integration](#the-minimal-integration). This is `null` by default, which means the instructions are read from the hidden input field named `params`.
+An object of Assembly instructions that should be executed. For examples please check [the minimal integration](#the-minimal-integration). This is <code>null</code> by default, which means the instructions are read from the hidden input field named <code>params</code>.
 
 Here is an example:
 
@@ -155,10 +155,10 @@ $('#upload-form').transloadit({
 </tr>
 <tr>
  <td markdown="1">
-  `signature`
+  <code>signature</code>
  </td>
  <td markdown="1">
-  Specifies the signature string, which is required if signature authentication is enabled in your account. This is `null` by default. The old way of providing this in a hidden input field named `signature` is still valid and will not be deprecated.
+  Specifies the signature string, which is required if signature authentication is enabled in your account. This is <code>null</code> by default. The old way of providing this in a hidden input field named <code>signature</code> is still valid and will not be deprecated.
 
   Please make sure the signature is calculated in your back-end code, so that your Transloadit Auth Secret is not exposed in your public JavaScript code!
  </td>
@@ -166,59 +166,59 @@ $('#upload-form').transloadit({
 
 <tr>
  <td markdown="1">
-  `modal`
+  <code>modal</code>
  </td>
  <td markdown="1">
-  Specifies whether to render the Transloadit overlay and progress bar automatically. This is `true` by default.
- </td>
-</tr>
-<tr>
- <td markdown="1">
-  `autoSubmit`
- </td>
- <td markdown="1">
-  Specifies whether to submit the original form automatically once the upload and processing have completed. This is `true` by default.
+  Specifies whether to render the Transloadit overlay and progress bar automatically. This is <code>true</code> by default.
  </td>
 </tr>
 <tr>
  <td markdown="1">
-  `formData`
+  <code>autoSubmit</code>
  </td>
  <td markdown="1">
-  Specifies whether to use XMLHttpRequest (XHR) for file uploading. This is `false` by default. Can either be a FormData object or `true`, in which case the plugin builds the FormData object.
- </td>
-</tr>
-<tr>
- <td markdown="1">
-  `processZeroFiles`
- </td>
- <td markdown="1">
-  Specifies whether to perform processing when the form is submitted with no files selected using the form inputs. This is `true` by default.
+  Specifies whether to submit the original form automatically once the upload and processing have completed. This is <code>true</code> by default.
  </td>
 </tr>
 <tr>
  <td markdown="1">
-  `triggerUploadOnFileSelection`
+  <code>formData</code>
  </td>
  <td markdown="1">
-  When set to `true` this triggers the upload to Transloadit as soon as the user has selected a file in any of the form's file input fields. This is `false` by default.
- </td>
-</tr>
-<tr>
- <td markdown="1">
-  `exclude`
- </td>
- <td markdown="1">
-  Specifies a selector for which any matching `input[type=file]` elements in the current form will <em>not</em> be uploaded through Transloadit. This is `""` by default.
+  Specifies whether to use XMLHttpRequest (XHR) for file uploading. This is <code>false</code> by default. Can either be a FormData object or <code>true</code>, in which case the plugin builds the FormData object.
  </td>
 </tr>
 <tr>
  <td markdown="1">
-  `fields`
+  <code>processZeroFiles</code>
+ </td>
+ <td markdown="1">
+  Specifies whether to perform processing when the form is submitted with no files selected using the form inputs. This is <code>true</code> by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  <code>triggerUploadOnFileSelection</code>
+ </td>
+ <td markdown="1">
+  When set to <code>true</code> this triggers the upload to Transloadit as soon as the user has selected a file in any of the form's file input fields. This is <code>false</code> by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  <code>exclude</code>
+ </td>
+ <td markdown="1">
+  Specifies a selector for which any matching <code>input[type=file]</code> elements in the current form will <em>not</em> be uploaded through Transloadit. This is <code>""</code> by default.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
+  <code>fields</code>
  </td>
  <td markdown="1">
 
-A CSS selector that specifies the form fields to be sent to Transloadit. This is `false` by default, which means no form fields are submitted with an upload.
+A CSS selector that specifies the form fields to be sent to Transloadit. This is <code>false</code> by default, which means no form fields are submitted with an upload.
 
 For example:
 
@@ -257,21 +257,21 @@ $('form').transloadit({
 });
 ```
 
-The fields that you send here will be available as `${fields.*}` variables in your Assembly instructions. Learn more about that [here](#form-fields-in-assembly-instructions).
+The fields that you send here will be available as <code>${fields.*}</code> variables in your Assembly instructions. Learn more about that [here](#form-fields-in-assembly-instructions).
  </td>
 </tr>
 
 <tr>
  <td markdown="1">
-  `debug`
+  <code>debug</code>
  </td>
  <td markdown="1">
-  Specifies whether Transloadit errors are displayed to end users. If this is set to `false`, no Transloadit errors will be displayed. Use the `onError` callback to perform your own logging or presentation. This is `true` by default.
+  Specifies whether Transloadit errors are displayed to end users. If this is set to <code>false</code>, no Transloadit errors will be displayed. Use the <code>onError</code> callback to perform your own logging or presentation. This is <code>true</code> by default.
  </td>
 </tr>
 <tr>
  <td markdown="1">
-  `onStart(assembly)`
+  <code>onStart(assembly)</code>
  </td>
  <td markdown="1">
   This is fired whenever an upload begins.
@@ -279,7 +279,7 @@ The fields that you send here will be available as `${fields.*}` variables in yo
 </tr>
 <tr>
  <td markdown="1">
-  `onFileSelect(fileName, $fileInputField)`
+  <code>onFileSelect(fileName, $fileInputField)</code>
  </td>
  <td markdown="1">
   This is fired whenever a user selects a file in file input field.
@@ -295,30 +295,30 @@ The fields that you send here will be available as `${fields.*}` variables in yo
 </tr>
 <tr>
  <td markdown="1">
-  `onUpload(upload)`
+  <code>onUpload(upload)</code>
  </td>
  <td markdown="1">
   This is fired once for each file uploaded. This is useful for custom renderings of multiple file uploads.
 
-  Each upload here has an ID field. You can map that back to the `original_id` field of results on the `onResult` callback.
+  Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
  </td>
 </tr>
 
 <tr>
  <td markdown="1">
-  `onResult(step, result)`
+  <code>onResult(step, result)</code>
  </td>
  <td markdown="1">
-  This is fired each time a result becomes available for a given Step, and is only available when `wait` is set to `true`. This can be used
+  This is fired each time a result becomes available for a given Step, and is only available when <code>wait</code> is set to <code>true</code>. This can be used
   to show thumbnails for videos or images once they are uploaded.
 
-  Results here contain a key `original_id`, which maps them back to the ID of the originally uploaded file's ID.
+  Results here contain a key <code>original_id</code>, which maps them back to the ID of the originally uploaded file's ID.
  </td>
 </tr>
 
 <tr>
  <td markdown="1">
-  `onCancel()`
+  <code>onCancel()</code>
  </td>
  <td markdown="1">
   This is fired after an upload has been canceled by the user.
@@ -326,7 +326,7 @@ The fields that you send here will be available as `${fields.*}` variables in yo
 </tr>
 <tr>
  <td markdown="1">
-  `onError(assembly)`
+  <code>onError(assembly)</code>
  </td>
  <td markdown="1">
   This is fired when upload errors occur.
@@ -334,10 +334,10 @@ The fields that you send here will be available as `${fields.*}` variables in yo
 </tr>
 <tr>
  <td markdown="1">
-  `onSuccess(assembly)`
+  <code>onSuccess(assembly)</code>
  </td>
  <td markdown="1">
-  This is fired when the plugin has completed an upload. If `wait` is set to `false`, this is fired after the upload finishes. If `wait` is `true`, this is fired once all files have been processed.
+  This is fired when the plugin has completed an upload. If <code>wait</code> is set to <code>false</code>, this is fired after the upload finishes. If <code>wait</code> is <code>true</code>, this is fired once all files have been processed.
  </td>
 </tr>
 </table>
@@ -357,7 +357,7 @@ This project implements the Semantic Versioning guidelines.
 
 Releases will be numbered with the following format:
 
-`<major>.<minor>.<patch>`
+<code><major>.<minor>.<patch></code>
 
 And constructed with the following guidelines:
 
@@ -367,19 +367,19 @@ And constructed with the following guidelines:
 
 For more information on SemVer, please visit http://semver.org/.
 
-`latest` points to the latest stable of a major version.
+<code>latest</code> points to the latest stable of a major version.
 
-Note that the `2` in `jquery.transloadit2-latest.js` refers to the Transloadit
+Note that the <code>2</code> in <code>jquery.transloadit2-latest.js</code> refers to the Transloadit
 API2 version, not the client SDK version.
 
 ## Releases
 
 We have two *magic* releases:
 
- - `jquery.transloadit2-latest.js`
+ - <code>jquery.transloadit2-latest.js</code>
    This is always the latest version of any major release and is **the recommended version to use**. If you use this, it may break backwards compatibility for you once we release the next major version. [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
- - `jquery.transloadit2-v2-latest.js`
+ - <code>jquery.transloadit2-v2-latest.js</code>
    This is always the latest major 2.0 version: [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
 
 Here's an overview of [all our releases](https://github.com/transloadit/jquery-sdk/releases).
@@ -394,11 +394,11 @@ for minification.
 make
 ```
 
-The minified output file can be found in: `build/jquery.transloadit2.js`.
+The minified output file can be found in: <code>build/jquery.transloadit2.js</code>.
 
 ## Tests
 
-To run the tests, install `make` (via Xcode or build-essentials), [CasperJS](http://casperjs.org/) and [Node.js](http://nodejs.org). Then run
+To run the tests, install <code>make</code> (via Xcode or build-essentials), [CasperJS](http://casperjs.org/) and [Node.js](http://nodejs.org). Then run
 
 ```bash
 make test
