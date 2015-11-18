@@ -29,6 +29,11 @@ By default, this will display an overlay with a progress bar.
 
 <span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
 
+
+### Include drag and drop
+
+Please refer to [this project](https://github.com/tim-kos/transloadit-drag-and-drop) to add support for drag and drop.
+
 ### Customize the progress bar
 
 If you don't like the Transloadit progress bar, you can render your own, like this:
