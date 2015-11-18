@@ -133,7 +133,7 @@ An object of Assembly instructions that should be executed. For examples please 
 
 Here is an example:
 
-```javascript
+<pre><code>
 $('#upload-form').transloadit({
   wait   : true,
   params : {
@@ -149,7 +149,7 @@ $('#upload-form').transloadit({
     }
   }
 });
-```
+</code></pre>
 
  </td>
 </tr>
