@@ -222,40 +222,40 @@ A CSS selector that specifies the form fields to be sent to Transloadit. This is
 
 For example:
 
-```javascript
+<pre><code>
 $('form').transloadit({
   // send no form fields; this is the default
   fields: false
 });
-```
+</code></pre>
 
 If you would like to only send some fields, set this parameter to a CSS selector string matching the fields to be sent:
 
-```javascript
+<pre><code>
 $('form').transloadit({
   // only send the fields named "field1" &amp; "field2"
   fields: 'input[name=field1], input[name=field2]'
 });
-```
+</code></pre>
 
 If you would like to send all form fields, set this to true:
 
-```javascript
+<pre><code>
 $('form').transloadit({
   fields: true
 });
-```
+</code></pre>
 
 You can also set this to an object of key/value pairs:
 
-```javascript
+<pre><code>
 $('form').transloadit({
   fields: {
     name : 'John Doe',
     age  : 26
   }
 });
-```
+</code></pre>
 
 The fields that you send here will be available as <code>${fields.*}</code> variables in your Assembly instructions. Learn more about that [here](#form-fields-in-assembly-instructions).
  </td>
