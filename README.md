@@ -117,7 +117,7 @@ The plugin supports several parameters.
 </tr>
 <tr>
  <td markdown="1">
-  `wait`
+  <code>wait</code>
  </td>
  <td markdown="1">
   Specifies whether the plugin should wait for files to be processed before submitting the form. This is `false` by default.
