@@ -346,11 +346,16 @@
     // when the user hits cancel and so that we can .append(this.$files) to
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
     this.$fileClones = $().not(document);
-    this.$files.each(function() {
-      var $clone = $(this).clone(true);
-      self.$fileClones = self.$fileClones.add($clone);
-      $clone.insertAfter(this);
-    });
+
+    // We do not need file clones if we do an XHR upload, because we do not
+    // have a shadow form submitted to an iframe in that case.
+    if (!this._options.formData) {
+      this.$files.each(function() {
+        var $clone = $(this).clone(true);
+        self.$fileClones = self.$fileClones.add($clone);
+        $clone.insertAfter(this);
+      });
+    }
 
     this.$iframe = $('<iframe id="transloadit-' + this.assemblyId + '" name="transloadit-' + this.assemblyId + '"/>')
       .appendTo('body')
