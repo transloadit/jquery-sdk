@@ -82,9 +82,8 @@ var $el = $('#upload-form');
 $el.transloadit({
   locale: "my_locale"
 });
-var uploader = $el.data('transloadit.uploader');
 
-uploader.i18n.my_locale = {
+$el.transloadit.i18n.my_locale = {
   'errors.BORED_INSTANCE_ERROR' : 'Could not find a bored instance.',
   'errors.CONNECTION_ERROR'     : 'There was a problem connecting to the upload server',
   'errors.unknown'              : 'There was an internal error.',
