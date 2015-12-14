@@ -73,6 +73,34 @@ $('#upload-form').transloadit({
 });
 ```
 
+### How to add your own localization / other language strings
+
+You can add your own language strings like so:
+
+```
+var $el = $('#upload-form');
+$el.transloadit({
+  locale: "my_locale"
+});
+var uploader = $el.data('transloadit.uploader');
+
+uploader.i18n.my_locale = {
+  'errors.BORED_INSTANCE_ERROR' : 'Could not find a bored instance.',
+  'errors.CONNECTION_ERROR'     : 'There was a problem connecting to the upload server',
+  'errors.unknown'              : 'There was an internal error.',
+  'errors.tryAgain'             : 'Please try your upload again.',
+  'errors.troubleshootDetails'  : 'If you would like our help to troubleshoot this, ' +
+      'please email us this information:',
+  cancel                        : 'Cancel',
+  details                       : 'Details',
+  startingUpload                : 'Starting upload ...',
+  processingFiles               : 'Upload done, now processing files ...',
+  uploadProgress                : '%s / %s MB at %s kB/s | %s left'
+}
+```
+
+Then just replace the English strings with your custom language strings.
+
 ### How to access the internal Transloadit object
 
 You can access the internal uploader object to call methods directly on it like so:
