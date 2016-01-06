@@ -267,7 +267,6 @@
   };
 
   Uploader.prototype._findBoredInstanceUrl = function(cb) {
-    var self   = this;
     var region = this._options.region;
     var domain = 's3';
 
@@ -278,20 +277,33 @@
     var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region;
     url    += '.transloadit.com/cached_instances.json';
 
-    $.ajax({
+    var self = this;
+    var opts = {
       url      : url,
-      datatype : 'json',
       timeout  : 5000,
+      datatype : 'json',
       success  : function(result) {
         var instances = self._shuffle(result.uploaders);
         self._findResponsiveInstance(instances, 0, cb);
-      },
-      error    : function(xhr, status) {
-        var msg = 'Could not query S3 for cached uploaders from url: ' + url;
+      }
+    };
+
+    opts.error = function(xhr, status) {
+      // retry from the crm if S3 let us down
+      opts.url = PROTOCOL + 'transloadit.com/' + region;
+      opts.url += '_cached_instances.json';
+
+      opts.error = function(xhr, status) {
+        var msg = 'Could not get cached uploaders from neither S3 or the crm';
+        msg += ' for region: ' + region;
         var err = new Error(msg);
         cb(err);
-      }
-    });
+      };
+
+      $.ajax(opts);
+    };
+
+    $.ajax(opts);
   };
 
   Uploader.prototype._findResponsiveInstance = function(instances, index, cb) {
