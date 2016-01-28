@@ -442,8 +442,8 @@ This plugin includes the following dependencies:
 
 * [jquery.easing.js](http://gsgd.co.uk/sandbox/jquery/easing/) by George McGinley Smith (BSD License)
 * [jquery.jsonp.js](http://code.google.com/p/jquery-jsonp/) by Julian Aubourg (MIT License)
-* [toolbox.expose.js](http://flowplayer.org/tools/toolbox/expose.html) by Tero Piirainen (Public domain)
-* [json2.js](http://www.json.org/json2.js) by Douglas Crockford (Public domain)
+* [toolbox.expose.js](http://jquerytools.github.io/documentation/toolbox/expose.html) by Tero Piirainen (Public domain)
+* [json2.js](https://cdnjs.cloudflare.com/ajax/libs/json2/20150503/json2.js) by Douglas Crockford (Public domain)
 
 A big thanks goes to the authors of these fantastic projects!
 
