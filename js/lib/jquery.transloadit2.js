@@ -376,13 +376,16 @@
     var url = PROTOCOL + this.instance + '/assemblies/' + this.assemblyId + '?redirect=false';
 
     if (this._options.formData) {
-      var paramsFieldVal = this.$form.find("input[name=params]").val();
+      var assemblyParams = this._options.params;
+      if (this.$params) {
+        assemblyParams = this.$params.val();
+      }
 
       if (this._options.formData instanceof FormData) {
-        this._options.formData.append("params", paramsFieldVal);
+        this._options.formData.append("params", assemblyParams);
       } else {
         var formData = new FormData(this.$form);
-        formData.append("params", paramsFieldVal);
+        formData.append("params", assemblyParams);
 
         for (var i = 0; i < this._options.formData.length; i++) {
           var tupel = this._options.formData[i];
