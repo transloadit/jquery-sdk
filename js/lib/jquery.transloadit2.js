@@ -384,7 +384,7 @@
       if (this._options.formData instanceof FormData) {
         this._options.formData.append("params", assemblyParams);
       } else {
-        var formData = new FormData(this.$form);
+        var formData = new FormData(this.$form.get(0));
         formData.append("params", assemblyParams);
 
         for (var i = 0; i < this._options.formData.length; i++) {
