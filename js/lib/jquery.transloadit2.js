@@ -380,16 +380,23 @@
       if (this.$params) {
         assemblyParams = this.$params.val();
       }
-
       if (typeof assemblyParams !== 'string') {
         assemblyParams = JSON.stringify(assemblyParams);
       }
 
       if (this._options.formData instanceof FormData) {
         this._options.formData.append("params", assemblyParams);
+
+        if (this._options.signature) {
+          this._options.formData.append("signature", this._options.signature);
+        }
       } else {
         var formData = new FormData(this.$form.get(0));
         formData.append("params", assemblyParams);
+
+        if (this._options.signature) {
+          formData.append("signature", this._options.signature);
+        }
 
         for (var i = 0; i < this._options.formData.length; i++) {
           var tupel = this._options.formData[i];
