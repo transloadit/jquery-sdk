@@ -381,6 +381,10 @@
         assemblyParams = this.$params.val();
       }
 
+      if (typeof assemblyParams !== 'string') {
+        assemblyParams = JSON.stringify(assemblyParams);
+      }
+
       if (this._options.formData instanceof FormData) {
         this._options.formData.append("params", assemblyParams);
       } else {
