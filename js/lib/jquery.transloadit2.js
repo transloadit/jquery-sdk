@@ -22,6 +22,8 @@
     onCancel                     : function() {},
     onError                      : function() {},
     onSuccess                    : function() {},
+    resumable                    : false,
+    resumableEndpointPath        : '/resumable/',
     interval                     : 2500,
     pollTimeout                  : 8000,
     poll404Retries               : 15,
@@ -359,6 +361,11 @@
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
     this.$fileClones = $().not(document);
 
+    // if we want resumability support, we want to use XHR
+    if (this._options.resumable && !this._options.formData) {
+      this._options.formData = true;
+    }
+
     // We do not need file clones if we do an XHR upload, because we do not
     // have a shadow form submitted to an iframe in that case.
     if (!this._options.formData) {
@@ -386,16 +393,40 @@
 
       if (this._options.formData instanceof FormData) {
         this._options.formData.append("params", assemblyParams);
-
         if (this._options.signature) {
           this._options.formData.append("signature", this._options.signature);
         }
       } else {
-        var formData = new FormData(this.$form.get(0));
-        formData.append("params", assemblyParams);
+        var formData = {}
 
-        if (this._options.signature) {
-          formData.append("signature", this._options.signature);
+        if (!this._options.resumable) {
+          formData = new FormData(this.$form.get(0));
+          formData.append("params", assemblyParams);
+        } else {
+          // For resumable file uploads we cannot make the file input fields
+          // part of the formData. We need to upload them separately via
+          // tus uploads.
+          formData = new FormData();
+          formData.append("params", assemblyParams);
+
+          var fileCount = 0;
+          this.$files.each(function() {
+            fileCount += this.files.length;
+          });
+          formData.append("tus_num_expected_upload_files", fileCount);
+
+          this.$form.find(':input').each(function() {
+            if ($(this).attr('type') === 'file') {
+              return;
+            }
+
+            var name = $(this).attr('name');
+            if (!name) {
+              return;
+            }
+            var value = $(this).val();
+            formData.append(name, value);
+          });
         }
 
         for (var i = 0; i < this._options.formData.length; i++) {
@@ -403,12 +434,42 @@
           formData.append(tupel[0], tupel[1], tupel[2]);
         }
 
+        if (this._options.signature) {
+          formData.append("signature", this._options.signature);
+        }
         this._options.formData = formData;
       }
 
       var f = new XMLHttpRequest();
       f.open("POST", url);
       f.send(this._options.formData);
+
+      if (this._options.resumable) {
+        var resumableEndpoint = PROTOCOL + this.instance + this._options.resumableEndpointPath;
+
+        // @todo: add support for files from custom formData
+        this.$files.each(function() {
+          var nameAttr = $(this).attr('name');
+
+          for (var i = 0; i < this.files.length; i++) {
+            var file = this.files[i];
+
+            var upload = new tus.Upload(file, {
+              metadata: {
+                fieldname   : nameAttr,
+                filename    : file.name,
+                assembly_id : self.assemblyId
+              },
+              endpoint: resumableEndpoint
+              // @todo: handle error events here
+              // onError: function(error) {
+              //   console.log("Failed because: " + error);
+              // }
+            });
+          }
+          upload.start();
+        });
+      }
     } else {
       this.$uploadForm = $('<form enctype="multipart/form-data" />')
         .attr('action', url)
