@@ -342,8 +342,6 @@
   };
 
   Uploader.prototype.start = function() {
-    var self = this;
-
     this.started             = false;
     this.ended               = false;
     this.bytesReceivedBefore = 0;
@@ -356,15 +354,78 @@
 
     this.assemblyId = this._genUuid();
 
+    if (this._options.resumable) {
+      this._startWithResumabilitySupport();
+    } else if (this._options.formData) {
+      this._startWithXhr();
+    } else {
+      this._startFormUrlencoded();
+    }
+
+    this.lastPoll = +new Date();
+
+    var self = this;
+    setTimeout(function() {
+      self._poll();
+    }, 300);
+  };
+
+  Uploader.prototype._startWithXhr = function() {
+    var formData = this._prepareFormData(this.$form.get(0));
+    this._appendCustomFormData(formData);
+
+    var url = this._getAssemblyRequestTargetUrl();
+    var f = new XMLHttpRequest();
+    f.open("POST", url);
+    f.send(formData);
+  };
+
+  Uploader.prototype._startWithResumabilitySupport = function() {
+    var formData = this._prepareFormData();
+    this._appendTusFileCount(formData);
+    this._appendNonFileInputFields(formData);
+    this._appendCustomFormData(formData);
+
+    var url = this._getAssemblyRequestTargetUrl();
+    var f   = new XMLHttpRequest();
+    f.open("POST", url);
+    f.send(formData);
+
+    var endpoint = PROTOCOL + this.instance + this._options.resumableEndpointPath;
+
+    // @todo: add support for files from custom formData
+    var bytesExpected = this._countTotalBytesExpected();
+
+    this.$files.each(function() {
+      var nameAttr = $(this).attr('name');
+      for (var i = 0; i < this.files.length; i++) {
+        var file = this.files[i];
+        var upload = new tus.Upload(file, {
+          endpoint : endpoint,
+          resume   : true,
+          metadata : {
+            fieldname   : nameAttr,
+            filename    : file.name,
+            assembly_id : self.assemblyId
+          },
+          onError: function(error) {
+            console.log("Failed because: " + error);
+          },
+          onProgress: function(bytesUploaded, bytesTotal) {
+            var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2);
+            console.log(bytesUploaded, bytesTotal, percentage + "%");
+          }
+        });
+        upload.start();
+      }
+    });
+  };
+
+  Uploader.prototype._startFormUrlencoded = function() {
     // add a clone, so that we can restore the file input fields
     // when the user hits cancel and so that we can .append(this.$files) to
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
     this.$fileClones = $().not(document);
-
-    // if we want resumability support, we want to use XHR
-    if (this._options.resumable && !this._options.formData) {
-      this._options.formData = true;
-    }
 
     // We do not need file clones if we do an XHR upload, because we do not
     // have a shadow form submitted to an iframe in that case.
@@ -380,168 +441,147 @@
       .appendTo('body')
       .hide();
 
-    var url = PROTOCOL + this.instance + '/assemblies/' + this.assemblyId + '?redirect=false';
+    var url = this._getAssemblyRequestTargetUrl();
 
-    if (this._options.formData) {
-      var assemblyParams = this._options.params;
-      if (this.$params) {
-        assemblyParams = this.$params.val();
-      }
-      if (typeof assemblyParams !== 'string') {
-        assemblyParams = JSON.stringify(assemblyParams);
-      }
+    this.$uploadForm = $('<form enctype="multipart/form-data" />')
+      .attr('action', url)
+      .attr('target', 'transloadit-' + this.assemblyId)
+      .attr('method', 'POST')
 
-      if (this._options.formData instanceof FormData) {
-        this._options.formData.append("params", assemblyParams);
-        if (this._options.signature) {
-          this._options.formData.append("signature", this._options.signature);
-        }
-      } else {
-        var formData = {}
+      // using .append(this.$files.clone(true)) does not work here as it does
+      // not carry over the selected file value :/
+      // hence we need to clone file input fields beforehand and store them
+      // in self.$fileClones
+      .append(this.$files)
+      .appendTo('body')
+      .hide();
 
-        if (!this._options.resumable) {
-          formData = new FormData(this.$form.get(0));
-          formData.append("params", assemblyParams);
-        } else {
-          // For resumable file uploads we cannot make the file input fields
-          // part of the formData. We need to upload them separately via
-          // tus uploads.
-          formData = new FormData();
-          formData.append("params", assemblyParams);
-
-          var fileCount = 0;
-          this.$files.each(function() {
-            fileCount += this.files.length;
-          });
-          formData.append("tus_num_expected_upload_files", fileCount);
-
-          this.$form.find(':input').each(function() {
-            if ($(this).attr('type') === 'file') {
-              return;
-            }
-
-            var name = $(this).attr('name');
-            if (!name) {
-              return;
-            }
-            var value = $(this).val();
-            formData.append(name, value);
-          });
-        }
-
-        for (var i = 0; i < this._options.formData.length; i++) {
-          var tupel = this._options.formData[i];
-          formData.append(tupel[0], tupel[1], tupel[2]);
-        }
-
-        if (this._options.signature) {
-          formData.append("signature", this._options.signature);
-        }
-        this._options.formData = formData;
-      }
-
-      var f = new XMLHttpRequest();
-      f.open("POST", url);
-      f.send(this._options.formData);
-
-      if (this._options.resumable) {
-        var resumableEndpoint = PROTOCOL + this.instance + this._options.resumableEndpointPath;
-
-        // @todo: add support for files from custom formData
-        this.$files.each(function() {
-          var nameAttr = $(this).attr('name');
-
-          for (var i = 0; i < this.files.length; i++) {
-            var file = this.files[i];
-
-            var upload = new tus.Upload(file, {
-              metadata: {
-                fieldname   : nameAttr,
-                filename    : file.name,
-                assembly_id : self.assemblyId
-              },
-              endpoint: resumableEndpoint
-              // @todo: handle error events here
-              // onError: function(error) {
-              //   console.log("Failed because: " + error);
-              // }
-            });
-          }
-          upload.start();
-        });
-      }
-    } else {
-      this.$uploadForm = $('<form enctype="multipart/form-data" />')
-        .attr('action', url)
-        .attr('target', 'transloadit-' + this.assemblyId)
-        .attr('method', 'POST')
-
-        // using .append(this.$files.clone(true)) does not work here as it does
-        // not carry over the selected file value :/
-        // hence we need to clone file input fields beforehand and store them
-        // in self.$fileClones
-        .append(this.$files)
-        .appendTo('body')
-        .hide();
-
-      var fieldsFilter = '[name=params], [name=signature]';
-      if (this._options.fields === true) {
-        fieldsFilter = '*';
-      } else if (typeof this._options.fields === 'string') {
-        fieldsFilter += ', ' + this._options.fields;
-      }
-
-      var $fieldsToClone = this.$form.find(':input[type!=file]').filter(fieldsFilter);
-
-      // remove selects from $clones, because we have to clone them as hidden input
-      // fields, otherwise their values are not transferred properly
-      var $selects = $fieldsToClone.filter('select');
-
-      $fieldsToClone = $fieldsToClone.filter(function() {
-        return !$(this).is('select');
-      });
-
-      // filter out submit elements as they will cause funny behavior in the
-      // shadow form
-      $fieldsToClone = $fieldsToClone.filter('[type!=submit]');
-
-
-      var $clones = this.clone($fieldsToClone);
-
-      if (this._options.params && !this.$params) {
-        $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
-      }
-      if (this._options.signature) {
-        $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>');
-      }
-
-      if (typeof this._options.fields == 'object') {
-        for (var fieldName in this._options.fields) {
-          var fieldValue = this._options.fields[fieldName];
-          $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>');
-        }
-      }
-
-      $clones.prependTo(this.$uploadForm);
-
-
-      // now add all selects as hidden fields
-      $selects.each(function() {
-        $('<input type="hidden"/>')
-          .attr('name', $(this).attr('name'))
-          .attr('value', $(this).val())
-          .prependTo(self.$uploadForm);
-      });
-
-      this.$uploadForm.submit();
+    var fieldsFilter = '[name=params], [name=signature]';
+    if (this._options.fields === true) {
+      fieldsFilter = '*';
+    } else if (typeof this._options.fields === 'string') {
+      fieldsFilter += ', ' + this._options.fields;
     }
 
-    this.lastPoll = +new Date();
-    setTimeout(function() {
-      self._poll();
-    }, 300);
+    var $fieldsToClone = this.$form.find(':input[type!=file]').filter(fieldsFilter);
+
+    // remove selects from $clones, because we have to clone them as hidden input
+    // fields, otherwise their values are not transferred properly
+    var $selects = $fieldsToClone.filter('select');
+
+    $fieldsToClone = $fieldsToClone.filter(function() {
+      return !$(this).is('select');
+    });
+
+    // filter out submit elements as they will cause funny behavior in the
+    // shadow form
+    $fieldsToClone = $fieldsToClone.filter('[type!=submit]');
+
+
+    var $clones = this.clone($fieldsToClone);
+
+    if (this._options.params && !this.$params) {
+      $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
+    }
+    if (this._options.signature) {
+      $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>');
+    }
+
+    if (typeof this._options.fields == 'object') {
+      for (var fieldName in this._options.fields) {
+        var fieldValue = this._options.fields[fieldName];
+        $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>');
+      }
+    }
+
+    $clones.prependTo(this.$uploadForm);
+
+
+    // now add all selects as hidden fields
+    $selects.each(function() {
+      $('<input type="hidden"/>')
+        .attr('name', $(this).attr('name'))
+        .attr('value', $(this).val())
+        .prependTo(self.$uploadForm);
+    });
+
+    this.$uploadForm.submit();
   };
 
+  Uploader.prototype._prepareFormData = function(form) {
+    var assemblyParams = this._options.params;
+    if (this.$params) {
+      assemblyParams = this.$params.val();
+    }
+    if (typeof assemblyParams !== 'string') {
+      assemblyParams = JSON.stringify(assemblyParams);
+    }
+
+    var result = {};
+    if (this._options.formData instanceof FormData) {
+      result = this._options.formData;
+    } else {
+      result = new FormData(form);
+    }
+
+    result.append("params", assemblyParams);
+    if (this._options.signature) {
+      result.append("signature", this._options.signature);
+    }
+
+    return result;
+  };
+
+  Uploader.prototype._appendTusFileCount = function(formData) {
+    var fileCount = 0;
+    this.$files.each(function() {
+      fileCount += this.files.length;
+    });
+    formData.append("tus_num_expected_upload_files", fileCount);
+  };
+
+  Uploader.prototype._appendNonFileInputFields = function(formData) {
+    this.$form.find(':input').each(function() {
+      if ($(this).attr('type') === 'file') {
+        return;
+      }
+
+      var name = $(this).attr('name');
+      if (!name) {
+        return;
+      }
+      var value = $(this).val();
+      formData.append(name, value);
+    });
+  };
+
+  Uploader.prototype._appendCustomFormData = function(formData) {
+    for (var i = 0; i < this._options.formData.length; i++) {
+      var tupel = this._options.formData[i];
+      formData.append(tupel[0], tupel[1], tupel[2]);
+    }
+  };
+
+  Uploader.prototype._getAssemblyRequestTargetUrl = function() {
+    var result = PROTOCOL + this.instance + '/assemblies/';
+    result    += this.assemblyId + '?redirect=false';
+
+    return result;
+  };
+
+  Uploader.prototype._countTotalBytesExpected = function() {
+    var result = 0;
+    this.$files.each(function() {
+      var nameAttr = $(this).attr('name');
+      for (var i = 0; i < this.files.length; i++) {
+        if (this.files[i].size) {
+          result += file.size;
+        }
+      }
+    });
+
+    return result;
+  }
   Uploader.prototype.clone = function($obj) {
     var $result         = $obj.clone();
     var myTextareas     = $obj.filter('textarea');
@@ -765,7 +805,6 @@
     this.ended = true;
   };
 
-
   Uploader.prototype.cancel = function() {
     // @todo this has still a race condition if a new upload is started
     // while the cancel request is still being executed. Shouldn't happen
@@ -777,23 +816,27 @@
         this.$params.prependTo(this.$form);
       }
 
-      this.$fileClones.each(function(i) {
-        var $original = $(self.$files[i]).clone(true);
-        var $clone = $(this);
-        $original.insertAfter($clone);
-        $clone.remove();
-      });
-      clearTimeout(self.timer);
+      if (this.$fileClones) {
+        this.$fileClones.each(function(i) {
+          var $original = $(self.$files[i]).clone(true);
+          var $clone = $(this);
+          $original.insertAfter($clone);
+          $clone.remove();
+        });
+      }
+      clearTimeout(this.timer);
 
       this._poll('?method=delete');
 
-      if (navigator.appName == 'Microsoft Internet Explorer') {
-        this.$iframe[0].contentWindow.document.execCommand('Stop');
-      }
+      if (this.$iframe) {
+        if (navigator.appName == 'Microsoft Internet Explorer') {
+          this.$iframe[0].contentWindow.document.execCommand('Stop');
+        }
 
-      setTimeout(function() {
-        self.$iframe.remove();
-      }, 500);
+        setTimeout(function() {
+          self.$iframe.remove();
+        }, 500);
+      }
     }
 
     if (this._options.modal) {
