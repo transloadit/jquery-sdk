@@ -1,24 +1,19 @@
 language: node_js
-
 node_js:
-  - "0.10"
-
+- '0.10'
 before_install:
-  - npm install -g npm@1.4
-  - wget --retry-connrefused http://phantomjs.googlecode.com/files/phantomjs-1.8.0-linux-x86_64.tar.bz2
-  - tar jxf phantomjs-1.8.0-linux-x86_64.tar.bz2
-  - sudo cp -Raf phantomjs-*/* /usr/local/
-  - wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.0.3
-  - tar zvxf 1.0.3
-  - sudo cp -Raf n1k0-casperjs-*/* /usr/local/
-
+- npm install -g npm@1.4
+- wget --retry-connrefused http://phantomjs.googlecode.com/files/phantomjs-1.8.0-linux-x86_64.tar.bz2
+- tar jxf phantomjs-1.8.0-linux-x86_64.tar.bz2
+- sudo cp -Raf phantomjs-*/* /usr/local/
+- wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.0.3
+- tar zvxf 1.0.3
+- sudo cp -Raf n1k0-casperjs-*/* /usr/local/
 notifications:
   email: false
   slack:
-    secure: U+RtmtVJEzEoZf+/VVuon9qNC4GXKzXoTqdYThP57ZTzqoDAJDnuZ/qUrMGrMYpYg38ikxtK3qJhBMfffzHXc3KS9hcA7Ay/yPz4QiCBMy3M9EBPWt8iGP6n2T3KUw4WG/hSBUtnJqmwPdzRfVUIqOMgchiN9eWwEbEmSYTvOqA=
-
+    secure: gTNTTwFYpakA7O8yBhnk/cU3zP5lK2aHBkcTdiwmaNxbSNnfgQrrXlY8+ZBbEiAu83t7KZR50G8uX55SZ/QguVx8gMy5Acx1a+ihhZB83RAn1pmm56h3iNjD3EAcb3kjZrSaHTd50/27ZQLJIE/QGLMx+FNOjXQ5Rjl9pwev1DQ=
 env:
-  # travis encrypt TRANSLOADIT_ACCESS_KEY=xxx
-  - secure: "szhzwrsC10cdjrHYH4XPXBcMvFcSpxxL5bDQxcthcRXeV1m89wy89Fbr96BQ+HIRM/jYvsHCcOgkYmwzrgj9WiJFpwSlSNCDhv0cLmFih2oHZC+xMsXiWkiT4q3eyXwibisZVHx1QHWw8lSldWKYBXR6Vjex3CfNMwhui3RPFpo="
-
+# travis encrypt TRANSLOADIT_ACCESS_KEY=xxx
+- secure: szhzwrsC10cdjrHYH4XPXBcMvFcSpxxL5bDQxcthcRXeV1m89wy89Fbr96BQ+HIRM/jYvsHCcOgkYmwzrgj9WiJFpwSlSNCDhv0cLmFih2oHZC+xMsXiWkiT4q3eyXwibisZVHx1QHWw8lSldWKYBXR6Vjex3CfNMwhui3RPFpo=
 script: make test
