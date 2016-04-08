@@ -371,7 +371,8 @@
   };
 
   Uploader.prototype._startWithXhr = function() {
-    var formData = this._prepareFormData(this.$form.get(0));
+    var formData = this._prepareFormData();
+    this._appendFilteredFormFields(formData, true);
     this._appendCustomFormData(formData);
 
     var url = this._getAssemblyRequestTargetUrl();
@@ -383,7 +384,7 @@
   Uploader.prototype._startWithResumabilitySupport = function() {
     var formData = this._prepareFormData();
     this._appendTusFileCount(formData);
-    this._appendNonFileInputFields(formData);
+    this._appendFilteredFormFields(formData);
     this._appendCustomFormData(formData);
 
     var url = this._getAssemblyRequestTargetUrl();
@@ -427,15 +428,11 @@
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
     this.$fileClones = $().not(document);
 
-    // We do not need file clones if we do an XHR upload, because we do not
-    // have a shadow form submitted to an iframe in that case.
-    if (!this._options.formData) {
-      this.$files.each(function() {
-        var $clone = $(this).clone(true);
-        self.$fileClones = self.$fileClones.add($clone);
-        $clone.insertAfter(this);
-      });
-    }
+    this.$files.each(function() {
+      var $clone = $(this).clone(true);
+      self.$fileClones = self.$fileClones.add($clone);
+      $clone.insertAfter(this);
+    });
 
     this.$iframe = $('<iframe id="transloadit-' + this.assemblyId + '" name="transloadit-' + this.assemblyId + '"/>')
       .appendTo('body')
@@ -449,36 +446,23 @@
       .attr('method', 'POST')
 
       // using .append(this.$files.clone(true)) does not work here as it does
-      // not carry over the selected file value :/
-      // hence we need to clone file input fields beforehand and store them
-      // in self.$fileClones
+      // not carry over the selected file value. :/
+      // Thus, we need to clone file input fields beforehand and store them
+      // in this.$fileClones.
       .append(this.$files)
       .appendTo('body')
       .hide();
 
-    var fieldsFilter = '[name=params], [name=signature]';
-    if (this._options.fields === true) {
-      fieldsFilter = '*';
-    } else if (typeof this._options.fields === 'string') {
-      fieldsFilter += ', ' + this._options.fields;
-    }
-
-    var $fieldsToClone = this.$form.find(':input[type!=file]').filter(fieldsFilter);
+    var $fieldsToClone = this._getFilteredFormFields();
 
     // remove selects from $clones, because we have to clone them as hidden input
     // fields, otherwise their values are not transferred properly
     var $selects = $fieldsToClone.filter('select');
-
     $fieldsToClone = $fieldsToClone.filter(function() {
       return !$(this).is('select');
     });
 
-    // filter out submit elements as they will cause funny behavior in the
-    // shadow form
-    $fieldsToClone = $fieldsToClone.filter('[type!=submit]');
-
-
-    var $clones = this.clone($fieldsToClone);
+    var $clones  = this.clone($fieldsToClone);
 
     if (this._options.params && !this.$params) {
       $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
@@ -495,7 +479,6 @@
     }
 
     $clones.prependTo(this.$uploadForm);
-
 
     // now add all selects as hidden fields
     $selects.each(function() {
@@ -540,12 +523,10 @@
     formData.append("tus_num_expected_upload_files", fileCount);
   };
 
-  Uploader.prototype._appendNonFileInputFields = function(formData) {
-    this.$form.find(':input').each(function() {
-      if ($(this).attr('type') === 'file') {
-        return;
-      }
+  Uploader.prototype._appendFilteredFormFields = function(formData, allowFiles) {
+    var $fields = this._getFilteredFormFields(allowFiles);
 
+    $fields.each(function() {
       var name = $(this).attr('name');
       if (!name) {
         return;
@@ -581,7 +562,26 @@
     });
 
     return result;
-  }
+  };
+
+  Uploader.prototype._getFilteredFormFields = function(allowFiles) {
+    var fieldsFilter = '[name=params], [name=signature]';
+    if (this._options.fields === true) {
+      fieldsFilter = '*';
+    } else if (typeof this._options.fields === 'string') {
+      fieldsFilter += ', ' + this._options.fields;
+    }
+
+    // Filter out submit elements right away as they will cause funny behavior
+    // in the shadow form.
+    var $fields = this.$form.find(':input[type!=submit]');
+    if (!allowFiles) {
+      $fields = $fields.filter('[type!=file]');
+    }
+
+    return $fields.filter(fieldsFilter);
+  };
+
   Uploader.prototype.clone = function($obj) {
     var $result         = $obj.clone();
     var myTextareas     = $obj.filter('textarea');
