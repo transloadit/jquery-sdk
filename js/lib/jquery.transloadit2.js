@@ -382,6 +382,8 @@
   };
 
   Uploader.prototype._startWithResumabilitySupport = function() {
+    var self = this;
+
     var formData = this._prepareFormData();
     this._appendTusFileCount(formData);
     this._appendFilteredFormFields(formData);
@@ -426,6 +428,7 @@
     // add a clone, so that we can restore the file input fields
     // when the user hits cancel and so that we can .append(this.$files) to
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
+    var self = this;
     this.$fileClones = $().not(document);
 
     this.$files.each(function() {
@@ -537,6 +540,10 @@
   };
 
   Uploader.prototype._appendCustomFormData = function(formData) {
+    if (!this._options.formData) {
+      return;
+    }
+
     for (var i = 0; i < this._options.formData.length; i++) {
       var tupel = this._options.formData[i];
       formData.append(tupel[0], tupel[1], tupel[2]);
@@ -556,7 +563,7 @@
       var nameAttr = $(this).attr('name');
       for (var i = 0; i < this.files.length; i++) {
         if (this.files[i].size) {
-          result += file.size;
+          result += this.files[i].size;
         }
       }
     });
