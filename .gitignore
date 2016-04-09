@@ -3,8 +3,5 @@ node_modules/
 /flow/
 /tests/screen-*
 env.sh
-
-
 flow-osx-latest.zip
-
 npm-debug.log
