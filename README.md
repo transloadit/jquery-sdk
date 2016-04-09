@@ -3,7 +3,7 @@
 # Transloadit jQuery SDK
 
 The official docs for our jQuery plugin / SDK are on the
-[transloadit website](https://transloadit.com/docs/#jquery-plugin).
+[Transloadit website](https://transloadit.com/docs/#jquery-plugin).
 
 ### Basics
 
@@ -15,7 +15,7 @@ The Transloadit jQuery plugin allows you to
 
 Assuming a form with the ID <code>"upload-form"</code> (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
 
-```markup
+```html
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
 <script type="text/javascript">
 // We call .transloadit() after the DOM is initialized:
