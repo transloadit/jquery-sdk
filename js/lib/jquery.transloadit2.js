@@ -1,3 +1,5 @@
+/*global tus:false*/
+
 /** @license jquery.transloadit2.js: Copyright (c) 2013 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
  *
  * Fork this on Github: http://github.com/transloadit/jquery-sdk
@@ -5,6 +7,7 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
+
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
 
@@ -44,30 +47,30 @@
 
   var I18N = {
     en: {
-      'errors.BORED_INSTANCE_ERROR' : 'Could not find a bored instance.',
-      'errors.CONNECTION_ERROR'     : 'There was a problem connecting to the upload server',
-      'errors.unknown'              : 'There was an internal error.',
-      'errors.tryAgain'             : 'Please try your upload again.',
-      'errors.troubleshootDetails'  : 'If you would like our help to troubleshoot this, ' +
+      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
+      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
+      'errors.unknown': 'There was an internal error.',
+      'errors.tryAgain': 'Please try your upload again.',
+      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
           'please email us this information:',
-      cancel                        : 'Cancel',
-      details                       : 'Details',
-      startingUpload                : 'Starting upload ...',
-      processingFiles               : 'Upload done, now processing files ...',
-      uploadProgress                : '%s / %s MB at %s kB/s | %s left'
+      cancel: 'Cancel',
+      details: 'Details',
+      startingUpload: 'Starting upload ...',
+      processingFiles: 'Upload done, now processing files ...',
+      uploadProgress: '%s / %s MB at %s kB/s | %s left'
     },
     ja: {
-      'errors.BORED_INSTANCE_ERROR' : 'サーバー接続に問題があります',
-      'errors.CONNECTION_ERROR'     : 'サーバー接続に問題があります',
-      'errors.unknown'              : '通信環境に問題があります',
-      'errors.tryAgain'             : 'しばらくしてから再度投稿してください',
-      'errors.troubleshootDetails'  : '解決できない場合は、こちらにお問い合わせください ' +
+      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
+      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
+      'errors.unknown': '通信環境に問題があります',
+      'errors.tryAgain': 'しばらくしてから再度投稿してください',
+      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
           '下記の情報をメールでお送りください:',
-      cancel                        : 'キャンセル',
-      details                       : '詳細',
-      startingUpload                : '投稿中 ...',
-      processingFiles               : '接続中',
-      uploadProgress                : '%s MB / %s MB (%s kB / 秒)'
+      cancel: 'キャンセル',
+      details: '詳細',
+      startingUpload: '投稿中 ...',
+      processingFiles: '接続中',
+      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
     }
   }
   var CSS_LOADED = false
@@ -100,7 +103,7 @@
       return
     }
 
-    if (args.length == 1 && typeof args[0] === 'object' || args[0] === undefined) {
+    if (args.length === 1 && typeof args[0] === 'object' || args[0] === undefined) {
       args.unshift('init')
     }
 
@@ -198,10 +201,10 @@
 
     function proceed () {
       $.jsonp({
-        url               : url,
-        timeout           : self._options.pollTimeout,
-        callbackParameter : 'callback',
-        success           : function (instance) {
+        url: url,
+        timeout: self._options.pollTimeout,
+        callbackParameter: 'callback',
+        success: function (instance) {
           if (instance.error) {
             self.ended = true
             instance.url = url
@@ -213,7 +216,7 @@
           self.instance = instance.api2_host
           self.start()
         },
-        error             : function (xhr, status, jsonpErr) {
+        error: function (xhr, status, jsonpErr) {
           if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
             canUseCustomBoredLogic = false
 
@@ -221,8 +224,8 @@
               if (err) {
                 self.ended = true
                 err = {
-                  error   : 'BORED_INSTANCE_ERROR',
-                  message : self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
+                  error: 'BORED_INSTANCE_ERROR',
+                  message: self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
                 }
                 self.renderError(err)
                 self._options.onError(err)
@@ -246,10 +249,10 @@
           reason += ', err: ' + jsonpErr
 
           var err = {
-            error   : 'CONNECTION_ERROR',
-            message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : reason,
-            url     : url
+            error: 'CONNECTION_ERROR',
+            message: self.i18n('errors.CONNECTION_ERROR'),
+            reason: reason,
+            url: url
           }
           self.renderError(err)
           self._options.onError(err)
@@ -277,10 +280,10 @@
 
     var self = this
     var opts = {
-      url      : url,
-      timeout  : 5000,
-      datatype : 'json',
-      success  : function (result) {
+      url: url,
+      timeout: 5000,
+      datatype: 'json',
+      success: function (result) {
         var instances = self._shuffle(result.uploaders)
         self._findResponsiveInstance(instances, 0, cb)
       }
@@ -314,13 +317,13 @@
     var url = instances[index]
 
     $.jsonp({
-      url               : PROTOCOL + url,
-      timeout           : 3000,
-      callbackParameter : 'callback',
-      success           : function (result) {
+      url: PROTOCOL + url,
+      timeout: 3000,
+      callbackParameter: 'callback',
+      success: function (result) {
         cb(null, url)
       },
-      error             : function (xhr, status) {
+      error: function (xhr, status) {
         self._findResponsiveInstance(instances, index + 1, cb)
       }
     })
@@ -393,19 +396,20 @@
     var endpoint = PROTOCOL + this.instance + this._options.resumableEndpointPath
 
     // @todo: add support for files from custom formData
-    var bytesExpected = this._countTotalBytesExpected()
+    // @todo Unused?
+    // var bytesExpected = this._countTotalBytesExpected()
 
     this.$files.each(function () {
       var nameAttr = $(this).attr('name')
       for (var i = 0; i < this.files.length; i++) {
         var file = this.files[i]
         var upload = new tus.Upload(file, {
-          endpoint : endpoint,
-          resume   : true,
-          metadata : {
-            fieldname   : nameAttr,
-            filename    : file.name,
-            assembly_id : self.assemblyId
+          endpoint: endpoint,
+          resume: true,
+          metadata: {
+            fieldname: nameAttr,
+            filename: file.name,
+            assembly_id: self.assemblyId
           },
           onError: function (error) {
             console.log('Failed because: ' + error)
@@ -556,7 +560,8 @@
   Uploader.prototype._countTotalBytesExpected = function () {
     var result = 0
     this.$files.each(function () {
-      var nameAttr = $(this).attr('name')
+      // @todo Unused?
+      // var nameAttr = $(this).attr('name')
       for (var i = 0; i < this.files.length; i++) {
         if (this.files[i].size) {
           result += this.files[i].size
@@ -631,7 +636,7 @@
 
     if (this.params.redirect_url) {
       this.$form.attr('action', this.params.redirect_url)
-    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service + 'assemblies')) {
+    } else if (this._options.autoSubmit && (this.$form.attr('action') === this._options.service + 'assemblies')) {
       alert('Error: input[name=params] does not include a redirect_url')
       return
     }
@@ -661,10 +666,10 @@
     }
 
     $.jsonp({
-      url               : url,
-      timeout           : self._options.pollTimeout,
-      callbackParameter : 'callback',
-      success           : function (assembly) {
+      url: url,
+      timeout: self._options.pollTimeout,
+      callbackParameter: 'callback',
+      success: function (assembly) {
         if (self.ended) {
           return
         }
@@ -700,7 +705,8 @@
         }
 
         self.pollRetries = 0
-        var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING'
+        // @todo: Unused?
+        // var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING'
         var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
         var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
         var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
@@ -772,7 +778,7 @@
         }, timeout)
         self.lastPoll = +new Date()
       },
-      error             : function (xhr, status, jsonpErr) {
+      error: function (xhr, status, jsonpErr) {
         if (self.ended) {
           return
         }
@@ -786,10 +792,10 @@
           reason += ', err: ' + jsonpErr
 
           var err = {
-            error   : 'CONNECTION_ERROR',
-            message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : reason,
-            url     : url
+            error: 'CONNECTION_ERROR',
+            message: self.i18n('errors.CONNECTION_ERROR'),
+            reason: reason,
+            url: url
           }
           self.renderError(err)
           self._options.onError(err)
@@ -892,15 +898,15 @@
       .appendTo('body')
 
     $.extend(this.$modal, {
-      '$content'            : this.$modal.find('.content'),
-      '$close'              : this.$modal.find('.close'),
-      '$label'              : this.$modal.find('label'),
-      '$progress'           : this.$modal.find('.progress'),
-      '$percent'            : this.$modal.find('.progress .percent'),
-      '$progressBar'        : this.$modal.find('.progress .bar'),
-      '$error'              : this.$modal.find('.error'),
-      '$errorDetails'       : this.$modal.find('.error-details'),
-      '$errorDetailsToggle' : this.$modal.find('.error-details-toggle')
+      '$content': this.$modal.find('.content'),
+      '$close': this.$modal.find('.close'),
+      '$label': this.$modal.find('label'),
+      '$progress': this.$modal.find('.progress'),
+      '$percent': this.$modal.find('.progress .percent'),
+      '$progressBar': this.$modal.find('.progress .bar'),
+      '$error': this.$modal.find('.error'),
+      '$errorDetails': this.$modal.find('.error-details'),
+      '$errorDetailsToggle': this.$modal.find('.error-details-toggle')
     })
 
     var self = this
@@ -909,14 +915,15 @@
     this.$modal.$errorDetails.hide()
     this.$modal.$errorDetailsToggle.hide()
 
-    var expose = this.$modal.expose({
-      api          : true,
-      maskId       : 'transloadit_expose',
-      opacity      : 0.9,
-      loadSpeed    : 250,
-      closeOnEsc   : false,
-      closeOnClick : false
-    })
+    // @todo Unused?
+    // var expose = this.$modal.expose({
+    //   api: true,
+    //   maskId: 'transloadit_expose',
+    //   opacity: 0.9,
+    //   loadSpeed: 250,
+    //   closeOnEsc: false,
+    //   closeOnClick: false
+    // })
 
     this.$modal.$close.click(function () {
       self.cancel()
@@ -962,14 +969,14 @@
     })
     .always(function () {
       var details = {
-        endpoint     : err.url,
-        instance     : self.instance,
-        assembly_id  : assemblyId,
-        ip           : ip,
-        time         : self.getUTCDatetime(),
-        agent        : navigator.userAgent,
-        poll_retries : self.pollRetries,
-        error        : errorMsg
+        endpoint: err.url,
+        instance: self.instance,
+        assembly_id: assemblyId,
+        ip: ip,
+        time: self.getUTCDatetime(),
+        agent: navigator.userAgent,
+        poll_retries: self.pollRetries,
+        error: errorMsg
       }
       $.post(PROTOCOL + 'status.transloadit.com/client_error', details)
 
@@ -1016,7 +1023,7 @@
       durationLeft = this._duration(outstanding / speedInBytes)
     }
 
-    txt = this.i18n('uploadProgress',
+    var txt = this.i18n('uploadProgress',
       mbReceived, mbExpected, uploadRate, durationLeft
     )
 
@@ -1040,9 +1047,9 @@
     this.$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
-        duration : duration,
-        easing   : 'linear',
-        progress : function (promise, currPercent, remainingMs) {
+        duration: duration,
+        easing: 'linear',
+        progress: function (promise, currPercent, remainingMs) {
           var width = parseInt(self.$modal.$progressBar.css('width'), 10)
 
           var percent = (width * 100 / totalWidth).toFixed(0)
@@ -1053,7 +1060,7 @@
             self.$modal.$percent.text(percent + '%')
           }
 
-          if (percent == 100 && !self._animatedTo100) {
+          if (percent === 100 && !self._animatedTo100) {
             self._animatedTo100 = true
 
             setTimeout(function () {
@@ -1148,7 +1155,7 @@
   }
 
   Uploader.prototype.option = function (key, val) {
-    if (arguments.length == 1) {
+    if (arguments.length === 1) {
       return this._options[key]
     }
 
@@ -1166,5 +1173,4 @@
 
     return sprintf(translated, args)
   }
-
 }(window.jQuery))
