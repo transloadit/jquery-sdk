@@ -25,18 +25,18 @@ $(build_path): js/dep/*.js js/lib/*.js
 	$(call compile_js,$(build_path))
 	$(call build_size,after:)
 
+.PHONY: lint
+lint:
+	npm run lint
+
+.PHONY: fix
+fix: 
+	npm run fix
+
 .PHONY: test
 test: $(build_path)
-	@$(MAKE) jscs || true
+	npm run lint || true
 	@source env.sh; tests/run.sh $(filter)
-
-.PHONY: jscs-fix
-jscs-fix:
-	@./node_modules/.bin/jscs js/lib tests/
-
-.PHONY: jscs
-jscs:
-	@./node_modules/.bin/jscs --fix js/lib tests/
 
 .PHONY: flow
 flow:
@@ -44,10 +44,6 @@ flow:
 	@[ -d flow ] || unzip -o flow-osx-latest.zip
 	@[ -f .flowconfig ] || ./flow/flow init
 	@cat ./js/lib/jquery.transloadit2.js | ./flow/flow check-contents --show-all-errors
-
-.PHONY: jshint
-jshint:
-	@./node_modules/.bin/jshint ./js/lib
 
 # TRANSLOADIT INTERNAL
 install: $(build_path) $(css_path)
