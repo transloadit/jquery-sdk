@@ -1,17 +1,18 @@
 var http = require('http')
 var querystring = require('querystring')
 var fs = require('fs')
-var debug = require('debug')('tlj:testserver')
-var util = require('util')
+var path = require('path')
+// var debug = require('debug')('tlj:testserver')
+// var util = require('util')
 
 function escapeHtml (string) {
   var entityMap = {
-    '&' : '&amp;',
-    '<' : '&lt;',
-    '>' : '&gt;',
-    '"' : '&quot;',
-    "'" : '&#39;',
-    '/' : '&#x2F;'
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;'
   }
 
   return String(string).replace(/[&<>"'\/]/g, function (s) {
@@ -43,11 +44,17 @@ function processPost (request, response, cb) {
 }
 
 function respondHtml (res, content) {
-  var headerFile = __dirname + '/fixtures/header.html'
+  var headerFile = path.join(__dirname, 'fixtures', 'header.html')
   fs.readFile(headerFile, function (err, header) {
+    if (err) {
+      throw err
+    }
 
-    var footerFile = __dirname + '/fixtures/footer.html'
+    var footerFile = path.join(__dirname, 'fixtures', 'footer.html')
     fs.readFile(footerFile, function (err, footer) {
+      if (err) {
+        throw err
+      }
       var body = header + content + footer
       res.writeHead(200, 'OK', {'Content-Type': 'text/html'})
       res.end(body)
@@ -56,14 +63,18 @@ function respondHtml (res, content) {
 }
 
 function addFixturePath (content) {
-  var toReplace = '<span id="fixture_path">' + __dirname + '/fixtures</span>'
+  var toReplace = '<span id="fixture_path">' + path.join(__dirname, 'fixtures</span>')
   return content.replace(/<span id="fixture_path"><\/span>/, toReplace)
 }
 
 function serveHtmlFile (res, filename) {
-  var fileName = __dirname + '/fixtures/' + filename
+  var fileName = path.join(__dirname, 'fixtures', filename)
 
   fs.readFile(fileName, function (err, content) {
+    if (err) {
+      throw err
+    }
+
     content = content.toString()
     content = addFixturePath(content)
 
@@ -73,9 +84,13 @@ function serveHtmlFile (res, filename) {
 }
 
 function serveBuildJs (res) {
-  var fileName = __dirname + '/../build/jquery.transloadit2-latest.js'
+  var fileName = path.join(__dirname, '../build/jquery.transloadit2-latest.js')
 
   fs.readFile(fileName, function (err, content) {
+    if (err) {
+      throw err
+    }
+
     content = content.toString()
 
     res.writeHead(200, 'OK', {'Content-Type': 'text/javascript'})
@@ -113,7 +128,6 @@ http.createServer(function (req, res) {
   }
 
   serveHtmlFile(res, 'standard_resize.html')
-
 }).listen(3000, '127.0.0.1')
 
 console.log('Server running at http://127.0.0.1:3000/')
