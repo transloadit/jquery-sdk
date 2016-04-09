@@ -6,7 +6,7 @@
     "clean": "rm -f build/*",
     "css": "cp css/transloadit2.css build/transloadit2-latest.css",
     "fix": "eslint . --fix",
-    "gzip": "gzip --force --keep --best build/jquery.transloadit2-latest.js",
+    "gzip": "gzip --force --best < build/jquery.transloadit2-latest.js > build/jquery.transloadit2-latest.js.gz",
     "inject": "cp -v build/*.css ${WEBSITEDIR:-../content}/css/ && cp -v build/*{.js,js.gz} ${WEBSITEDIR:-../content}/js/",
     "link": "ln -nfs $(pwd) ${WEBSITEDIR:-../content}/jquery-sdk",
     "lint": "eslint .",
