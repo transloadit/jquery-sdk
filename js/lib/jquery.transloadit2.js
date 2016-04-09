@@ -5,23 +5,23 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
-!function($) {
-  var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://';
+!function ($) {
+  var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://'
 
-  var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/';
+  var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/'
 
   var OPTIONS = {
     service                      : DEFAULT_SERVICE,
     assets                       : PROTOCOL + 'assets.transloadit.com/',
-    beforeStart                  : function() {return true;},
-    onFileSelect                 : function() {},
-    onStart                      : function() {},
-    onProgress                   : function() {},
-    onUpload                     : function() {},
-    onResult                     : function() {},
-    onCancel                     : function() {},
-    onError                      : function() {},
-    onSuccess                    : function() {},
+    beforeStart                  : function () { return true; },
+    onFileSelect                 : function () {},
+    onStart                      : function () {},
+    onProgress                   : function () {},
+    onUpload                     : function () {},
+    onResult                     : function () {},
+    onCancel                     : function () {},
+    onError                      : function () {},
+    onSuccess                    : function () {},
     resumable                    : false,
     resumableEndpointPath        : '/resumable/',
     interval                     : 2500,
@@ -40,7 +40,7 @@
     region                       : 'us-east-1',
     debug                        : true,
     locale                       : 'en'
-  };
+  }
 
   var I18N = {
     en : {
@@ -69,336 +69,336 @@
       processingFiles               : '接続中',
       uploadProgress                : '%s MB / %s MB (%s kB / 秒)'
     }
-  };
-  var CSS_LOADED = false;
+  }
+  var CSS_LOADED = false
 
-  function sprintf(str, args) {
-    args = args || [];
-    return str.replace(/(%[s])/g, function(m, i, s) {
-      var arg = args.shift();
+  function sprintf (str, args) {
+    args = args || []
+    return str.replace(/(%[s])/g, function (m, i, s) {
+      var arg = args.shift()
       if (!arg && arg !== 0) {
-        return '';
+        return ''
       }
-      return arg + '';
-    });
+      return arg + ''
+    })
   }
 
-  $.fn.transloadit = function() {
-    var args = Array.prototype.slice.call(arguments);
-    var method;
-    var uploader;
-    var r;
+  $.fn.transloadit = function () {
+    var args = Array.prototype.slice.call(arguments)
+    var method
+    var uploader
+    var r
 
     if (this.length === 0) {
-      return;
+      return
     }
 
     if (this.length > 1) {
-      this.each(function() {
-        $.fn.transloadit.apply($(this), args);
-      });
-      return;
+      this.each(function () {
+        $.fn.transloadit.apply($(this), args)
+      })
+      return
     }
 
     if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
-      args.unshift('init');
+      args.unshift('init')
     }
 
-    method = args.shift();
+    method = args.shift()
     if (method == 'init') {
-      uploader = new Uploader();
-      args.unshift(this);
-      this.data('transloadit.uploader', uploader);
+      uploader = new Uploader()
+      args.unshift(this)
+      this.data('transloadit.uploader', uploader)
     } else {
-      uploader = this.data('transloadit.uploader');
+      uploader = this.data('transloadit.uploader')
     }
 
     if (!uploader) {
-      throw new Error('Element is not initialized for transloadit!');
+      throw new Error('Element is not initialized for transloadit!')
     }
 
-    r = uploader[method].apply(uploader, args);
-    return (r === undefined) ? this : r;
-  };
-
-  $.fn.transloadit.i18n = I18N;
-
-  function Uploader() {
-    this.assemblyId = null;
-
-    this.instance      = null;
-    this.documentTitle = null;
-    this.timer         = null;
-    this._options      = {};
-    this.uploads       = [];
-    this.results       = {};
-    this.ended         = null;
-    this.pollStarted   = null;
-    this.pollRetries   = 0;
-    this.started       = false;
-    this.assembly      = null;
-    this.params        = null;
-
-    this.bytesReceivedBefore = 0;
-    this.lastPoll            = 0;
-
-    this.$params     = null;
-    this.$form       = null;
-    this.$files      = null;
-    this.$fileClones = null;
-    this.$iframe     = null;
-    this.$modal      = null;
-
-    this._animatedTo100 = false;
-    this._uploadFileIds = [];
-    this._resultFileIds = [];
+    r = uploader[method].apply(uploader, args)
+    return (r === undefined) ? this : r
   }
 
-  Uploader.prototype.init = function($form, options) {
-    this.$form = $form;
-    this.options($.extend({}, OPTIONS, options || {}));
+  $.fn.transloadit.i18n = I18N
 
-    var self = this;
-    $form.bind('submit.transloadit', function() {
-      self.validate();
-      self.detectFileInputs();
+  function Uploader () {
+    this.assemblyId = null
+
+    this.instance = null
+    this.documentTitle = null
+    this.timer = null
+    this._options = {}
+    this.uploads = []
+    this.results = {}
+    this.ended = null
+    this.pollStarted = null
+    this.pollRetries = 0
+    this.started = false
+    this.assembly = null
+    this.params = null
+
+    this.bytesReceivedBefore = 0
+    this.lastPoll = 0
+
+    this.$params = null
+    this.$form = null
+    this.$files = null
+    this.$fileClones = null
+    this.$iframe = null
+    this.$modal = null
+
+    this._animatedTo100 = false
+    this._uploadFileIds = []
+    this._resultFileIds = []
+  }
+
+  Uploader.prototype.init = function ($form, options) {
+    this.$form = $form
+    this.options($.extend({}, OPTIONS, options || {}))
+
+    var self = this
+    $form.bind('submit.transloadit', function () {
+      self.validate()
+      self.detectFileInputs()
 
       if (!self._options['processZeroFiles'] && self.$files.length === 0) {
         if (self._options.beforeStart()) {
-          self.submitForm();
+          self.submitForm()
         }
       } else {
         if (self._options.beforeStart()) {
-          self.getBoredInstance();
+          self.getBoredInstance()
         }
       }
 
-      return false;
-    });
+      return false
+    })
 
     if (this._options['triggerUploadOnFileSelection']) {
-      $form.on('change', 'input[type="file"]', function() {
-        $form.trigger('submit.transloadit');
-      });
+      $form.on('change', 'input[type="file"]', function () {
+        $form.trigger('submit.transloadit')
+      })
     }
 
-    $form.on('change', 'input[type="file"]', function() {
-      self._options.onFileSelect($(this).val(), $(this));
-    });
+    $form.on('change', 'input[type="file"]', function () {
+      self._options.onFileSelect($(this).val(), $(this))
+    })
 
-    this.includeCss();
-  };
+    this.includeCss()
+  }
 
-  Uploader.prototype.getBoredInstance = function() {
-    var self = this;
+  Uploader.prototype.getBoredInstance = function () {
+    var self = this
 
-    this.instance              = null;
-    var url                    = this._options['service'] + 'instances/bored';
-    var canUseCustomBoredLogic = true;
+    this.instance = null
+    var url = this._options['service'] + 'instances/bored'
+    var canUseCustomBoredLogic = true
 
-    function proceed() {
+    function proceed () {
       $.jsonp({
         url               : url,
         timeout           : self._options.pollTimeout,
         callbackParameter : 'callback',
-        success           : function(instance) {
+        success           : function (instance) {
           if (instance.error) {
-            self.ended   = true;
-            instance.url = url;
-            self.renderError(instance);
-            self._options.onError(instance);
-            return;
+            self.ended = true
+            instance.url = url
+            self.renderError(instance)
+            self._options.onError(instance)
+            return
           }
 
-          self.instance = instance.api2_host;
-          self.start();
+          self.instance = instance.api2_host
+          self.start()
         },
-        error             : function(xhr, status, jsonpErr) {
+        error             : function (xhr, status, jsonpErr) {
           if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
-            canUseCustomBoredLogic = false;
+            canUseCustomBoredLogic = false
 
-            self._findBoredInstanceUrl(function(err, theUrl) {
+            self._findBoredInstanceUrl(function (err, theUrl) {
               if (err) {
-                self.ended = true;
+                self.ended = true
                 err = {
                   error   : 'BORED_INSTANCE_ERROR',
                   message : self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
-                };
-                self.renderError(err);
-                self._options.onError(err);
-                return;
+                }
+                self.renderError(err)
+                self._options.onError(err)
+                return
               }
 
-              url = PROTOCOL + 'api2.' + theUrl + '/instances/bored';
+              url = PROTOCOL + 'api2.' + theUrl + '/instances/bored'
 
               if (PROTOCOL === 'https://') {
-                url = PROTOCOL + 'api2-' + theUrl + '/instances/bored';
+                url = PROTOCOL + 'api2-' + theUrl + '/instances/bored'
               }
 
-              proceed();
-            });
-            return;
+              proceed()
+            })
+            return
           }
 
-          self.ended = true;
+          self.ended = true
 
-          var reason = 'JSONP bored instance request status: ' + status;
-          reason += ', err: ' + jsonpErr;
+          var reason = 'JSONP bored instance request status: ' + status
+          reason += ', err: ' + jsonpErr
 
           var err = {
             error   : 'CONNECTION_ERROR',
             message : self.i18n('errors.CONNECTION_ERROR'),
             reason  : reason,
             url     : url
-          };
-          self.renderError(err);
-          self._options.onError(err);
+          }
+          self.renderError(err)
+          self._options.onError(err)
         }
-      });
+      })
     }
 
-    proceed();
+    proceed()
 
     if (this._options.modal) {
-      this.showModal();
+      this.showModal()
     }
-  };
+  }
 
-  Uploader.prototype._findBoredInstanceUrl = function(cb) {
-    var region = this._options.region;
-    var domain = 's3';
+  Uploader.prototype._findBoredInstanceUrl = function (cb) {
+    var region = this._options.region
+    var domain = 's3'
 
     if (region !== 'us-east-1') {
-      domain = 's3-' + region;
+      domain = 's3-' + region
     }
 
-    var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region;
-    url    += '.transloadit.com/cached_instances.json';
+    var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region
+    url += '.transloadit.com/cached_instances.json'
 
-    var self = this;
+    var self = this
     var opts = {
       url      : url,
       timeout  : 5000,
       datatype : 'json',
-      success  : function(result) {
-        var instances = self._shuffle(result.uploaders);
-        self._findResponsiveInstance(instances, 0, cb);
+      success  : function (result) {
+        var instances = self._shuffle(result.uploaders)
+        self._findResponsiveInstance(instances, 0, cb)
       }
-    };
-
-    opts.error = function(xhr, status) {
-      // retry from the crm if S3 let us down
-      opts.url = PROTOCOL + 'transloadit.com/' + region;
-      opts.url += '_cached_instances.json';
-
-      opts.error = function(xhr, status) {
-        var msg = 'Could not get cached uploaders from neither S3 or the crm';
-        msg += ' for region: ' + region;
-        var err = new Error(msg);
-        cb(err);
-      };
-
-      $.ajax(opts);
-    };
-
-    $.ajax(opts);
-  };
-
-  Uploader.prototype._findResponsiveInstance = function(instances, index, cb) {
-    if (!instances[index]) {
-      var err = new Error('No responsive uploaders');
-      return cb(err);
     }
 
-    var self = this;
-    var url  = instances[index];
+    opts.error = function (xhr, status) {
+      // retry from the crm if S3 let us down
+      opts.url = PROTOCOL + 'transloadit.com/' + region
+      opts.url += '_cached_instances.json'
+
+      opts.error = function (xhr, status) {
+        var msg = 'Could not get cached uploaders from neither S3 or the crm'
+        msg += ' for region: ' + region
+        var err = new Error(msg)
+        cb(err)
+      }
+
+      $.ajax(opts)
+    }
+
+    $.ajax(opts)
+  }
+
+  Uploader.prototype._findResponsiveInstance = function (instances, index, cb) {
+    if (!instances[index]) {
+      var err = new Error('No responsive uploaders')
+      return cb(err)
+    }
+
+    var self = this
+    var url = instances[index]
 
     $.jsonp({
       url               : PROTOCOL + url,
       timeout           : 3000,
       callbackParameter : 'callback',
-      success           : function(result) {
-        cb(null, url);
+      success           : function (result) {
+        cb(null, url)
       },
-      error             : function(xhr, status) {
-        self._findResponsiveInstance(instances, index + 1, cb);
+      error             : function (xhr, status) {
+        self._findResponsiveInstance(instances, index + 1, cb)
       }
-    });
-  };
+    })
+  }
 
-  Uploader.prototype._shuffle = function(arr) {
-    var shuffled = [];
-    var rand;
+  Uploader.prototype._shuffle = function (arr) {
+    var shuffled = []
+    var rand
     for (var i = 0; i < arr.length; i++) {
-      rand           = Math.floor(Math.random() * (i + 1));
-      shuffled[i]    = shuffled[rand];
-      shuffled[rand] = arr[i];
+      rand = Math.floor(Math.random() * (i + 1))
+      shuffled[i] = shuffled[rand]
+      shuffled[rand] = arr[i]
     }
-    return shuffled;
-  };
+    return shuffled
+  }
 
-  Uploader.prototype.start = function() {
-    this.started             = false;
-    this.ended               = false;
-    this.bytesReceivedBefore = 0;
-    this.pollRetries         = 0;
-    this.uploads             = [];
-    this._animatedTo100      = false;
-    this._uploadFileIds      = [];
-    this._resultFileIds      = [];
-    this.results             = {};
+  Uploader.prototype.start = function () {
+    this.started = false
+    this.ended = false
+    this.bytesReceivedBefore = 0
+    this.pollRetries = 0
+    this.uploads = []
+    this._animatedTo100 = false
+    this._uploadFileIds = []
+    this._resultFileIds = []
+    this.results = {}
 
-    this.assemblyId = this._genUuid();
+    this.assemblyId = this._genUuid()
 
     if (this._options.resumable) {
-      this._startWithResumabilitySupport();
+      this._startWithResumabilitySupport()
     } else if (this._options.formData) {
-      this._startWithXhr();
+      this._startWithXhr()
     } else {
-      this._startFormUrlencoded();
+      this._startFormUrlencoded()
     }
 
-    this.lastPoll = +new Date();
+    this.lastPoll = +new Date()
 
-    var self = this;
-    setTimeout(function() {
-      self._poll();
-    }, 300);
-  };
+    var self = this
+    setTimeout(function () {
+      self._poll()
+    }, 300)
+  }
 
-  Uploader.prototype._startWithXhr = function() {
-    var formData = this._prepareFormData();
-    this._appendFilteredFormFields(formData, true);
-    this._appendCustomFormData(formData);
+  Uploader.prototype._startWithXhr = function () {
+    var formData = this._prepareFormData()
+    this._appendFilteredFormFields(formData, true)
+    this._appendCustomFormData(formData)
 
-    var url = this._getAssemblyRequestTargetUrl();
-    var f = new XMLHttpRequest();
-    f.open("POST", url);
-    f.send(formData);
-  };
+    var url = this._getAssemblyRequestTargetUrl()
+    var f = new XMLHttpRequest()
+    f.open('POST', url)
+    f.send(formData)
+  }
 
-  Uploader.prototype._startWithResumabilitySupport = function() {
-    var self = this;
+  Uploader.prototype._startWithResumabilitySupport = function () {
+    var self = this
 
-    var formData = this._prepareFormData();
-    this._appendTusFileCount(formData);
-    this._appendFilteredFormFields(formData);
-    this._appendCustomFormData(formData);
+    var formData = this._prepareFormData()
+    this._appendTusFileCount(formData)
+    this._appendFilteredFormFields(formData)
+    this._appendCustomFormData(formData)
 
-    var url = this._getAssemblyRequestTargetUrl();
-    var f   = new XMLHttpRequest();
-    f.open("POST", url);
-    f.send(formData);
+    var url = this._getAssemblyRequestTargetUrl()
+    var f = new XMLHttpRequest()
+    f.open('POST', url)
+    f.send(formData)
 
-    var endpoint = PROTOCOL + this.instance + this._options.resumableEndpointPath;
+    var endpoint = PROTOCOL + this.instance + this._options.resumableEndpointPath
 
     // @todo: add support for files from custom formData
-    var bytesExpected = this._countTotalBytesExpected();
+    var bytesExpected = this._countTotalBytesExpected()
 
-    this.$files.each(function() {
-      var nameAttr = $(this).attr('name');
+    this.$files.each(function () {
+      var nameAttr = $(this).attr('name')
       for (var i = 0; i < this.files.length; i++) {
-        var file = this.files[i];
+        var file = this.files[i]
         var upload = new tus.Upload(file, {
           endpoint : endpoint,
           resume   : true,
@@ -407,37 +407,37 @@
             filename    : file.name,
             assembly_id : self.assemblyId
           },
-          onError: function(error) {
-            console.log("Failed because: " + error);
+          onError: function (error) {
+            console.log('Failed because: ' + error)
           },
-          onProgress: function(bytesUploaded, bytesTotal) {
-            var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2);
-            console.log(bytesUploaded, bytesTotal, percentage + "%");
+          onProgress: function (bytesUploaded, bytesTotal) {
+            var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
+            console.log(bytesUploaded, bytesTotal, percentage + '%')
           }
-        });
-        upload.start();
+        })
+        upload.start()
       }
-    });
-  };
+    })
+  }
 
-  Uploader.prototype._startFormUrlencoded = function() {
+  Uploader.prototype._startFormUrlencoded = function () {
     // add a clone, so that we can restore the file input fields
     // when the user hits cancel and so that we can .append(this.$files) to
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
-    var self = this;
-    this.$fileClones = $().not(document);
+    var self = this
+    this.$fileClones = $().not(document)
 
-    this.$files.each(function() {
-      var $clone = $(this).clone(true);
-      self.$fileClones = self.$fileClones.add($clone);
-      $clone.insertAfter(this);
-    });
+    this.$files.each(function () {
+      var $clone = $(this).clone(true)
+      self.$fileClones = self.$fileClones.add($clone)
+      $clone.insertAfter(this)
+    })
 
     this.$iframe = $('<iframe id="transloadit-' + this.assemblyId + '" name="transloadit-' + this.assemblyId + '"/>')
       .appendTo('body')
-      .hide();
+      .hide()
 
-    var url = this._getAssemblyRequestTargetUrl();
+    var url = this._getAssemblyRequestTargetUrl()
 
     this.$uploadForm = $('<form enctype="multipart/form-data" />')
       .attr('action', url)
@@ -450,408 +450,408 @@
       // in this.$fileClones.
       .append(this.$files)
       .appendTo('body')
-      .hide();
+      .hide()
 
-    var $fieldsToClone = this._getFilteredFormFields();
+    var $fieldsToClone = this._getFilteredFormFields()
 
     // remove selects from $clones, because we have to clone them as hidden input
     // fields, otherwise their values are not transferred properly
-    var $selects = $fieldsToClone.filter('select');
-    $fieldsToClone = $fieldsToClone.filter(function() {
-      return !$(this).is('select');
-    });
+    var $selects = $fieldsToClone.filter('select')
+    $fieldsToClone = $fieldsToClone.filter(function () {
+      return !$(this).is('select')
+    })
 
-    var $clones  = this.clone($fieldsToClone);
+    var $clones = this.clone($fieldsToClone)
 
     if (this._options.params && !this.$params) {
-      $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
+      $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>')
     }
     if (this._options.signature) {
-      $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>');
+      $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>')
     }
 
     if (typeof this._options.fields == 'object') {
       for (var fieldName in this._options.fields) {
-        var fieldValue = this._options.fields[fieldName];
-        $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>');
+        var fieldValue = this._options.fields[fieldName]
+        $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>')
       }
     }
 
-    $clones.prependTo(this.$uploadForm);
+    $clones.prependTo(this.$uploadForm)
 
     // now add all selects as hidden fields
-    $selects.each(function() {
+    $selects.each(function () {
       $('<input type="hidden"/>')
         .attr('name', $(this).attr('name'))
         .attr('value', $(this).val())
-        .prependTo(self.$uploadForm);
-    });
+        .prependTo(self.$uploadForm)
+    })
 
-    this.$uploadForm.submit();
-  };
+    this.$uploadForm.submit()
+  }
 
-  Uploader.prototype._prepareFormData = function(form) {
-    var assemblyParams = this._options.params;
+  Uploader.prototype._prepareFormData = function (form) {
+    var assemblyParams = this._options.params
     if (this.$params) {
-      assemblyParams = this.$params.val();
+      assemblyParams = this.$params.val()
     }
     if (typeof assemblyParams !== 'string') {
-      assemblyParams = JSON.stringify(assemblyParams);
+      assemblyParams = JSON.stringify(assemblyParams)
     }
 
-    var result = {};
+    var result = {}
     if (this._options.formData instanceof FormData) {
-      result = this._options.formData;
+      result = this._options.formData
     } else {
-      result = new FormData(form);
+      result = new FormData(form)
     }
 
-    result.append("params", assemblyParams);
+    result.append('params', assemblyParams)
     if (this._options.signature) {
-      result.append("signature", this._options.signature);
+      result.append('signature', this._options.signature)
     }
 
-    return result;
-  };
+    return result
+  }
 
-  Uploader.prototype._appendTusFileCount = function(formData) {
-    var fileCount = 0;
-    this.$files.each(function() {
-      fileCount += this.files.length;
-    });
-    formData.append("tus_num_expected_upload_files", fileCount);
-  };
+  Uploader.prototype._appendTusFileCount = function (formData) {
+    var fileCount = 0
+    this.$files.each(function () {
+      fileCount += this.files.length
+    })
+    formData.append('tus_num_expected_upload_files', fileCount)
+  }
 
-  Uploader.prototype._appendFilteredFormFields = function(formData, allowFiles) {
-    var $fields = this._getFilteredFormFields(allowFiles);
+  Uploader.prototype._appendFilteredFormFields = function (formData, allowFiles) {
+    var $fields = this._getFilteredFormFields(allowFiles)
 
-    $fields.each(function() {
-      var name = $(this).attr('name');
+    $fields.each(function () {
+      var name = $(this).attr('name')
       if (!name) {
-        return;
+        return
       }
-      var value = $(this).val();
-      formData.append(name, value);
-    });
-  };
+      var value = $(this).val()
+      formData.append(name, value)
+    })
+  }
 
-  Uploader.prototype._appendCustomFormData = function(formData) {
+  Uploader.prototype._appendCustomFormData = function (formData) {
     if (!this._options.formData) {
-      return;
+      return
     }
 
     for (var i = 0; i < this._options.formData.length; i++) {
-      var tupel = this._options.formData[i];
-      formData.append(tupel[0], tupel[1], tupel[2]);
+      var tupel = this._options.formData[i]
+      formData.append(tupel[0], tupel[1], tupel[2])
     }
-  };
+  }
 
-  Uploader.prototype._getAssemblyRequestTargetUrl = function() {
-    var result = PROTOCOL + this.instance + '/assemblies/';
-    result    += this.assemblyId + '?redirect=false';
+  Uploader.prototype._getAssemblyRequestTargetUrl = function () {
+    var result = PROTOCOL + this.instance + '/assemblies/'
+    result += this.assemblyId + '?redirect=false'
 
-    return result;
-  };
+    return result
+  }
 
-  Uploader.prototype._countTotalBytesExpected = function() {
-    var result = 0;
-    this.$files.each(function() {
-      var nameAttr = $(this).attr('name');
+  Uploader.prototype._countTotalBytesExpected = function () {
+    var result = 0
+    this.$files.each(function () {
+      var nameAttr = $(this).attr('name')
       for (var i = 0; i < this.files.length; i++) {
         if (this.files[i].size) {
-          result += this.files[i].size;
+          result += this.files[i].size
         }
       }
-    });
+    })
 
-    return result;
-  };
+    return result
+  }
 
-  Uploader.prototype._getFilteredFormFields = function(allowFiles) {
-    var fieldsFilter = '[name=params], [name=signature]';
+  Uploader.prototype._getFilteredFormFields = function (allowFiles) {
+    var fieldsFilter = '[name=params], [name=signature]'
     if (this._options.fields === true) {
-      fieldsFilter = '*';
+      fieldsFilter = '*'
     } else if (typeof this._options.fields === 'string') {
-      fieldsFilter += ', ' + this._options.fields;
+      fieldsFilter += ', ' + this._options.fields
     }
 
     // Filter out submit elements right away as they will cause funny behavior
     // in the shadow form.
-    var $fields = this.$form.find(':input[type!=submit]');
+    var $fields = this.$form.find(':input[type!=submit]')
     if (!allowFiles) {
-      $fields = $fields.filter('[type!=file]');
+      $fields = $fields.filter('[type!=file]')
     }
 
-    return $fields.filter(fieldsFilter);
-  };
+    return $fields.filter(fieldsFilter)
+  }
 
-  Uploader.prototype.clone = function($obj) {
-    var $result         = $obj.clone();
-    var myTextareas     = $obj.filter('textarea');
-    var resultTextareas = $result.filter('textarea');
+  Uploader.prototype.clone = function ($obj) {
+    var $result = $obj.clone()
+    var myTextareas = $obj.filter('textarea')
+    var resultTextareas = $result.filter('textarea')
 
     for (var i = 0; i < myTextareas.length; ++i) {
-      $(resultTextareas[i]).val($(myTextareas[i]).val());
+      $(resultTextareas[i]).val($(myTextareas[i]).val())
     }
 
-    return $result;
-  };
+    return $result
+  }
 
-  Uploader.prototype.detectFileInputs = function() {
+  Uploader.prototype.detectFileInputs = function () {
     var $files = this.$form
       .find('input[type=file]')
-      .not(this._options.exclude);
+      .not(this._options.exclude)
 
     if (!this._options['processZeroFiles']) {
-      $files = $files.filter(function() {
-        return this.value !== '';
-      });
+      $files = $files.filter(function () {
+        return this.value !== ''
+      })
     }
-    this.$files = $files;
-  };
+    this.$files = $files
+  }
 
-  Uploader.prototype.validate = function() {
+  Uploader.prototype.validate = function () {
     if (!this._options.params) {
-      var $params = this.$form.find('input[name=params]');
+      var $params = this.$form.find('input[name=params]')
       if (!$params.length) {
-        alert('Could not find input[name=params] in your form.');
-        return;
+        alert('Could not find input[name=params] in your form.')
+        return
       }
 
-      this.$params = $params;
+      this.$params = $params
       try {
-        this.params = JSON.parse($params.val());
+        this.params = JSON.parse($params.val())
       } catch (e) {
-        alert('Error: input[name=params] seems to contain invalid JSON.');
-        return;
+        alert('Error: input[name=params] seems to contain invalid JSON.')
+        return
       }
     } else {
-      this.params = this._options.params;
+      this.params = this._options.params
     }
 
     if (this.params.redirect_url) {
-      this.$form.attr('action', this.params.redirect_url);
+      this.$form.attr('action', this.params.redirect_url)
     } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service + 'assemblies')) {
-      alert('Error: input[name=params] does not include a redirect_url');
-      return;
+      alert('Error: input[name=params] does not include a redirect_url')
+      return
     }
-  };
+  }
 
-  Uploader.prototype._poll = function(query) {
-    var self = this;
+  Uploader.prototype._poll = function (query) {
+    var self = this
     if (this.ended) {
-      return;
+      return
     }
 
     // Reduce Firefox Title Flickering
-    var match = /(mozilla)(?:.*? rv:([\w.]+))?/.exec(navigator.userAgent);
-    var isMozilla = match && match[1];
-    this.documentTitle = document.title;
+    var match = /(mozilla)(?:.*? rv:([\w.]+))?/.exec(navigator.userAgent)
+    var isMozilla = match && match[1]
+    this.documentTitle = document.title
     if (isMozilla && !this.documentTitle) {
-      document.title = 'Loading...';
+      document.title = 'Loading...'
     }
 
-    this.pollStarted = +new Date();
+    this.pollStarted = +new Date()
 
-    var instance = 'status-' + this.instance;
-    var url      = PROTOCOL + instance + '/assemblies/' + this.assemblyId;
+    var instance = 'status-' + this.instance
+    var url = PROTOCOL + instance + '/assemblies/' + this.assemblyId
 
     if (query) {
-      url += query;
+      url += query
     }
 
     $.jsonp({
       url               : url,
       timeout           : self._options.pollTimeout,
       callbackParameter : 'callback',
-      success           : function(assembly) {
+      success           : function (assembly) {
         if (self.ended) {
-          return;
+          return
         }
 
-        self.assembly = assembly;
+        self.assembly = assembly
         if (assembly.error == 'ASSEMBLY_NOT_FOUND') {
-          self.pollRetries++;
+          self.pollRetries++
 
           if (self.pollRetries > self._options.poll404Retries) {
-            document.title = self.documentTitle;
-            self.ended = true;
-            self.renderError(assembly);
-            self._options.onError(assembly);
-            return;
+            document.title = self.documentTitle
+            self.ended = true
+            self.renderError(assembly)
+            self._options.onError(assembly)
+            return
           }
 
-          setTimeout(function() {
-            self._poll();
-          }, 400);
-          return;
+          setTimeout(function () {
+            self._poll()
+          }, 400)
+          return
         }
         if (assembly.error) {
-          self.ended = true;
-          self.renderError(assembly);
-          document.title = self.documentTitle;
-          self._options.onError(assembly);
-          return;
+          self.ended = true
+          self.renderError(assembly)
+          document.title = self.documentTitle
+          self._options.onError(assembly)
+          return
         }
 
         if (!self.started && assembly.bytes_expected > 0) {
-          self.started = true;
-          self._options.onStart(assembly);
+          self.started = true
+          self._options.onStart(assembly)
         }
 
-        self.pollRetries = 0;
-        var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING';
-        var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING';
-        var isCanceled  = assembly.ok === 'ASSEMBLY_CANCELED';
-        var isComplete  = assembly.ok === 'ASSEMBLY_COMPLETED';
+        self.pollRetries = 0
+        var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING'
+        var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
+        var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
+        var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
 
         if (assembly.bytes_expected > 0) {
-          self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
+          self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly)
         }
 
         for (var i = 0; i < assembly.uploads.length; i++) {
-          var upload = assembly.uploads[i];
+          var upload = assembly.uploads[i]
 
           if ($.inArray(upload.id, self._uploadFileIds) === -1) {
-            self._options.onUpload(upload, assembly);
-            self.uploads.push(upload);
-            self._uploadFileIds.push(upload.id);
+            self._options.onUpload(upload, assembly)
+            self.uploads.push(upload)
+            self._uploadFileIds.push(upload.id)
           }
         }
 
         for (var step in assembly.results) {
-          self.results[step] = self.results[step] || [];
+          self.results[step] = self.results[step] || []
 
           for (var j = 0; j < assembly.results[step].length; j++) {
-            var result   = assembly.results[step][j];
-            var resultId = step + '_' + result.id;
+            var result = assembly.results[step][j]
+            var resultId = step + '_' + result.id
 
             if ($.inArray(resultId, self._resultFileIds) === -1) {
-              self._options.onResult(step, result, assembly);
-              self.results[step].push(result);
-              self._resultFileIds.push(resultId);
+              self._options.onResult(step, result, assembly)
+              self.results[step].push(result)
+              self._resultFileIds.push(resultId)
             }
           }
         }
 
         if (isCanceled) {
-          self.ended = true;
-          document.title = self.documentTitle;
-          self._options.onCancel(assembly);
-          return;
+          self.ended = true
+          document.title = self.documentTitle
+          self._options.onCancel(assembly)
+          return
         }
 
-        var isEnded = isComplete || (!self._options['wait'] && isExecuting);
+        var isEnded = isComplete || (!self._options['wait'] && isExecuting)
 
         if (assembly.bytes_expected > 0) {
-          self.renderProgress(assembly, isEnded, self._options['wait']);
+          self.renderProgress(assembly, isEnded, self._options['wait'])
         }
 
         if (isEnded) {
-          self.ended = true;
-          document.title = self.documentTitle;
-          assembly.uploads = self.uploads;
-          assembly.results = self.results;
-          self._options.onSuccess(assembly);
+          self.ended = true
+          document.title = self.documentTitle
+          assembly.uploads = self.uploads
+          assembly.results = self.results
+          self._options.onSuccess(assembly)
 
           // give the progressbar some time to finish to 100%
-          setTimeout(function() {
+          setTimeout(function () {
             if (self._options.modal) {
-              self.cancel();
+              self.cancel()
             }
-            self.submitForm();
-          }, 600);
-          return;
+            self.submitForm()
+          }, 600)
+          return
         }
 
-        var ping    = self.pollStarted - +new Date();
-        var timeout = ping < self._options.interval ? self._options.interval : ping;
+        var ping = self.pollStarted - +new Date()
+        var timeout = ping < self._options.interval ? self._options.interval : ping
 
-        self.timer = setTimeout(function() {
-          self._poll();
-        }, timeout);
-        self.lastPoll = +new Date();
+        self.timer = setTimeout(function () {
+          self._poll()
+        }, timeout)
+        self.lastPoll = +new Date()
       },
-      error             : function(xhr, status, jsonpErr) {
+      error             : function (xhr, status, jsonpErr) {
         if (self.ended) {
-          return;
+          return
         }
 
-        self.pollRetries++;
+        self.pollRetries++
         if (self.pollRetries > self._options.pollConnectionRetries) {
-          document.title = self.documentTitle;
-          self.ended = true;
+          document.title = self.documentTitle
+          self.ended = true
 
-          var reason = 'JSONP status poll request status: ' + status;
-          reason += ', err: ' + jsonpErr;
+          var reason = 'JSONP status poll request status: ' + status
+          reason += ', err: ' + jsonpErr
 
           var err = {
             error   : 'CONNECTION_ERROR',
             message : self.i18n('errors.CONNECTION_ERROR'),
             reason  : reason,
             url     : url
-          };
-          self.renderError(err);
-          self._options.onError(err);
-          return;
+          }
+          self.renderError(err)
+          self._options.onError(err)
+          return
         }
 
-        setTimeout(function() {
-          self._poll();
-        }, 350);
+        setTimeout(function () {
+          self._poll()
+        }, 350)
       }
-    });
-  };
+    })
+  }
 
-  Uploader.prototype.stop = function() {
-    document.title = this.documentTitle;
-    this.ended = true;
-  };
+  Uploader.prototype.stop = function () {
+    document.title = this.documentTitle
+    this.ended = true
+  }
 
-  Uploader.prototype.cancel = function() {
+  Uploader.prototype.cancel = function () {
     // @todo this has still a race condition if a new upload is started
     // while the cancel request is still being executed. Shouldn't happen
     // in real life, but needs fixing.
 
     if (!this.ended) {
-      var self = this;
+      var self = this
       if (this.$params) {
-        this.$params.prependTo(this.$form);
+        this.$params.prependTo(this.$form)
       }
 
       if (this.$fileClones) {
-        this.$fileClones.each(function(i) {
-          var $original = $(self.$files[i]).clone(true);
-          var $clone = $(this);
-          $original.insertAfter($clone);
-          $clone.remove();
-        });
+        this.$fileClones.each(function (i) {
+          var $original = $(self.$files[i]).clone(true)
+          var $clone = $(this)
+          $original.insertAfter($clone)
+          $clone.remove()
+        })
       }
-      clearTimeout(this.timer);
+      clearTimeout(this.timer)
 
-      this._poll('?method=delete');
+      this._poll('?method=delete')
 
       if (this.$iframe) {
         if (navigator.appName == 'Microsoft Internet Explorer') {
-          this.$iframe[0].contentWindow.document.execCommand('Stop');
+          this.$iframe[0].contentWindow.document.execCommand('Stop')
         }
 
-        setTimeout(function() {
-          self.$iframe.remove();
-        }, 500);
+        setTimeout(function () {
+          self.$iframe.remove()
+        }, 500)
       }
     }
 
     if (this._options.modal) {
-      this.hideModal();
+      this.hideModal()
     }
-  };
+  }
 
-  Uploader.prototype.submitForm = function() {
+  Uploader.prototype.submitForm = function () {
     // prevent that files are uploaded to the final destination
     // after all that is what we use this plugin for :)
     if (this.$form.attr('enctype') === 'multipart/form-data') {
-      this.$form.removeAttr('enctype');
+      this.$form.removeAttr('enctype')
     }
 
     if (this.assembly !== null) {
@@ -859,22 +859,22 @@
         .attr('name', 'transloadit')
         .text(JSON.stringify(this.assembly))
         .prependTo(this.$form)
-        .hide();
+        .hide()
     }
 
     if (this._options.autoSubmit) {
       this.$form
         .unbind('submit.transloadit')
-        .submit();
+        .submit()
     }
-  };
+  }
 
-  Uploader.prototype.hideModal = function() {
-    $.mask.close();
-    this.$modal.remove();
-  };
+  Uploader.prototype.hideModal = function () {
+    $.mask.close()
+    this.$modal.remove()
+  }
 
-  Uploader.prototype.showModal = function() {
+  Uploader.prototype.showModal = function () {
     this.$modal =
       $('<div id="transloadit">' +
         '<div class="content">' +
@@ -889,7 +889,7 @@
           '<p class="error-details"></p>' +
         '</div>' +
       '</div>')
-      .appendTo('body');
+      .appendTo('body')
 
     $.extend(this.$modal, {
       '$content'            : this.$modal.find('.content'),
@@ -901,13 +901,13 @@
       '$error'              : this.$modal.find('.error'),
       '$errorDetails'       : this.$modal.find('.error-details'),
       '$errorDetailsToggle' : this.$modal.find('.error-details-toggle')
-    });
+    })
 
-    var self = this;
+    var self = this
 
-    this.$modal.$error.hide();
-    this.$modal.$errorDetails.hide();
-    this.$modal.$errorDetailsToggle.hide();
+    this.$modal.$error.hide()
+    this.$modal.$errorDetails.hide()
+    this.$modal.$errorDetailsToggle.hide()
 
     var expose = this.$modal.expose({
       api          : true,
@@ -916,51 +916,51 @@
       loadSpeed    : 250,
       closeOnEsc   : false,
       closeOnClick : false
-    });
+    })
 
-    this.$modal.$close.click(function() {
-      self.cancel();
-      return false;
-    });
-  };
+    this.$modal.$close.click(function () {
+      self.cancel()
+      return false
+    })
+  }
 
-  Uploader.prototype.renderError = function(err) {
+  Uploader.prototype.renderError = function (err) {
     if (!this._options.modal) {
-      return;
+      return
     }
 
     if (!this._options.debug) {
-      return this.cancel();
+      return this.cancel()
     }
 
-    this.$modal.$content.addClass('content-error');
-    this.$modal.$progress.hide();
-    this.$modal.$label.hide();
+    this.$modal.$content.addClass('content-error')
+    this.$modal.$progress.hide()
+    this.$modal.$label.hide()
 
-    var errorMsg = err.error + ': ' + err.message + '<br /><br />';
-    errorMsg += (err.reason || '');
+    var errorMsg = err.error + ': ' + err.message + '<br /><br />'
+    errorMsg += (err.reason || '')
 
     var errorsRequiringDetails = [
       'CONNECTION_ERROR',
       'BORED_INSTANCE_ERROR',
       'ASSEMBLY_NOT_FOUND'
-    ];
+    ]
     if ($.inArray(err.error, errorsRequiringDetails) === -1) {
-      this.$modal.$error.html(errorMsg).show();
-      return;
+      this.$modal.$error.html(errorMsg).show()
+      return
     }
 
-    var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain');
-    this.$modal.$error.html(text).show();
+    var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain')
+    this.$modal.$error.html(text).show()
 
-    var assemblyId = err.assemblyId ? err.assemblyId : this.assemblyId;
-    var self       = this;
-    var ip         = null;
+    var assemblyId = err.assemblyId ? err.assemblyId : this.assemblyId
+    var self = this
+    var ip = null
 
-    $.getJSON(PROTOCOL + 'jsonip.com/', function(ipData) {
-      ip = ipData.ip;
+    $.getJSON(PROTOCOL + 'jsonip.com/', function (ipData) {
+      ip = ipData.ip
     })
-    .always(function() {
+    .always(function () {
       var details = {
         endpoint     : err.url,
         instance     : self.instance,
@@ -970,71 +970,71 @@
         agent        : navigator.userAgent,
         poll_retries : self.pollRetries,
         error        : errorMsg
-      };
-      $.post(PROTOCOL + 'status.transloadit.com/client_error', details);
+      }
+      $.post(PROTOCOL + 'status.transloadit.com/client_error', details)
 
-      var detailsArr = [];
+      var detailsArr = []
       for (var key in details) {
-        detailsArr.push(key + ': ' + details[key]);
+        detailsArr.push(key + ': ' + details[key])
       }
 
-      var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />';
-      self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'));
+      var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />'
+      self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
 
       self.$modal.$errorDetailsToggle.show().find('a')
         .off('click')
-        .on('click', function(e) {
-          e.preventDefault();
-          self.$modal.$errorDetails.toggle();
-        });
-    });
-  };
+        .on('click', function (e) {
+          e.preventDefault()
+          self.$modal.$errorDetails.toggle()
+        })
+    })
+  }
 
-  Uploader.prototype.renderProgress = function(assembly, isAssemblyComplete, waitIsTrue) {
+  Uploader.prototype.renderProgress = function (assembly, isAssemblyComplete, waitIsTrue) {
     if (!this._options.modal) {
-      return;
+      return
     }
 
-    var progress = assembly.bytes_received / assembly.bytes_expected * 100;
+    var progress = assembly.bytes_received / assembly.bytes_expected * 100
     if (progress > 100) {
-      progress = 0;
+      progress = 0
     }
 
-    var bytesReceived     = assembly.bytes_received - this.bytesReceivedBefore;
-    var timeSinceLastPoll = +new Date() - this.lastPoll;
-    var duration          = progress === 100 ? 1000 : this._options.interval * 2;
+    var bytesReceived = assembly.bytes_received - this.bytesReceivedBefore
+    var timeSinceLastPoll = +new Date() - this.lastPoll
+    var duration = progress === 100 ? 1000 : this._options.interval * 2
 
-    var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2);
-    var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2);
-    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1);
+    var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2)
+    var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2)
+    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1)
 
-    var outstanding  = assembly.bytes_expected - assembly.bytes_received;
-    var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1);
+    var outstanding = assembly.bytes_expected - assembly.bytes_received
+    var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1)
 
-    var durationLeft = '';
+    var durationLeft = ''
     if (speedInBytes > 0) {
-      durationLeft = this._duration(outstanding / speedInBytes);
+      durationLeft = this._duration(outstanding / speedInBytes)
     }
 
     txt = this.i18n('uploadProgress',
       mbReceived, mbExpected, uploadRate, durationLeft
-    );
+    )
 
     if (!this._animatedTo100) {
-      this.$modal.$label.text(txt);
+      this.$modal.$label.text(txt)
     }
 
-    var totalWidth           = parseInt(this.$modal.$progress.css('width'), 10);
-    this.bytesReceivedBefore = assembly.bytes_received;
+    var totalWidth = parseInt(this.$modal.$progress.css('width'), 10)
+    this.bytesReceivedBefore = assembly.bytes_received
 
     if (bytesReceived <= 0 && !isAssemblyComplete) {
-      return;
+      return
     }
 
-    var self = this;
+    var self = this
 
     if (isAssemblyComplete && waitIsTrue) {
-      duration = 500;
+      duration = 500
     }
 
     this.$modal.$progressBar.stop().animate(
@@ -1042,43 +1042,43 @@
       {
         duration : duration,
         easing   : 'linear',
-        progress : function(promise, currPercent, remainingMs) {
-          var width = parseInt(self.$modal.$progressBar.css('width'), 10);
+        progress : function (promise, currPercent, remainingMs) {
+          var width = parseInt(self.$modal.$progressBar.css('width'), 10)
 
-          var percent = (width * 100 / totalWidth).toFixed(0);
+          var percent = (width * 100 / totalWidth).toFixed(0)
           if (percent > 100) {
-            percent = 100;
+            percent = 100
           }
           if (percent > 13 && !self._animatedTo100) {
-            self.$modal.$percent.text(percent + '%');
+            self.$modal.$percent.text(percent + '%')
           }
 
           if (percent == 100 && !self._animatedTo100) {
-            self._animatedTo100 = true;
+            self._animatedTo100 = true
 
-            setTimeout(function() {
-              self.$modal.$label.text(self.i18n('processingFiles'));
-              self.$modal.$progress.addClass('active');
-              self.$modal.$percent.text('');
-            }, 500);
+            setTimeout(function () {
+              self.$modal.$label.text(self.i18n('processingFiles'))
+              self.$modal.$progress.addClass('active')
+              self.$modal.$percent.text('')
+            }, 500)
           }
         }
       }
-    );
-  };
+    )
+  }
 
-  Uploader.prototype.includeCss = function() {
+  Uploader.prototype.includeCss = function () {
     if (CSS_LOADED || !this._options.modal) {
-      return;
+      return
     }
 
-    CSS_LOADED = true;
+    CSS_LOADED = true
     $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2-latest.css" />')
-      .appendTo('head');
-  };
+      .appendTo('head')
+  }
 
-  Uploader.prototype.getUTCDatetime = function() {
-    var now = new Date();
+  Uploader.prototype.getUTCDatetime = function () {
+    var now = new Date()
     var d = new Date(
       now.getUTCFullYear(),
       now.getUTCMonth(),
@@ -1086,20 +1086,20 @@
       now.getUTCHours(),
       now.getUTCMinutes(),
       now.getUTCSeconds()
-    );
+    )
 
-    var pad = function(n) {
-      return n < 10 ? '0' + n : n;
-    };
-    var tz = d.getTimezoneOffset();
-    var tzs = (tz > 0 ? "-" : "+") + pad(parseInt(tz / 60, 10));
+    var pad = function (n) {
+      return n < 10 ? '0' + n : n
+    }
+    var tz = d.getTimezoneOffset()
+    var tzs = (tz > 0 ? '-' : '+') + pad(parseInt(tz / 60, 10))
 
     if (tz % 60 !== 0) {
-      tzs += pad(tz % 60);
+      tzs += pad(tz % 60)
     }
 
     if (tz === 0) {
-      tzs = 'Z';
+      tzs = 'Z'
     }
 
     return d.getFullYear() + '-' +
@@ -1107,64 +1107,64 @@
         pad(d.getDate()) + 'T' +
         pad(d.getHours()) + ':' +
         pad(d.getMinutes()) + ':' +
-        pad(d.getSeconds()) + tzs;
-  };
+        pad(d.getSeconds()) + tzs
+  }
 
-  Uploader.prototype._duration = function(t) {
-    var min   = 60;
-    var h     = 60 * min;
-    var hours = Math.floor(t / h);
+  Uploader.prototype._duration = function (t) {
+    var min = 60
+    var h = 60 * min
+    var hours = Math.floor(t / h)
 
-    t -= hours * h;
+    t -= hours * h
 
-    var minutes = Math.floor(t / min);
-    t -= minutes * min;
+    var minutes = Math.floor(t / min)
+    t -= minutes * min
 
-    var r = '';
+    var r = ''
     if (hours > 0) {
-      r += hours + 'h ';
+      r += hours + 'h '
     }
     if (minutes > 0) {
-      r += minutes + 'min ';
+      r += minutes + 'min '
     }
     if (t > 0) {
-      t = t.toFixed(0);
-      r += t + 's';
+      t = t.toFixed(0)
+      r += t + 's'
     }
 
     if (r === '') {
-      r = '0s';
+      r = '0s'
     }
 
-    return r;
-  };
+    return r
+  }
 
-  Uploader.prototype.options = function(options) {
+  Uploader.prototype.options = function (options) {
     if (arguments.length === 0) {
-      return this._options;
+      return this._options
     }
 
-    $.extend(this._options, options);
-  };
+    $.extend(this._options, options)
+  }
 
-  Uploader.prototype.option = function(key, val) {
+  Uploader.prototype.option = function (key, val) {
     if (arguments.length == 1) {
-      return this._options[key];
+      return this._options[key]
     }
 
-    this._options[key] = val;
-  };
+    this._options[key] = val
+  }
 
-  Uploader.prototype.i18n = function() {
-    var args = Array.prototype.slice.call(arguments);
-    var key  = args.shift();
-    var locale = this._options.locale;
-    var translated = I18N[locale] && I18N[locale][key] || I18N.en[key];
+  Uploader.prototype.i18n = function () {
+    var args = Array.prototype.slice.call(arguments)
+    var key = args.shift()
+    var locale = this._options.locale
+    var translated = I18N[locale] && I18N[locale][key] || I18N.en[key]
     if (!translated) {
-      throw new Error('Unknown i18n key: ' + key);
+      throw new Error('Unknown i18n key: ' + key)
     }
 
-    return sprintf(translated, args);
-  };
+    return sprintf(translated, args)
+  }
 
-}(window.jQuery);
+}(window.jQuery)
