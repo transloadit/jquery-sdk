@@ -6,12 +6,12 @@ var util = require('util')
 
 function escapeHtml (string) {
   var entityMap = {
-     '&' : '&amp;',
-     '<' : '&lt;',
-     '>' : '&gt;',
+    '&' : '&amp;',
+    '<' : '&lt;',
+    '>' : '&gt;',
     '"' : '&quot;',
     "'" : '&#39;',
-     '/' : '&#x2F;'
+    '/' : '&#x2F;'
   }
 
   return String(string).replace(/[&<>"'\/]/g, function (s) {

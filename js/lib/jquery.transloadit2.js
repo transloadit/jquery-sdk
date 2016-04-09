@@ -13,7 +13,7 @@
   var OPTIONS = {
     service                      : DEFAULT_SERVICE,
     assets                       : PROTOCOL + 'assets.transloadit.com/',
-    beforeStart                  : function () { return true; },
+    beforeStart                  : function () { return true },
     onFileSelect                 : function () {},
     onStart                      : function () {},
     onProgress                   : function () {},
