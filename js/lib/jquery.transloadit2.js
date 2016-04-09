@@ -5,45 +5,45 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
-!function ($) {
-  var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://'
+!(function ($) {
+  var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
 
   var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/'
 
   var OPTIONS = {
-    service                      : DEFAULT_SERVICE,
-    assets                       : PROTOCOL + 'assets.transloadit.com/',
-    beforeStart                  : function () { return true },
-    onFileSelect                 : function () {},
-    onStart                      : function () {},
-    onProgress                   : function () {},
-    onUpload                     : function () {},
-    onResult                     : function () {},
-    onCancel                     : function () {},
-    onError                      : function () {},
-    onSuccess                    : function () {},
-    resumable                    : false,
-    resumableEndpointPath        : '/resumable/',
-    interval                     : 2500,
-    pollTimeout                  : 8000,
-    poll404Retries               : 15,
-    pollConnectionRetries        : 5,
-    wait                         : false,
-    processZeroFiles             : true,
-    triggerUploadOnFileSelection : false,
-    autoSubmit                   : true,
-    modal                        : true,
-    exclude                      : '',
-    fields                       : false,
-    params                       : null,
-    signature                    : null,
-    region                       : 'us-east-1',
-    debug                        : true,
-    locale                       : 'en'
+    service: DEFAULT_SERVICE,
+    assets: PROTOCOL + 'assets.transloadit.com/',
+    beforeStart: function () { return true },
+    onFileSelect: function () {},
+    onStart: function () {},
+    onProgress: function () {},
+    onUpload: function () {},
+    onResult: function () {},
+    onCancel: function () {},
+    onError: function () {},
+    onSuccess: function () {},
+    resumable: false,
+    resumableEndpointPath: '/resumable/',
+    interval: 2500,
+    pollTimeout: 8000,
+    poll404Retries: 15,
+    pollConnectionRetries: 5,
+    wait: false,
+    processZeroFiles: true,
+    triggerUploadOnFileSelection: false,
+    autoSubmit: true,
+    modal: true,
+    exclude: '',
+    fields: false,
+    params: null,
+    signature: null,
+    region: 'us-east-1',
+    debug: true,
+    locale: 'en'
   }
 
   var I18N = {
-    en : {
+    en: {
       'errors.BORED_INSTANCE_ERROR' : 'Could not find a bored instance.',
       'errors.CONNECTION_ERROR'     : 'There was a problem connecting to the upload server',
       'errors.unknown'              : 'There was an internal error.',
@@ -56,7 +56,7 @@
       processingFiles               : 'Upload done, now processing files ...',
       uploadProgress                : '%s / %s MB at %s kB/s | %s left'
     },
-    ja : {
+    ja: {
       'errors.BORED_INSTANCE_ERROR' : 'サーバー接続に問題があります',
       'errors.CONNECTION_ERROR'     : 'サーバー接続に問題があります',
       'errors.unknown'              : '通信環境に問題があります',
@@ -100,12 +100,12 @@
       return
     }
 
-    if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
+    if (args.length == 1 && typeof args[0] === 'object' || args[0] === undefined) {
       args.unshift('init')
     }
 
     method = args.shift()
-    if (method == 'init') {
+    if (method === 'init') {
       uploader = new Uploader()
       args.unshift(this)
       this.data('transloadit.uploader', uploader)
@@ -470,7 +470,7 @@
       $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>')
     }
 
-    if (typeof this._options.fields == 'object') {
+    if (typeof this._options.fields === 'object') {
       for (var fieldName in this._options.fields) {
         var fieldValue = this._options.fields[fieldName]
         $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>')
@@ -670,7 +670,7 @@
         }
 
         self.assembly = assembly
-        if (assembly.error == 'ASSEMBLY_NOT_FOUND') {
+        if (assembly.error === 'ASSEMBLY_NOT_FOUND') {
           self.pollRetries++
 
           if (self.pollRetries > self._options.poll404Retries) {
@@ -832,7 +832,7 @@
       this._poll('?method=delete')
 
       if (this.$iframe) {
-        if (navigator.appName == 'Microsoft Internet Explorer') {
+        if (navigator.appName === 'Microsoft Internet Explorer') {
           this.$iframe[0].contentWindow.document.execCommand('Stop')
         }
 
@@ -1167,4 +1167,4 @@
     return sprintf(translated, args)
   }
 
-}(window.jQuery)
+}(window.jQuery))
