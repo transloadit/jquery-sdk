@@ -1,63 +1,40 @@
-SHELL := /usr/bin/env bash
+# Licensed under MIT.
+# Copyright (2016) by Kevin van Zonneveld https://twitter.com/kvz
+#
+# https://www.npmjs.com/package/fakefile
+#
+# This Makefile offers convience shortcuts into any Node.js project that utilizes npm scripts.
+# It functions as a wrapper around the actual listed in `package.json`
+# So instead of typing:
+#
+#  $ npm script build:assets
+#
+# you could also type:
+#
+#  $ make build-assets
+#
+# Notice that colons (:) are replaced by dashes for Makefile compatibility.
+#
+# The benefits of this wrapper are:
+#
+# - You get to keep the the scripts package.json, which is more portable
+#   (Makefiles & Windows are harder to mix)
+# - Offer a polite way into the project for developers coming from different
+#   languages (npm scripts is obviously very Node centric)
+# - Profit from better autocomplete (make <TAB><TAB>) than npm currently offers.
+#   OSX users will have to install bash-completion
+#   (http://davidalger.com/development/bash-completion-on-os-x-with-brew/)
 
-install_dir = ../crm
-build_name = jquery.transloadit2-latest.js
-build_path = build/$(build_name)
-build_size = @ls -lh $(build_path) | awk '{print "$(1)", $$9, $$5}'
-css_name = transloadit2.css
-css_path = css/$(css_name)
-compile_js =\
-	@curl \
-	--silent \
-	--request POST \
-	--header 'Expect: ' \
-	--data-urlencode compilation_level="SIMPLE_OPTIMIZATIONS" \
-	--data-urlencode output_format="text" \
-	--data-urlencode output_info="compiled_code" \
-	--data-urlencode js_code@$(build_path) \
-	--output $(1) \
-	http://closure-compiler.appspot.com/compile
+define npm_script_targets
+TARGETS := $(shell node -e 'for (var k in require("./package.json").scripts) {console.log(k.replace(/:/g, "-"));}')
+$$(TARGETS):
+	npm run $(subst -,:,$(MAKECMDGOALS))
 
-$(build_path): js/dep/*.js js/lib/*.js
-	@cat $^ > $(build_path)
-	$(call build_size,before:)
-	@echo "compiling with google closure rest api ..."
-	$(call compile_js,$(build_path))
-	$(call build_size,after:)
+.PHONY: $$(TARGETS)
+endef
 
-.PHONY: lint
-lint:
-	npm run lint
+$(eval $(call npm_script_targets))
 
-.PHONY: fix
-fix: 
-	npm run fix
-
-.PHONY: test
-test: $(build_path)
-	npm run lint || true
-	@source env.sh; tests/run.sh $(filter)
-
-.PHONY: flow
-flow:
-	@[ -f flow-osx-latest.zip ] || wget http://flowtype.org/downloads/flow-osx-latest.zip
-	@[ -d flow ] || unzip -o flow-osx-latest.zip
-	@[ -f .flowconfig ] || ./flow/flow init
-	@cat ./js/lib/jquery.transloadit2.js | ./flow/flow check-contents --show-all-errors
-
-# TRANSLOADIT INTERNAL
-install: $(build_path) $(css_path)
-	@cp $(build_path) $(install_dir)/js/$(build_name)
-	@cp $(css_path) $(install_dir)/css/$(css_name)
-
-.PHONY: start-test-server
-start-test-server:
-	@source env.sh && node tests/server.js
-
-.PHONY: link
-link:
-	@ln -s `pwd` ${install_dir}/jquery-sdk
-
-.PHONY: clean
-clean:
-	@rm build/*.*
+# These npm run scripts are available, without needing to be mentioned in `package.json`
+install:
+	npm run install
