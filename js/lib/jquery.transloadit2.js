@@ -192,12 +192,11 @@
     this.includeCss()
   }
 
-  Uploader.prototype.getAssemblyId = function () {
+  Uploader.prototype._getInstance = function () {
     var self = this
 
     this.instance = null
-    this.assemblyId = null
-    var url = this._options['service'] + 'assembly_id'
+    var url = this._options['service']
     var attempts = 0
 
     function attempt () {
@@ -214,7 +213,6 @@
           }
 
           self.instance = result.hostname
-          self.assemblyId = result.assembly_id
           self.start()
         },
         error: function (xhr, status, jsonpErr) {
@@ -261,23 +259,31 @@
 
     this.assemblyId = this._genUuid()
 
-    if (this._options.resumable) {
-      this._startWithResumabilitySupport()
-    } else if (this._options.formData) {
-      this._startWithXhr()
-    } else {
-      this._startFormUrlencoded()
+    var self = this
+    var cb = function () {
+      self.lastPoll = +new Date()
+      setTimeout(function () {
+        self._poll()
+      }, 300)
     }
 
-    this.lastPoll = +new Date()
+    if (this._options.resumable) {
+      return this._startWithResumabilitySupport(cb)
+    }
+    if (this._options.formData) {
+      return this._getInstance(function () {
+        self._startWithXhr(cb)
+      })
+    }
 
-    var self = this
-    setTimeout(function () {
-      self._poll()
-    }, 300)
+    this._getInstance(function () {
+      self._startFormUrlencoded(cb)
+    })
   }
 
-  Uploader.prototype._startWithXhr = function () {
+  Uploader.prototype._startWithXhr = function (cb) {
+    this.assemblyId = window.transloadit.uuid()
+
     var formData = this._prepareFormData()
     this._appendFilteredFormFields(formData, true)
     this._appendCustomFormData(formData)
@@ -296,43 +302,54 @@
     this._appendFilteredFormFields(formData)
     this._appendCustomFormData(formData)
 
-    var url = this._getAssemblyRequestTargetUrl()
+    function proceed () {
+      var endpoint = PROTOCOL + self.instance + self._options.resumableEndpointPath
+
+      // @todo: add support for files from custom formData
+      // @todo Unused?
+      // var bytesExpected = this._countTotalBytesExpected()
+
+      self.$files.each(function () {
+        var nameAttr = $(self).attr('name')
+        for (var i = 0; i < self.files.length; i++) {
+          var file = self.files[i]
+          var upload = new tus.Upload(file, {
+            endpoint: endpoint,
+            resume: true,
+            metadata: {
+              fieldname: nameAttr,
+              filename: file.name,
+              assembly_id: self.assemblyId
+            },
+            onError: function (error) {
+              console.log('Failed because: ' + error)
+            },
+            onProgress: function (bytesUploaded, bytesTotal) {
+              var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
+              console.log(bytesUploaded, bytesTotal, percentage + '%')
+            }
+          })
+          upload.start()
+        }
+      })
+    }
+
+    var url = this._options['service']
     var f = new XMLHttpRequest()
     f.open('POST', url)
-    f.send(formData)
-
-    var endpoint = PROTOCOL + this.instance + this._options.resumableEndpointPath
-
-    // @todo: add support for files from custom formData
-    // @todo Unused?
-    // var bytesExpected = this._countTotalBytesExpected()
-
-    this.$files.each(function () {
-      var nameAttr = $(this).attr('name')
-      for (var i = 0; i < this.files.length; i++) {
-        var file = this.files[i]
-        var upload = new tus.Upload(file, {
-          endpoint: endpoint,
-          resume: true,
-          metadata: {
-            fieldname: nameAttr,
-            filename: file.name,
-            assembly_id: self.assemblyId
-          },
-          onError: function (error) {
-            console.log('Failed because: ' + error)
-          },
-          onProgress: function (bytesUploaded, bytesTotal) {
-            var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
-            console.log(bytesUploaded, bytesTotal, percentage + '%')
-          }
-        })
-        upload.start()
+    f.onreadystatechange = function () {
+      if (f.readyState === 4 && f.status === 200) {
+        var resp = JSON.parse(f.responseText)
+        self.assemblyId = resp.assembly_id
+        self.instance = resp.instance
+        proceed()
       }
-    })
+    }
+    f.send(formData)
   }
 
   Uploader.prototype._startFormUrlencoded = function () {
+    this.assemblyId = window.transloadit.uuid()
     // add a clone, so that we can restore the file input fields
     // when the user hits cancel and so that we can .append(this.$files) to
     // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
