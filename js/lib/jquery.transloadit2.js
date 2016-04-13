@@ -192,60 +192,41 @@
     this.includeCss()
   }
 
-  Uploader.prototype.getBoredInstance = function () {
+  Uploader.prototype.getAssemblyId = function () {
     var self = this
 
     this.instance = null
-    var url = this._options['service'] + 'instances/bored'
-    var canUseCustomBoredLogic = true
+    this.assemblyId = null
+    var url = this._options['service'] + 'assembly_id'
+    var attempts = 0
 
-    function proceed () {
+    function attempt () {
       $.jsonp({
         url: url,
         timeout: self._options.pollTimeout,
         callbackParameter: 'callback',
-        success: function (instance) {
-          if (instance.error) {
+        success: function (result) {
+          if (result.error) {
+            var err = result
             self.ended = true
-            instance.url = url
-            self.renderError(instance)
-            self._options.onError(instance)
-            return
+            self.renderError(err)
+            return self._options.onError(err)
           }
 
-          self.instance = instance.api2_host
+          self.instance = result.hostname
+          self.assemblyId = result.assembly_id
           self.start()
         },
         error: function (xhr, status, jsonpErr) {
-          if (canUseCustomBoredLogic && self._options['service'] === DEFAULT_SERVICE) {
-            canUseCustomBoredLogic = false
+          attempts++
 
-            self._findBoredInstanceUrl(function (err, theUrl) {
-              if (err) {
-                self.ended = true
-                err = {
-                  error: 'BORED_INSTANCE_ERROR',
-                  message: self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
-                }
-                self.renderError(err)
-                self._options.onError(err)
-                return
-              }
-
-              url = PROTOCOL + 'api2.' + theUrl + '/instances/bored'
-
-              if (PROTOCOL === 'https://') {
-                url = PROTOCOL + 'api2-' + theUrl + '/instances/bored'
-              }
-
-              proceed()
-            })
-            return
+          if (attempts < self._options.pollConnectionRetries) {
+            return attempt()
           }
 
           self.ended = true
 
-          var reason = 'JSONP bored instance request status: ' + status
+          var reason = 'JSONP assembly_id request status: ' + status
           reason += ', err: ' + jsonpErr
 
           var err = {
@@ -260,84 +241,11 @@
       })
     }
 
-    proceed()
+    attempt()
 
     if (this._options.modal) {
       this.showModal()
     }
-  }
-
-  Uploader.prototype._findBoredInstanceUrl = function (cb) {
-    var region = this._options.region
-    var domain = 's3'
-
-    if (region !== 'us-east-1') {
-      domain = 's3-' + region
-    }
-
-    var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region
-    url += '.transloadit.com/cached_instances.json'
-
-    var self = this
-    var opts = {
-      url: url,
-      timeout: 5000,
-      datatype: 'json',
-      success: function (result) {
-        var instances = self._shuffle(result.uploaders)
-        self._findResponsiveInstance(instances, 0, cb)
-      }
-    }
-
-    opts.error = function (xhr, status) {
-      // retry from the crm if S3 let us down
-      opts.url = PROTOCOL + 'transloadit.com/' + region
-      opts.url += '_cached_instances.json'
-
-      opts.error = function (xhr, status) {
-        var msg = 'Could not get cached uploaders from neither S3 or the crm'
-        msg += ' for region: ' + region
-        var err = new Error(msg)
-        cb(err)
-      }
-
-      $.ajax(opts)
-    }
-
-    $.ajax(opts)
-  }
-
-  Uploader.prototype._findResponsiveInstance = function (instances, index, cb) {
-    if (!instances[index]) {
-      var err = new Error('No responsive uploaders')
-      return cb(err)
-    }
-
-    var self = this
-    var url = instances[index]
-
-    $.jsonp({
-      url: PROTOCOL + url,
-      timeout: 3000,
-      callbackParameter: 'callback',
-      success: function (result) {
-        cb(null, url)
-      },
-      error: function (xhr, status) {
-        self._findResponsiveInstance(instances, index + 1, cb)
-      }
-    })
-  }
-
-  Uploader.prototype._shuffle = function (arr) {
-    var shuffled = []
-    var rand
-    for (var i = 0; i < arr.length; i++) {
-      rand = Math.floor(Math.random() * (i + 1))
-      shuffled[i] = shuffled[rand]
-      shuffled[rand] = arr[i]
-    }
-    return shuffled
   }
 
   Uploader.prototype.start = function () {
