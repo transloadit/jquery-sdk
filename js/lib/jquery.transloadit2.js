@@ -7,7 +7,6 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
-
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
 
@@ -172,7 +171,7 @@
         }
       } else {
         if (self._options.beforeStart()) {
-          self.getBoredInstance()
+          self.start()
         }
       }
 
@@ -192,7 +191,7 @@
     this.includeCss()
   }
 
-  Uploader.prototype._getInstance = function () {
+  Uploader.prototype._getInstance = function (cb) {
     var self = this
 
     this.instance = null
@@ -213,7 +212,7 @@
           }
 
           self.instance = result.hostname
-          self.start()
+          cb()
         },
         error: function (xhr, status, jsonpErr) {
           attempts++
@@ -235,6 +234,7 @@
           }
           self.renderError(err)
           self._options.onError(err)
+          cb(err)
         }
       })
     }
@@ -271,13 +271,17 @@
       return this._startWithResumabilitySupport(cb)
     }
     if (this._options.formData) {
-      return this._getInstance(function () {
-        self._startWithXhr(cb)
+      return this._getInstance(function (err) {
+        if (!err) {
+          self._startWithXhr(cb)
+        }
       })
     }
 
-    this._getInstance(function () {
-      self._startFormUrlencoded(cb)
+    this._getInstance(function (err) {
+      if (!err) {
+        self._startFormUrlencoded(cb)
+      }
     })
   }
 
@@ -292,9 +296,10 @@
     var f = new XMLHttpRequest()
     f.open('POST', url)
     f.send(formData)
+    cb()
   }
 
-  Uploader.prototype._startWithResumabilitySupport = function () {
+  Uploader.prototype._startWithResumabilitySupport = function (cb) {
     var self = this
 
     var formData = this._prepareFormData()
@@ -346,9 +351,10 @@
       }
     }
     f.send(formData)
+    cb()
   }
 
-  Uploader.prototype._startFormUrlencoded = function () {
+  Uploader.prototype._startFormUrlencoded = function (cb) {
     this.assemblyId = window.transloadit.uuid()
     // add a clone, so that we can restore the file input fields
     // when the user hits cancel and so that we can .append(this.$files) to
@@ -417,6 +423,7 @@
     })
 
     this.$uploadForm.submit()
+    cb()
   }
 
   Uploader.prototype._prepareFormData = function (form) {
@@ -503,6 +510,11 @@
       fieldsFilter = '*'
     } else if (typeof this._options.fields === 'string') {
       fieldsFilter += ', ' + this._options.fields
+    } else {
+      // fields is false, but let's attach file fields, otherwise we will not have uploads. :)
+      if (allowFiles) {
+        fieldsFilter += ", [type=file]"
+      }
     }
 
     // Filter out submit elements right away as they will cause funny behavior
