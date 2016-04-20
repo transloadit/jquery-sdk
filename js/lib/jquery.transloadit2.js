@@ -7,6 +7,7 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
+
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
 
@@ -466,8 +467,9 @@
       if (!name) {
         return
       }
-      var value = $(this).val()
-      formData.append(name, value)
+      for (var i = 0; i < this.files.length; i++) {
+        formData.append(name, this.files[i])
+      }
     })
   }
 
