@@ -142,17 +142,16 @@
     this.assembly = null
     this.params = null
 
-    this.bytesReceivedBefore = 0
-    this.lastPoll = 0
+    this._bytesReceivedBefore = 0
 
     this.$params = null
     this.$form = null
     this.$files = null
-    this.$fileClones = null
-    this.$iframe = null
     this.$modal = null
 
     this._animatedTo100 = false
+    this._lastProgressEventOn = 0
+    this._assemblyComplete = false
     this._uploadFileIds = []
     this._resultFileIds = []
   }
@@ -250,19 +249,17 @@
   Uploader.prototype.start = function () {
     this.started = false
     this.ended = false
-    this.bytesReceivedBefore = 0
+    this._bytesReceivedBefore = 0
     this.pollRetries = 0
     this.uploads = []
     this._animatedTo100 = false
+    this._assemblyComplete = false
     this._uploadFileIds = []
     this._resultFileIds = []
     this.results = {}
 
-    this.assemblyId = this._genUuid()
-
     var self = this
     var cb = function () {
-      self.lastPoll = +new Date()
       setTimeout(function () {
         self._poll()
       }, 300)
@@ -271,17 +268,9 @@
     if (this._options.resumable) {
       return this._startWithResumabilitySupport(cb)
     }
-    if (this._options.formData) {
-      return this._getInstance(function (err) {
-        if (!err) {
-          self._startWithXhr(cb)
-        }
-      })
-    }
-
     this._getInstance(function (err) {
       if (!err) {
-        self._startFormUrlencoded(cb)
+        self._startWithXhr(cb)
       }
     })
   }
@@ -289,12 +278,27 @@
   Uploader.prototype._startWithXhr = function (cb) {
     this.assemblyId = window.transloadit.uuid()
 
+    var self = this
     var formData = this._prepareFormData()
     this._appendFilteredFormFields(formData, true)
     this._appendCustomFormData(formData)
 
     var url = this._getAssemblyRequestTargetUrl()
     var f = new XMLHttpRequest()
+    // f.upload.addEventListener("loadstart", function() {
+    //   console.log("loadstart")
+    // })
+    // f.upload.addEventListener("load", function() {
+    //   console.log("load")
+    // })
+    f.upload.addEventListener("progress", function progressFunction(evt){
+      if (!evt.lengthComputable) {
+        return
+      }
+      self.renderProgress(evt.loaded, evt.total)
+      self._options.onProgress(evt.loaded, evt.total, self.assembly)
+    })
+
     f.open('POST', url)
     f.send(formData)
     cb()
@@ -331,8 +335,8 @@
               console.log('Failed because: ' + error)
             },
             onProgress: function (bytesUploaded, bytesTotal) {
-              var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
-              console.log(bytesUploaded, bytesTotal, percentage + '%')
+              self.renderProgress(bytesUploaded, bytesTotal)
+              self._options.onProgress(bytesUploaded, bytesTotal, self.assembly)
             }
           })
           upload.start()
@@ -352,78 +356,6 @@
       }
     }
     f.send(formData)
-    cb()
-  }
-
-  Uploader.prototype._startFormUrlencoded = function (cb) {
-    this.assemblyId = window.transloadit.uuid()
-    // add a clone, so that we can restore the file input fields
-    // when the user hits cancel and so that we can .append(this.$files) to
-    // this.$uploadForm, which moves (without a clone!) the file input fields in the dom
-    var self = this
-    this.$fileClones = $().not(document)
-
-    this.$files.each(function () {
-      var $clone = $(this).clone(true)
-      self.$fileClones = self.$fileClones.add($clone)
-      $clone.insertAfter(this)
-    })
-
-    this.$iframe = $('<iframe id="transloadit-' + this.assemblyId + '" name="transloadit-' + this.assemblyId + '"/>')
-      .appendTo('body')
-      .hide()
-
-    var url = this._getAssemblyRequestTargetUrl()
-
-    this.$uploadForm = $('<form enctype="multipart/form-data" />')
-      .attr('action', url)
-      .attr('target', 'transloadit-' + this.assemblyId)
-      .attr('method', 'POST')
-
-      // using .append(this.$files.clone(true)) does not work here as it does
-      // not carry over the selected file value. :/
-      // Thus, we need to clone file input fields beforehand and store them
-      // in this.$fileClones.
-      .append(this.$files)
-      .appendTo('body')
-      .hide()
-
-    var $fieldsToClone = this._getFilteredFormFields()
-
-    // remove selects from $clones, because we have to clone them as hidden input
-    // fields, otherwise their values are not transferred properly
-    var $selects = $fieldsToClone.filter('select')
-    $fieldsToClone = $fieldsToClone.filter(function () {
-      return !$(this).is('select')
-    })
-
-    var $clones = this.clone($fieldsToClone)
-
-    if (this._options.params && !this.$params) {
-      $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>')
-    }
-    if (this._options.signature) {
-      $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>')
-    }
-
-    if (typeof this._options.fields === 'object') {
-      for (var fieldName in this._options.fields) {
-        var fieldValue = this._options.fields[fieldName]
-        $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>')
-      }
-    }
-
-    $clones.prependTo(this.$uploadForm)
-
-    // now add all selects as hidden fields
-    $selects.each(function () {
-      $('<input type="hidden"/>')
-        .attr('name', $(this).attr('name'))
-        .attr('value', $(this).val())
-        .prependTo(self.$uploadForm)
-    })
-
-    this.$uploadForm.submit()
     cb()
   }
 
@@ -686,13 +618,8 @@
           return
         }
 
-        var isEnded = isComplete || (!self._options['wait'] && isExecuting)
-
-        if (assembly.bytes_expected > 0) {
-          self.renderProgress(assembly, isEnded, self._options['wait'])
-        }
-
-        if (isEnded) {
+        this._assemblyComplete = isComplete || (!self._options['wait'] && isExecuting)
+        if (this._assemblyComplete) {
           self.ended = true
           document.title = self.documentTitle
           assembly.uploads = self.uploads
@@ -715,7 +642,6 @@
         self.timer = setTimeout(function () {
           self._poll()
         }, timeout)
-        self.lastPoll = +new Date()
       },
       error: function (xhr, status, jsonpErr) {
         if (self.ended) {
@@ -763,28 +689,8 @@
       if (this.$params) {
         this.$params.prependTo(this.$form)
       }
-
-      if (this.$fileClones) {
-        this.$fileClones.each(function (i) {
-          var $original = $(self.$files[i]).clone(true)
-          var $clone = $(this)
-          $original.insertAfter($clone)
-          $clone.remove()
-        })
-      }
       clearTimeout(this.timer)
-
       this._poll('?method=delete')
-
-      if (this.$iframe) {
-        if (navigator.appName === 'Microsoft Internet Explorer') {
-          this.$iframe[0].contentWindow.document.execCommand('Stop')
-        }
-
-        setTimeout(function () {
-          self.$iframe.remove()
-        }, 500)
-      }
     }
 
     if (this._options.modal) {
@@ -854,15 +760,14 @@
     this.$modal.$errorDetails.hide()
     this.$modal.$errorDetailsToggle.hide()
 
-    // @todo Unused?
-    // var expose = this.$modal.expose({
-    //   api: true,
-    //   maskId: 'transloadit_expose',
-    //   opacity: 0.9,
-    //   loadSpeed: 250,
-    //   closeOnEsc: false,
-    //   closeOnClick: false
-    // })
+    this.$modal.expose({
+      api: true,
+      maskId: 'transloadit_expose',
+      opacity: 0.9,
+      loadSpeed: 250,
+      closeOnEsc: false,
+      closeOnClick: false
+    })
 
     this.$modal.$close.click(function () {
       self.cancel()
@@ -936,26 +841,27 @@
     })
   }
 
-  Uploader.prototype.renderProgress = function (assembly, isAssemblyComplete, waitIsTrue) {
+  Uploader.prototype.renderProgress = function (received, expected) {
     if (!this._options.modal) {
       return
     }
-
-    var progress = assembly.bytes_received / assembly.bytes_expected * 100
+    var waitIsTrue = this._options['wait']
+    var progress = received / expected * 100
     if (progress > 100) {
       progress = 0
     }
 
-    var bytesReceived = assembly.bytes_received - this.bytesReceivedBefore
-    var timeSinceLastPoll = +new Date() - this.lastPoll
-    var duration = progress === 100 ? 1000 : this._options.interval * 2
+    var bytesReceived = received - this._bytesReceivedBefore
+    var timeSinceLastProgEvent = +new Date() - this._lastProgressEventOn
+    this._lastProgressEventOn = +new Date()
+    this._bytesReceivedBefore = received
 
-    var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2)
-    var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2)
-    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1)
+    var mbReceived = (received / 1024 / 1024).toFixed(2)
+    var mbExpected = (expected / 1024 / 1024).toFixed(2)
+    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastProgEvent / 1000)).toFixed(1)
 
-    var outstanding = assembly.bytes_expected - assembly.bytes_received
-    var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1)
+    var outstanding = expected - received
+    var speedInBytes = (bytesReceived / (timeSinceLastProgEvent / 1000)).toFixed(1)
 
     var durationLeft = ''
     if (speedInBytes > 0) {
@@ -971,22 +877,17 @@
     }
 
     var totalWidth = parseInt(this.$modal.$progress.css('width'), 10)
-    this.bytesReceivedBefore = assembly.bytes_received
 
-    if (bytesReceived <= 0 && !isAssemblyComplete) {
+
+    if (bytesReceived <= 0 && !this._assemblyComplete) {
       return
     }
 
     var self = this
-
-    if (isAssemblyComplete && waitIsTrue) {
-      duration = 500
-    }
-
     this.$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
-        duration: duration,
+        duration: 500,
         easing: 'linear',
         progress: function (promise, currPercent, remainingMs) {
           var width = parseInt(self.$modal.$progressBar.css('width'), 10)
@@ -999,9 +900,8 @@
             self.$modal.$percent.text(percent + '%')
           }
 
-          if (percent === 100 && !self._animatedTo100) {
+          if (percent == 100 && !self._animatedTo100) {
             self._animatedTo100 = true
-
             setTimeout(function () {
               self.$modal.$label.text(self.i18n('processingFiles'))
               self.$modal.$progress.addClass('active')
@@ -1083,120 +983,6 @@
     }
 
     return r
-  }
-
-  Uploader.prototype._genUuid = function (options, buf, offset) {
-    options = options || {}
-
-    var i = buf && offset || 0
-    var b = buf || []
-
-    var _rnds = new Array(16)
-    var _rng = function () {
-      for (var j = 0, r; j < 16; j++) {
-        if ((j & 0x03) === 0) r = Math.random() * 0x100000000
-        _rnds[j] = r >>> ((j & 0x03) << 3) & 0xff
-      }
-
-      return _rnds
-    }
-    var _seedBytes = _rng()
-
-    var _nodeId = [
-      _seedBytes[0] | 0x01,
-      _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
-    ]
-
-    this._clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff
-    var clockseq = options.clockseq != null ? options.clockseq : this._clockseq
-
-    var _byteToHex = []
-    var _hexToByte = {}
-    for (var j = 0; j < 256; j++) {
-      _byteToHex[j] = (j + 0x100).toString(16).substr(1)
-      _hexToByte[_byteToHex[j]] = j
-    }
-
-      // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-      // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-      // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-      // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-    var msecs = options.msecs != null ? options.msecs : new Date().getTime()
-
-      // Per 4.2.1.2, use count of uuid's generated during the current clock
-      // cycle to simulate higher resolution clock
-    var nsecs = options.nsecs != null ? options.nsecs : this._lastNSecs + 1
-
-      // Time since last uuid creation (in msecs)
-    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs) / 10000
-
-      // Per 4.2.1.2, Bump clockseq on clock regression
-    if (dt < 0 && options.clockseq == null) {
-      clockseq = clockseq + 1 & 0x3fff
-    }
-
-      // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-      // time interval
-    if ((dt < 0 || msecs > this._lastMSecs) && options.nsecs == null) {
-      nsecs = 0
-    }
-
-      // Per 4.2.1.2 Throw error if too many uuids are requested
-    if (nsecs >= 10000) {
-      throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec')
-    }
-
-    this._lastMSecs = msecs
-    this._lastNSecs = nsecs
-    this._clockseq = clockseq
-
-      // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-    msecs += 12219292800000
-
-      // `time_low`
-    var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000
-    b[i++] = tl >>> 24 & 0xff
-    b[i++] = tl >>> 16 & 0xff
-    b[i++] = tl >>> 8 & 0xff
-    b[i++] = tl & 0xff
-
-      // `time_mid`
-    var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff
-    b[i++] = tmh >>> 8 & 0xff
-    b[i++] = tmh & 0xff
-
-      // `time_high_and_version`
-    b[i++] = tmh >>> 24 & 0xf | 0x10 // include version
-    b[i++] = tmh >>> 16 & 0xff
-
-      // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-    b[i++] = clockseq >>> 8 | 0x80
-
-      // `clock_seq_low`
-    b[i++] = clockseq & 0xff
-
-      // `node`
-    var node = options.node || _nodeId
-
-    for (var n = 0; n < 6; n++) {
-      b[i + n] = node[n]
-    }
-
-    function unparse (_buf, offset) {
-      var i = offset || 0
-      var bth = _byteToHex
-
-      return bth[_buf[i++]] + bth[_buf[i++]] +
-                bth[_buf[i++]] + bth[_buf[i++]] +
-                bth[_buf[i++]] + bth[_buf[i++]] +
-                bth[_buf[i++]] + bth[_buf[i++]] +
-                bth[_buf[i++]] + bth[_buf[i++]] +
-                bth[_buf[i++]] + bth[_buf[i++]] +
-                bth[_buf[i++]] + bth[_buf[i++]] +
-                bth[_buf[i++]] + bth[_buf[i++]]
-    }
-
-    return buf || unparse(b)
   }
 
   Uploader.prototype.options = function (options) {
