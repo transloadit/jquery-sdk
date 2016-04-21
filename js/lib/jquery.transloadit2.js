@@ -12,6 +12,7 @@ require('../dep/jquery.jsonp')
 require('../dep/toolbox.expose')
 require('../dep/jquery.easing')
 var uuid = require('../dep/uuid')
+var helpers = require('../dep/helpers')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
@@ -149,10 +150,10 @@ var uuid = require('../dep/uuid')
 
     this._bytesReceivedBefore = 0
 
-    this.$params = null
-    this.$form = null
-    this.$files = null
-    this.$modal = null
+    this._$params = null
+    this._$form = null
+    this._$files = null
+    this._$modal = null
 
     this._animatedTo100 = false
     this._lastUploadSpeedUpdateOn = 0
@@ -164,15 +165,15 @@ var uuid = require('../dep/uuid')
   }
 
   Uploader.prototype.init = function ($form, options) {
-    this.$form = $form
+    this._$form = $form
     this.options($.extend({}, OPTIONS, options || {}))
 
     var self = this
-    $form.bind('submit.transloadit', function () {
+    this._$form.bind('submit.transloadit', function () {
       self.validate()
-      self.detectFileInputs()
+      self._detectFileInputs()
 
-      if (!self._options['processZeroFiles'] && self.$files.length === 0) {
+      if (!self._options['processZeroFiles'] && self._$files.length === 0) {
         if (self._options.beforeStart()) {
           self.submitForm()
         }
@@ -186,16 +187,47 @@ var uuid = require('../dep/uuid')
     })
 
     if (this._options['triggerUploadOnFileSelection']) {
-      $form.on('change', 'input[type="file"]', function () {
-        $form.trigger('submit.transloadit')
+      this._$form.on('change', 'input[type="file"]', function () {
+        self._$form.trigger('submit.transloadit')
       })
     }
 
-    $form.on('change', 'input[type="file"]', function () {
+    this._$form.on('change', 'input[type="file"]', function () {
       self._options.onFileSelect($(this).val(), $(this))
     })
 
     this.includeCss()
+  }
+
+  Uploader.prototype.start = function () {
+    this._started = false
+    this._ended = false
+    this._bytesReceivedBefore = 0
+    this._uploadRate = null
+    this._durationLeft = null
+    this._fullyUploaded = false
+    this._pollRetries = 0
+    this._uploads = []
+    this._animatedTo100 = false
+    this._uploadFileIds = []
+    this._resultFileIds = []
+    this._results = {}
+
+    var self = this
+    var cb = function () {
+      setTimeout(function () {
+        self._poll()
+      }, 300)
+    }
+
+    if (this._options.resumable) {
+      return this._startWithResumabilitySupport(cb)
+    }
+    this._getInstance(function (err) {
+      if (!err) {
+        self._startWithXhr(cb)
+      }
+    })
   }
 
   Uploader.prototype._getInstance = function (cb) {
@@ -247,37 +279,6 @@ var uuid = require('../dep/uuid')
     }
   }
 
-  Uploader.prototype.start = function () {
-    this._started = false
-    this._ended = false
-    this._bytesReceivedBefore = 0
-    this._uploadRate = null
-    this._durationLeft = null
-    this._fullyUploaded = false
-    this._pollRetries = 0
-    this._uploads = []
-    this._animatedTo100 = false
-    this._uploadFileIds = []
-    this._resultFileIds = []
-    this._results = {}
-
-    var self = this
-    var cb = function () {
-      setTimeout(function () {
-        self._poll()
-      }, 300)
-    }
-
-    if (this._options.resumable) {
-      return this._startWithResumabilitySupport(cb)
-    }
-    this._getInstance(function (err) {
-      if (!err) {
-        self._startWithXhr(cb)
-      }
-    })
-  }
-
   Uploader.prototype._startWithXhr = function (cb) {
     this._assemblyId = uuid.generate()
 
@@ -295,7 +296,7 @@ var uuid = require('../dep/uuid')
       if (!evt.lengthComputable) {
         return
       }
-      self.renderProgress(evt.loaded, evt.total)
+      self._renderProgress(evt.loaded, evt.total)
       self._options.onProgress(evt.loaded, evt.total, self._assembly)
     })
 
@@ -315,11 +316,7 @@ var uuid = require('../dep/uuid')
     function proceed () {
       var endpoint = PROTOCOL + self._instance + self._options.resumableEndpointPath
 
-      // @todo: add support for files from custom formData
-      // @todo Unused?
-      // var bytesExpected = this._countTotalBytesExpected()
-
-      self.$files.each(function () {
+      self._$files.each(function () {
         var nameAttr = $(self).attr('name')
         for (var i = 0; i < self.files.length; i++) {
           var file = self.files[i]
@@ -335,7 +332,7 @@ var uuid = require('../dep/uuid')
               console.log('Failed because: ' + error)
             },
             onProgress: function (bytesUploaded, bytesTotal) {
-              self.renderProgress(bytesUploaded, bytesTotal)
+              self._renderProgress(bytesUploaded, bytesTotal)
               self._options.onProgress(bytesUploaded, bytesTotal, self._assembly)
             }
           })
@@ -361,8 +358,8 @@ var uuid = require('../dep/uuid')
 
   Uploader.prototype._prepareFormData = function (form) {
     var assemblyParams = this._options.params
-    if (this.$params) {
-      assemblyParams = this.$params.val()
+    if (this._$params) {
+      assemblyParams = this._$params.val()
     }
     if (typeof assemblyParams !== 'string') {
       assemblyParams = JSON.stringify(assemblyParams)
@@ -385,7 +382,7 @@ var uuid = require('../dep/uuid')
 
   Uploader.prototype._appendTusFileCount = function (formData) {
     var fileCount = 0
-    this.$files.each(function () {
+    this._$files.each(function () {
       fileCount += this.files.length
     })
     formData.append('tus_num_expected_upload_files', fileCount)
@@ -419,22 +416,6 @@ var uuid = require('../dep/uuid')
   Uploader.prototype._getAssemblyRequestTargetUrl = function () {
     var result = PROTOCOL + this._instance + '/assemblies/'
     result += this._assemblyId + '?redirect=false'
-
-    return result
-  }
-
-  Uploader.prototype._countTotalBytesExpected = function () {
-    var result = 0
-    this.$files.each(function () {
-      // @todo Unused?
-      // var nameAttr = $(this).attr('name')
-      for (var i = 0; i < this.files.length; i++) {
-        if (this.files[i].size) {
-          result += this.files[i].size
-        }
-      }
-    })
-
     return result
   }
 
@@ -453,7 +434,7 @@ var uuid = require('../dep/uuid')
 
     // Filter out submit elements right away as they will cause funny behavior
     // in the shadow form.
-    var $fields = this.$form.find(':input[type!=submit]')
+    var $fields = this._$form.find(':input[type!=submit]')
     if (!allowFiles) {
       $fields = $fields.filter('[type!=file]')
     }
@@ -461,40 +442,114 @@ var uuid = require('../dep/uuid')
     return $fields.filter(fieldsFilter)
   }
 
-  Uploader.prototype.clone = function ($obj) {
-    var $result = $obj.clone()
-    var myTextareas = $obj.filter('textarea')
-    var resultTextareas = $result.filter('textarea')
-
-    for (var i = 0; i < myTextareas.length; ++i) {
-      $(resultTextareas[i]).val($(myTextareas[i]).val())
-    }
-
-    return $result
+  Uploader.prototype.stop = function () {
+    document.title = this._documentTitle
+    this._ended = true
   }
 
-  Uploader.prototype.detectFileInputs = function () {
-    var $files = this.$form
-      .find('input[type=file]')
-      .not(this._options.exclude)
+  Uploader.prototype.cancel = function () {
+    // @todo this has still a race condition if a new upload is started
+    // while the cancel request is still being executed. Shouldn't happen
+    // in real life, but needs fixing.
 
-    if (!this._options['processZeroFiles']) {
-      $files = $files.filter(function () {
-        return this.value !== ''
-      })
+    if (!this._ended) {
+      if (this._$params) {
+        this._$params.prependTo(this._$form)
+      }
+      clearTimeout(this._timer)
+      this._poll('?method=delete')
     }
-    this.$files = $files
+
+    if (this._options.modal) {
+      this.hideModal()
+    }
+  }
+
+  Uploader.prototype.submitForm = function () {
+    // prevent that files are uploaded to the final destination
+    // after all that is what we use this plugin for :)
+    if (this._$form.attr('enctype') === 'multipart/form-data') {
+      this._$form.removeAttr('enctype')
+    }
+
+    if (this._assembly !== null) {
+      $('<textarea/>')
+        .attr('name', 'transloadit')
+        .text(JSON.stringify(this._assembly))
+        .prependTo(this._$form)
+        .hide()
+    }
+
+    if (this._options.autoSubmit) {
+      this._$form
+        .unbind('submit.transloadit')
+        .submit()
+    }
+  }
+
+  Uploader.prototype.hideModal = function () {
+    $.mask.close()
+    this._$modal.remove()
+  }
+
+  Uploader.prototype.showModal = function () {
+    this._$modal =
+      $('<div id="transloadit">' +
+        '<div class="content">' +
+          '<a href="#close" class="close">' + this.i18n('cancel') + '</a>' +
+          '<p class="status"></p>' +
+          '<div class="progress progress-striped">' +
+            '<div class="bar"><span class="percent"></span></div>' +
+          '</div>' +
+          '<label>' + this.i18n('startingUpload') + '</label>' +
+          '<p class="error"></p>' +
+          '<div class="error-details-toggle"><a href="#">' + this.i18n('details') + '</a></div>' +
+          '<p class="error-details"></p>' +
+        '</div>' +
+      '</div>')
+      .appendTo('body')
+
+    $.extend(this._$modal, {
+      '$content': this._$modal.find('.content'),
+      '$close': this._$modal.find('.close'),
+      '$label': this._$modal.find('label'),
+      '$progress': this._$modal.find('.progress'),
+      '$percent': this._$modal.find('.progress .percent'),
+      '$progressBar': this._$modal.find('.progress .bar'),
+      '$error': this._$modal.find('.error'),
+      '$errorDetails': this._$modal.find('.error-details'),
+      '$errorDetailsToggle': this._$modal.find('.error-details-toggle')
+    })
+
+    this._$modal.$error.hide()
+    this._$modal.$errorDetails.hide()
+    this._$modal.$errorDetailsToggle.hide()
+
+    this._$modal.expose({
+      api: true,
+      maskId: 'transloadit_expose',
+      opacity: 0.9,
+      loadSpeed: 250,
+      closeOnEsc: false,
+      closeOnClick: false
+    })
+
+    var self = this
+    this._$modal.$close.click(function () {
+      self.cancel()
+      return false
+    })
   }
 
   Uploader.prototype.validate = function () {
     if (!this._options.params) {
-      var $params = this.$form.find('input[name=params]')
+      var $params = this._$form.find('input[name=params]')
       if (!$params.length) {
         alert('Could not find input[name=params] in your form.')
         return
       }
 
-      this.$params = $params
+      this._$params = $params
       try {
         this._params = JSON.parse($params.val())
       } catch (e) {
@@ -506,8 +561,8 @@ var uuid = require('../dep/uuid')
     }
 
     if (this._params.redirect_url) {
-      this.$form.attr('action', this._params.redirect_url)
-    } else if (this._options.autoSubmit && (this.$form.attr('action') === this._options.service + 'assemblies')) {
+      this._$form.attr('action', this._params.redirect_url)
+    } else if (this._options.autoSubmit && (this._$form.attr('action') === this._options.service + 'assemblies')) {
       alert('Error: input[name=params] does not include a redirect_url')
       return
     }
@@ -644,105 +699,6 @@ var uuid = require('../dep/uuid')
     return false
   }
 
-  Uploader.prototype.stop = function () {
-    document.title = this._documentTitle
-    this._ended = true
-  }
-
-  Uploader.prototype.cancel = function () {
-    // @todo this has still a race condition if a new upload is started
-    // while the cancel request is still being executed. Shouldn't happen
-    // in real life, but needs fixing.
-
-    if (!this._ended) {
-      if (this.$params) {
-        this.$params.prependTo(this.$form)
-      }
-      clearTimeout(this._timer)
-      this._poll('?method=delete')
-    }
-
-    if (this._options.modal) {
-      this.hideModal()
-    }
-  }
-
-  Uploader.prototype.submitForm = function () {
-    // prevent that files are uploaded to the final destination
-    // after all that is what we use this plugin for :)
-    if (this.$form.attr('enctype') === 'multipart/form-data') {
-      this.$form.removeAttr('enctype')
-    }
-
-    if (this._assembly !== null) {
-      $('<textarea/>')
-        .attr('name', 'transloadit')
-        .text(JSON.stringify(this._assembly))
-        .prependTo(this.$form)
-        .hide()
-    }
-
-    if (this._options.autoSubmit) {
-      this.$form
-        .unbind('submit.transloadit')
-        .submit()
-    }
-  }
-
-  Uploader.prototype.hideModal = function () {
-    $.mask.close()
-    this.$modal.remove()
-  }
-
-  Uploader.prototype.showModal = function () {
-    this.$modal =
-      $('<div id="transloadit">' +
-        '<div class="content">' +
-          '<a href="#close" class="close">' + this.i18n('cancel') + '</a>' +
-          '<p class="status"></p>' +
-          '<div class="progress progress-striped">' +
-            '<div class="bar"><span class="percent"></span></div>' +
-          '</div>' +
-          '<label>' + this.i18n('startingUpload') + '</label>' +
-          '<p class="error"></p>' +
-          '<div class="error-details-toggle"><a href="#">' + this.i18n('details') + '</a></div>' +
-          '<p class="error-details"></p>' +
-        '</div>' +
-      '</div>')
-      .appendTo('body')
-
-    $.extend(this.$modal, {
-      '$content': this.$modal.find('.content'),
-      '$close': this.$modal.find('.close'),
-      '$label': this.$modal.find('label'),
-      '$progress': this.$modal.find('.progress'),
-      '$percent': this.$modal.find('.progress .percent'),
-      '$progressBar': this.$modal.find('.progress .bar'),
-      '$error': this.$modal.find('.error'),
-      '$errorDetails': this.$modal.find('.error-details'),
-      '$errorDetailsToggle': this.$modal.find('.error-details-toggle')
-    })
-
-    this.$modal.$error.hide()
-    this.$modal.$errorDetails.hide()
-    this.$modal.$errorDetailsToggle.hide()
-
-    this.$modal.expose({
-      api: true,
-      maskId: 'transloadit_expose',
-      opacity: 0.9,
-      loadSpeed: 250,
-      closeOnEsc: false,
-      closeOnClick: false
-    })
-
-    var self = this
-    this.$modal.$close.click(function () {
-      self.cancel()
-      return false
-    })
-  }
-
   Uploader.prototype._renderError = function (err) {
     if (!this._options.modal) {
       return
@@ -752,9 +708,9 @@ var uuid = require('../dep/uuid')
       return this.cancel()
     }
 
-    this.$modal.$content.addClass('content-error')
-    this.$modal.$progress.hide()
-    this.$modal.$label.hide()
+    this._$modal.$content.addClass('content-error')
+    this._$modal.$progress.hide()
+    this._$modal.$label.hide()
 
     var errorMsg = err.error + ': ' + err.message + '<br /><br />'
     errorMsg += (err.reason || '')
@@ -765,12 +721,12 @@ var uuid = require('../dep/uuid')
       'ASSEMBLY_NOT_FOUND'
     ]
     if ($.inArray(err.error, errorsRequiringDetails) === -1) {
-      this.$modal.$error.html(errorMsg).show()
+      this._$modal.$error.html(errorMsg).show()
       return
     }
 
     var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain')
-    this.$modal.$error.html(text).show()
+    this._$modal.$error.html(text).show()
 
     var assemblyId = err._assemblyId ? err._assemblyId : this._assemblyId
     var self = this
@@ -785,7 +741,7 @@ var uuid = require('../dep/uuid')
         instance: self._instance,
         assembly_id: assemblyId,
         ip: ip,
-        time: self.getUTCDatetime(),
+        time: helpers._getUTCDatetime(),
         agent: navigator.userAgent,
         poll_retries: self._pollRetries,
         error: errorMsg
@@ -798,18 +754,31 @@ var uuid = require('../dep/uuid')
       }
 
       var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />'
-      self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
+      self._$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
 
-      self.$modal.$errorDetailsToggle.show().find('a')
+      self._$modal.$errorDetailsToggle.show().find('a')
         .off('click')
         .on('click', function (e) {
           e.preventDefault()
-          self.$modal.$errorDetails.toggle()
+          self._$modal.$errorDetails.toggle()
         })
     })
   }
 
-  Uploader.prototype.renderProgress = function (received, expected) {
+  Uploader.prototype._detectFileInputs = function () {
+    var $files = this._$form
+      .find('input[type=file]')
+      .not(this._options.exclude)
+
+    if (!this._options['processZeroFiles']) {
+      $files = $files.filter(function () {
+        return this.value !== ''
+      })
+    }
+    this._$files = $files
+  }
+
+  Uploader.prototype._renderProgress = function (received, expected) {
     if (!this._options.modal) {
       return
     }
@@ -839,7 +808,7 @@ var uuid = require('../dep/uuid')
 
       var durationLeft = ''
       if (speedInBytes > 0) {
-        durationLeft = this._duration(outstanding / speedInBytes)
+        durationLeft = helpers._duration(outstanding / speedInBytes)
       }
 
       this._uploadRate = uploadRate
@@ -851,32 +820,32 @@ var uuid = require('../dep/uuid')
     var txt = this.i18n('uploadProgress',
       mbReceived, mbExpected, this._uploadRate, this._durationLeft
     )
-    this.$modal.$label.text(txt)
+    this._$modal.$label.text(txt)
 
-    var totalWidth = parseInt(this.$modal.$progress.css('width'), 10)
+    var totalWidth = parseInt(this._$modal.$progress.css('width'), 10)
     var self = this
-    this.$modal.$progressBar.stop().animate(
+    this._$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
         duration: 1000,
         easing: 'linear',
         progress: function (promise, currPercent, remainingMs) {
-          var width = parseInt(self.$modal.$progressBar.css('width'), 10)
+          var width = parseInt(self._$modal.$progressBar.css('width'), 10)
 
           var percent = (width * 100 / totalWidth).toFixed(0)
           if (percent > 100) {
             percent = 100
           }
           if (percent > 13 && !self._animatedTo100) {
-            self.$modal.$percent.text(percent + '%')
+            self._$modal.$percent.text(percent + '%')
           }
 
           if (percent == 100 && !self._animatedTo100) {
             self._animatedTo100 = true
             setTimeout(function () {
-              self.$modal.$label.text(self.i18n('processingFiles'))
-              self.$modal.$progress.addClass('active')
-              self.$modal.$percent.text('')
+              self._$modal.$label.text(self.i18n('processingFiles'))
+              self._$modal.$progress.addClass('active')
+              self._$modal.$percent.text('')
             }, 500)
           }
         }
@@ -892,39 +861,6 @@ var uuid = require('../dep/uuid')
     CSS_LOADED = true
     $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2-latest.css" />')
       .appendTo('head')
-  }
-
-  Uploader.prototype.getUTCDatetime = function () {
-    var now = new Date()
-    var d = new Date(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()
-    )
-
-    var pad = function (n) {
-      return n < 10 ? '0' + n : n
-    }
-    var tz = d.getTimezoneOffset()
-    var tzs = (tz > 0 ? '-' : '+') + pad(parseInt(tz / 60, 10))
-
-    if (tz % 60 !== 0) {
-      tzs += pad(tz % 60)
-    }
-
-    if (tz === 0) {
-      tzs = 'Z'
-    }
-
-    return d.getFullYear() + '-' +
-        pad(d.getMonth() + 1) + '-' +
-        pad(d.getDate()) + 'T' +
-        pad(d.getHours()) + ':' +
-        pad(d.getMinutes()) + ':' +
-        pad(d.getSeconds()) + tzs
   }
 
   Uploader.prototype._calcPollTimeout = function () {
@@ -966,35 +902,6 @@ var uuid = require('../dep/uuid')
     this._ended = true
     this._renderError(err)
     this._options.onError(err)
-  }
-
-  Uploader.prototype._duration = function (t) {
-    var min = 60
-    var h = 60 * min
-    var hours = Math.floor(t / h)
-
-    t -= hours * h
-
-    var minutes = Math.floor(t / min)
-    t -= minutes * min
-
-    var r = ''
-    if (hours > 0) {
-      r += hours + 'h '
-    }
-    if (minutes > 0) {
-      r += minutes + 'min '
-    }
-    if (t > 0) {
-      t = t.toFixed(0)
-      r += t + 's'
-    }
-
-    if (r === '') {
-      r = '0s'
-    }
-
-    return r
   }
 
   Uploader.prototype.options = function (options) {
