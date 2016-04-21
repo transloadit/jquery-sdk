@@ -127,20 +127,20 @@
   $.fn.transloadit.i18n = I18N
 
   function Uploader () {
-    this.assemblyId = null
+    this._assemblyId = null
 
-    this.instance = null
-    this.documentTitle = null
-    this.timer = null
+    this._instance = null
+    this._documentTitle = null
+    this._timer = null
     this._options = {}
-    this.uploads = []
-    this.results = {}
-    this.ended = null
-    this.pollStarted = null
-    this.pollRetries = 0
-    this.started = false
-    this.assembly = null
-    this.params = null
+    this._uploads = []
+    this._results = {}
+    this._ended = null
+    this._pollStarted = null
+    this._pollRetries = 0
+    this._started = false
+    this._assembly = null
+    this._params = null
 
     this._bytesReceivedBefore = 0
 
@@ -151,6 +151,7 @@
 
     this._animatedTo100 = false
     this._lastUploadSpeedUpdateOn = 0
+    this._fullyUploaded = false
     this._uploadRate = null
     this._durationLeft = null
     this._uploadFileIds = []
@@ -195,7 +196,7 @@
   Uploader.prototype._getInstance = function (cb) {
     var self = this
 
-    this.instance = null
+    this._instance = null
     var url = this._options['service']
     var attempts = 0
 
@@ -206,13 +207,10 @@
         callbackParameter: 'callback',
         success: function (result) {
           if (result.error) {
-            var err = result
-            self.ended = true
-            self.renderError(err)
-            return self._options.onError(err)
+            return self._errorOut(result)
           }
 
-          self.instance = result.hostname
+          self._instance = result.hostname
           cb()
         },
         error: function (xhr, status, jsonpErr) {
@@ -221,8 +219,6 @@
           if (attempts < self._options.pollConnectionRetries) {
             return attempt()
           }
-
-          self.ended = true
 
           var reason = 'JSONP assembly_id request status: ' + status
           reason += ', err: ' + jsonpErr
@@ -233,8 +229,7 @@
             reason: reason,
             url: url
           }
-          self.renderError(err)
-          self._options.onError(err)
+          self._errorOut(err)
           cb(err)
         }
       })
@@ -248,17 +243,18 @@
   }
 
   Uploader.prototype.start = function () {
-    this.started = false
-    this.ended = false
+    this._started = false
+    this._ended = false
     this._bytesReceivedBefore = 0
     this._uploadRate = null
     this._durationLeft = null
-    this.pollRetries = 0
-    this.uploads = []
+    this._fullyUploaded = false
+    this._pollRetries = 0
+    this._uploads = []
     this._animatedTo100 = false
     this._uploadFileIds = []
     this._resultFileIds = []
-    this.results = {}
+    this._results = {}
 
     var self = this
     var cb = function () {
@@ -278,7 +274,7 @@
   }
 
   Uploader.prototype._startWithXhr = function (cb) {
-    this.assemblyId = window.transloadit.uuid()
+    this._assemblyId = window.transloadit.uuid()
 
     var self = this
     var formData = this._prepareFormData()
@@ -287,18 +283,15 @@
 
     var url = this._getAssemblyRequestTargetUrl()
     var f = new XMLHttpRequest()
-    // f.upload.addEventListener("loadstart", function() {
-    //   console.log("loadstart")
-    // })
-    // f.upload.addEventListener("load", function() {
-    //   console.log("load")
-    // })
+    f.upload.addEventListener("load", function() {
+      self._fullyUploaded = true
+    })
     f.upload.addEventListener("progress", function progressFunction(evt){
       if (!evt.lengthComputable) {
         return
       }
       self.renderProgress(evt.loaded, evt.total)
-      self._options.onProgress(evt.loaded, evt.total, self.assembly)
+      self._options.onProgress(evt.loaded, evt.total, self._assembly)
     })
 
     f.open('POST', url)
@@ -315,7 +308,7 @@
     this._appendCustomFormData(formData)
 
     function proceed () {
-      var endpoint = PROTOCOL + self.instance + self._options.resumableEndpointPath
+      var endpoint = PROTOCOL + self._instance + self._options.resumableEndpointPath
 
       // @todo: add support for files from custom formData
       // @todo Unused?
@@ -331,14 +324,14 @@
             metadata: {
               fieldname: nameAttr,
               filename: file.name,
-              assembly_id: self.assemblyId
+              assembly_id: self._assemblyId
             },
             onError: function (error) {
               console.log('Failed because: ' + error)
             },
             onProgress: function (bytesUploaded, bytesTotal) {
               self.renderProgress(bytesUploaded, bytesTotal)
-              self._options.onProgress(bytesUploaded, bytesTotal, self.assembly)
+              self._options.onProgress(bytesUploaded, bytesTotal, self._assembly)
             }
           })
           upload.start()
@@ -352,8 +345,8 @@
     f.onreadystatechange = function () {
       if (f.readyState === 4 && f.status === 200) {
         var resp = JSON.parse(f.responseText)
-        self.assemblyId = resp.assembly_id
-        self.instance = resp.instance
+        self._assemblyId = resp._assembly_id
+        self._instance = resp._instance
         proceed()
       }
     }
@@ -419,8 +412,8 @@
   }
 
   Uploader.prototype._getAssemblyRequestTargetUrl = function () {
-    var result = PROTOCOL + this.instance + '/assemblies/'
-    result += this.assemblyId + '?redirect=false'
+    var result = PROTOCOL + this._instance + '/assemblies/'
+    result += this._assemblyId + '?redirect=false'
 
     return result
   }
@@ -498,17 +491,17 @@
 
       this.$params = $params
       try {
-        this.params = JSON.parse($params.val())
+        this._params = JSON.parse($params.val())
       } catch (e) {
         alert('Error: input[name=params] seems to contain invalid JSON.')
         return
       }
     } else {
-      this.params = this._options.params
+      this._params = this._options.params
     }
 
-    if (this.params.redirect_url) {
-      this.$form.attr('action', this.params.redirect_url)
+    if (this._params.redirect_url) {
+      this.$form.attr('action', this._params.redirect_url)
     } else if (this._options.autoSubmit && (this.$form.attr('action') === this._options.service + 'assemblies')) {
       alert('Error: input[name=params] does not include a redirect_url')
       return
@@ -517,168 +510,138 @@
 
   Uploader.prototype._poll = function (query) {
     var self = this
-    if (this.ended) {
+    if (this._ended) {
       return
     }
 
     // Reduce Firefox Title Flickering
     var match = /(mozilla)(?:.*? rv:([\w.]+))?/.exec(navigator.userAgent)
     var isMozilla = match && match[1]
-    this.documentTitle = document.title
-    if (isMozilla && !this.documentTitle) {
+    this._documentTitle = document.title
+    if (isMozilla && !this._documentTitle) {
       document.title = 'Loading...'
     }
 
-    this.pollStarted = +new Date()
-
-    var instance = 'status-' + this.instance
-    var url = PROTOCOL + instance + '/assemblies/' + this.assemblyId
+    var instance = 'status-' + this._instance
+    var url = PROTOCOL + instance + '/assemblies/' + this._assemblyId
 
     if (query) {
       url += query
     }
+
+    this._pollStarted = +new Date()
 
     $.jsonp({
       url: url,
       timeout: self._options.pollTimeout,
       callbackParameter: 'callback',
       success: function (assembly) {
-        if (self.ended) {
+        if (self._ended) {
           return
         }
 
-        self.assembly = assembly
-        if (assembly.error === 'ASSEMBLY_NOT_FOUND') {
-          self.pollRetries++
-
-          if (self.pollRetries > self._options.poll404Retries) {
-            document.title = self.documentTitle
-            self.ended = true
-            self.renderError(assembly)
-            self._options.onError(assembly)
-            return
-          }
-
-          setTimeout(function () {
+        var continuePolling = self._handleSuccessfulPoll(assembly)
+        if (continuePolling) {
+          var timeout = self._calcPollTimeout()
+          self._timer = setTimeout(function () {
             self._poll()
-          }, 400)
-          return
+          }, timeout)
         }
-        if (assembly.error) {
-          self.ended = true
-          self.renderError(assembly)
-          document.title = self.documentTitle
-          self._options.onError(assembly)
-          return
-        }
-
-        if (!self.started && assembly.bytes_expected > 0) {
-          self.started = true
-          self._options.onStart(assembly)
-        }
-
-        self.pollRetries = 0
-        // @todo: Unused?
-        // var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING'
-        var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
-        var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
-        var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
-
-        if (assembly.bytes_expected > 0) {
-          self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly)
-        }
-
-        for (var i = 0; i < assembly.uploads.length; i++) {
-          var upload = assembly.uploads[i]
-
-          if ($.inArray(upload.id, self._uploadFileIds) === -1) {
-            self._options.onUpload(upload, assembly)
-            self.uploads.push(upload)
-            self._uploadFileIds.push(upload.id)
-          }
-        }
-
-        for (var step in assembly.results) {
-          self.results[step] = self.results[step] || []
-
-          for (var j = 0; j < assembly.results[step].length; j++) {
-            var result = assembly.results[step][j]
-            var resultId = step + '_' + result.id
-
-            if ($.inArray(resultId, self._resultFileIds) === -1) {
-              self._options.onResult(step, result, assembly)
-              self.results[step].push(result)
-              self._resultFileIds.push(resultId)
-            }
-          }
-        }
-
-        if (isCanceled) {
-          self.ended = true
-          document.title = self.documentTitle
-          self._options.onCancel(assembly)
-          return
-        }
-
-        var assemblyComplete = isComplete || (!self._options['wait'] && isExecuting)
-        if (assemblyComplete) {
-          self.ended = true
-          document.title = self.documentTitle
-          assembly.uploads = self.uploads
-          assembly.results = self.results
-          self._options.onSuccess(assembly)
-
-          // give the progressbar some time to finish to 100%
-          setTimeout(function () {
-            if (self._options.modal) {
-              self.cancel()
-            }
-            self.submitForm()
-          }, 600)
-          return
-        }
-
-        var ping = self.pollStarted - +new Date()
-        var timeout = ping < self._options.interval ? self._options.interval : ping
-
-        self.timer = setTimeout(function () {
-          self._poll()
-        }, timeout)
       },
       error: function (xhr, status, jsonpErr) {
-        if (self.ended) {
+        if (self._ended) {
           return
         }
 
-        self.pollRetries++
-        if (self.pollRetries > self._options.pollConnectionRetries) {
-          document.title = self.documentTitle
-          self.ended = true
-
-          var reason = 'JSONP status poll request status: ' + status
-          reason += ', err: ' + jsonpErr
-
-          var err = {
-            error: 'CONNECTION_ERROR',
-            message: self.i18n('errors.CONNECTION_ERROR'),
-            reason: reason,
-            url: url
-          }
-          self.renderError(err)
-          self._options.onError(err)
-          return
+        var continuePolling = self._handleErroneousPoll(xhr, status, jsonpErr)
+        if (continuePolling) {
+          var timeout = self._calcPollTimeout()
+          setTimeout(function () {
+            self._poll()
+          }, timeout)
         }
-
-        setTimeout(function () {
-          self._poll()
-        }, 350)
       }
     })
   }
 
+  Uploader.prototype._handleSuccessfulPoll = function (assembly) {
+    this._assembly = assembly
+
+    if (assembly.error === 'ASSEMBLY_NOT_FOUND') {
+      this._pollRetries++
+
+      if (this._pollRetries > this._options.poll404Retries) {
+        this._errorOut(assembly)
+        return false
+      }
+      return true
+    }
+
+    if (assembly.error) {
+      this._errorOut(assembly)
+      return false
+    }
+
+    if (!this._started && assembly.bytes_expected > 0) {
+      this._started = true
+      this._options.onStart(assembly)
+    }
+
+    this._pollRetries = 0
+
+    var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
+    var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
+    var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
+
+    this._mergeUploads(assembly)
+    this._mergeResults(assembly)
+
+    if (isCanceled) {
+      this._ended = true
+      document.title = this._documentTitle
+      this._options.onCancel(assembly)
+      return false
+    }
+
+    if (isComplete || (!this._options['wait'] && isExecuting)) {
+      this._ended = true
+      document.title = this._documentTitle
+      assembly.uploads = this._uploads
+      assembly.results = this._results
+      this._options.onSuccess(assembly)
+
+      if (this._options.modal) {
+        this.cancel()
+      }
+      this.submitForm()
+      return false
+    }
+
+    return true
+  }
+
+  Uploader.prototype._handleErroneousPoll = function (xhr, status, jsonpErr) {
+    this._pollRetries++
+    if (this._pollRetries <= this._options.pollConnectionRetries) {
+      return true
+    }
+
+    var reason = 'JSONP status poll request status: ' + status
+    reason += ', err: ' + jsonpErr
+
+    var err = {
+      error: 'CONNECTION_ERROR',
+      message: this.i18n('errors.CONNECTION_ERROR'),
+      reason: reason,
+      url: url
+    }
+    this._errorOut(err)
+    return false
+  }
+
   Uploader.prototype.stop = function () {
-    document.title = this.documentTitle
-    this.ended = true
+    document.title = this._documentTitle
+    this._ended = true
   }
 
   Uploader.prototype.cancel = function () {
@@ -686,12 +649,11 @@
     // while the cancel request is still being executed. Shouldn't happen
     // in real life, but needs fixing.
 
-    if (!this.ended) {
-      var self = this
+    if (!this._ended) {
       if (this.$params) {
         this.$params.prependTo(this.$form)
       }
-      clearTimeout(this.timer)
+      clearTimeout(this._timer)
       this._poll('?method=delete')
     }
 
@@ -707,10 +669,10 @@
       this.$form.removeAttr('enctype')
     }
 
-    if (this.assembly !== null) {
+    if (this._assembly !== null) {
       $('<textarea/>')
         .attr('name', 'transloadit')
-        .text(JSON.stringify(this.assembly))
+        .text(JSON.stringify(this._assembly))
         .prependTo(this.$form)
         .hide()
     }
@@ -756,8 +718,6 @@
       '$errorDetailsToggle': this.$modal.find('.error-details-toggle')
     })
 
-    var self = this
-
     this.$modal.$error.hide()
     this.$modal.$errorDetails.hide()
     this.$modal.$errorDetailsToggle.hide()
@@ -771,13 +731,14 @@
       closeOnClick: false
     })
 
+    var self = this
     this.$modal.$close.click(function () {
       self.cancel()
       return false
     })
   }
 
-  Uploader.prototype.renderError = function (err) {
+  Uploader.prototype._renderError = function (err) {
     if (!this._options.modal) {
       return
     }
@@ -806,7 +767,7 @@
     var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain')
     this.$modal.$error.html(text).show()
 
-    var assemblyId = err.assemblyId ? err.assemblyId : this.assemblyId
+    var assemblyId = err._assemblyId ? err._assemblyId : this._assemblyId
     var self = this
     var ip = null
 
@@ -816,12 +777,12 @@
     .always(function () {
       var details = {
         endpoint: err.url,
-        instance: self.instance,
+        instance: self._instance,
         assembly_id: assemblyId,
         ip: ip,
         time: self.getUTCDatetime(),
         agent: navigator.userAgent,
-        poll_retries: self.pollRetries,
+        poll_retries: self._pollRetries,
         error: errorMsg
       }
       $.post(PROTOCOL + 'status.transloadit.com/client_error', details)
@@ -892,7 +853,7 @@
     this.$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
-        duration: 500,
+        duration: 1000,
         easing: 'linear',
         progress: function (promise, currPercent, remainingMs) {
           var width = parseInt(self.$modal.$progressBar.css('width'), 10)
@@ -959,6 +920,47 @@
         pad(d.getHours()) + ':' +
         pad(d.getMinutes()) + ':' +
         pad(d.getSeconds()) + tzs
+  }
+
+  Uploader.prototype._calcPollTimeout = function () {
+    var ping = this._pollStarted - +new Date()
+    return ping < this._options.interval ? this._options.interval : ping
+  }
+
+  Uploader.prototype._mergeUploads = function (assembly) {
+    for (var i = 0; i < assembly.uploads.length; i++) {
+      var upload = assembly.uploads[i]
+
+      if ($.inArray(upload.id, this._uploadFileIds) === -1) {
+        this._options.onUpload(upload, assembly)
+        this._uploads.push(upload)
+        this._uploadFileIds.push(upload.id)
+      }
+    }
+  }
+
+  Uploader.prototype._mergeResults = function (assembly) {
+    for (var step in assembly.results) {
+      this._results[step] = this._results[step] || []
+
+      for (var j = 0; j < assembly.results[step].length; j++) {
+        var result = assembly.results[step][j]
+        var resultId = step + '_' + result.id
+
+        if ($.inArray(resultId, this._resultFileIds) === -1) {
+          this._options.onResult(step, result, assembly)
+          this._results[step].push(result)
+          this._resultFileIds.push(resultId)
+        }
+      }
+    }
+  }
+
+  Uploader.prototype._errorOut = function (err) {
+    document.title = this._documentTitle
+    this._ended = true
+    this._renderError(err)
+    this._options.onError(err)
   }
 
   Uploader.prototype._duration = function (t) {
