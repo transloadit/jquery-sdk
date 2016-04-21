@@ -1,9 +1,9 @@
-window.transloadit = {
+var uuid = {
   _clockseq: 0,
   _lastNSecs: 0,
   _lastMSecs: 0,
 
-  uuid: function() {
+  generate: function() {
     var i = 0;
     var b = [];
 
@@ -103,3 +103,5 @@ window.transloadit = {
     return unparse(b);
   }
 };
+
+module.exports = uuid;

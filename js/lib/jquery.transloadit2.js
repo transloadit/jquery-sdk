@@ -7,6 +7,11 @@
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
+require('../dep/json2')
+require('../dep/jquery.jsonp')
+require('../dep/toolbox.expose')
+require('../dep/jquery.easing')
+var uuid = require('../dep/uuid')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
@@ -274,7 +279,7 @@
   }
 
   Uploader.prototype._startWithXhr = function (cb) {
-    this._assemblyId = window.transloadit.uuid()
+    this._assemblyId = uuid.generate()
 
     var self = this
     var formData = this._prepareFormData()
