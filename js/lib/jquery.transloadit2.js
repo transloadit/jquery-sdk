@@ -150,8 +150,9 @@
     this.$modal = null
 
     this._animatedTo100 = false
-    this._lastProgressEventOn = 0
-    this._assemblyComplete = false
+    this._lastUploadSpeedUpdateOn = 0
+    this._uploadRate = null
+    this._durationLeft = null
     this._uploadFileIds = []
     this._resultFileIds = []
   }
@@ -250,10 +251,11 @@
     this.started = false
     this.ended = false
     this._bytesReceivedBefore = 0
+    this._uploadRate = null
+    this._durationLeft = null
     this.pollRetries = 0
     this.uploads = []
     this._animatedTo100 = false
-    this._assemblyComplete = false
     this._uploadFileIds = []
     this._resultFileIds = []
     this.results = {}
@@ -618,8 +620,8 @@
           return
         }
 
-        this._assemblyComplete = isComplete || (!self._options['wait'] && isExecuting)
-        if (this._assemblyComplete) {
+        var assemblyComplete = isComplete || (!self._options['wait'] && isExecuting)
+        if (assemblyComplete) {
           self.ended = true
           document.title = self.documentTitle
           assembly.uploads = self.uploads
@@ -845,44 +847,47 @@
     if (!this._options.modal) {
       return
     }
-    var waitIsTrue = this._options['wait']
+
     var progress = received / expected * 100
     if (progress > 100) {
       progress = 0
     }
 
-    var bytesReceived = received - this._bytesReceivedBefore
-    var timeSinceLastProgEvent = +new Date() - this._lastProgressEventOn
-    this._lastProgressEventOn = +new Date()
-    this._bytesReceivedBefore = received
-
+    var timeSinceLastUploadSpeedUpdate = +new Date() - this._lastUploadSpeedUpdateOn
     var mbReceived = (received / 1024 / 1024).toFixed(2)
     var mbExpected = (expected / 1024 / 1024).toFixed(2)
-    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastProgEvent / 1000)).toFixed(1)
 
-    var outstanding = expected - received
-    var speedInBytes = (bytesReceived / (timeSinceLastProgEvent / 1000)).toFixed(1)
+    // Only update speed and remaining time every 1 second at most, otherwise the values
+    // will fluctuate too much.
+    var updateSpeed = timeSinceLastUploadSpeedUpdate >= 1000
 
-    var durationLeft = ''
-    if (speedInBytes > 0) {
-      durationLeft = this._duration(outstanding / speedInBytes)
+    // We want to make sure we display "0s left" when the upload is done
+    updateSpeed = updateSpeed || progress === 100
+
+    if (!this._animatedTo100 && updateSpeed) {
+      var bytesReceived = received - this._bytesReceivedBefore
+      var uploadRate = ((bytesReceived / 1024) / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(1)
+
+      var outstanding = expected - received
+      var speedInBytes = (bytesReceived / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(1)
+
+      var durationLeft = ''
+      if (speedInBytes > 0) {
+        durationLeft = this._duration(outstanding / speedInBytes)
+      }
+
+      this._uploadRate = uploadRate
+      this._durationLeft = durationLeft
+      this._lastUploadSpeedUpdateOn = +new Date()
+      this._bytesReceivedBefore = received
     }
 
     var txt = this.i18n('uploadProgress',
-      mbReceived, mbExpected, uploadRate, durationLeft
+      mbReceived, mbExpected, this._uploadRate, this._durationLeft
     )
-
-    if (!this._animatedTo100) {
-      this.$modal.$label.text(txt)
-    }
+    this.$modal.$label.text(txt)
 
     var totalWidth = parseInt(this.$modal.$progress.css('width'), 10)
-
-
-    if (bytesReceived <= 0 && !this._assemblyComplete) {
-      return
-    }
-
     var self = this
     this.$modal.$progressBar.stop().animate(
       {width: progress + '%'},
