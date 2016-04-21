@@ -6,9 +6,10 @@
     "clean": "rm -f build/*",
     "css": "cp css/transloadit2.css build/transloadit2-latest.css",
     "browserify": "browserify js/lib/jquery.transloadit2.js -o build/jquery.transloadit2-latest.js",
+    "dev": "npm run clean && npm run css && npm run browserify && npm run inject",
     "fix": "eslint . --fix",
     "gzip": "gzip --force --best < build/jquery.transloadit2-latest.js > build/jquery.transloadit2-latest.js.gz",
-    "inject": "cp -v build/*.css ${WEBSITEDIR:-../content}/css/ && cp -v build/*{.js,js.gz} ${WEBSITEDIR:-../content}/js/",
+    "inject": "cp -v build/*.css ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/css/ && cp -v build/*.js* ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/js",
     "link": "ln -nfs $(pwd) ${WEBSITEDIR:-../content}/jquery-sdk",
     "lint": "eslint .",
     "release:major": "env SEMANTIC=major npm run release",
@@ -33,6 +34,6 @@
     "eslint-config-standard": "5.1.0",
     "eslint-plugin-promise": "1.1.0",
     "eslint-plugin-standard": "1.3.2",
-    "browserify": "13.0.0"
+    "browserify": "13.0.2"
   }
 }
