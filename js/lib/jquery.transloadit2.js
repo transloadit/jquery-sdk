@@ -11,7 +11,7 @@ require('../dep/json2')
 require('../dep/jquery.jsonp')
 require('../dep/toolbox.expose')
 require('../dep/jquery.easing')
-var uuid = require('../dep/uuid')
+var uuid = require('uuid')
 var helpers = require('../dep/helpers')
 
 !(function ($) {
@@ -280,7 +280,7 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._startWithXhr = function (cb) {
-    this._assemblyId = uuid.generate()
+    this._assemblyId = uuid.v4().replace(/\-/g, "")
 
     var self = this
     var formData = this._prepareFormData()
