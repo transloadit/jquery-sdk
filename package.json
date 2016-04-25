@@ -27,7 +27,8 @@
     "css"
   ],
   "dependencies": {
-    "uuid": "2.0.2"
+    "uuid": "2.0.2",
+    "is-online": "git://github.com/tim-kos/is-online"
   },
   "devDependencies": {
     "eslint": "2.7.0",

@@ -12,6 +12,7 @@ require('../dep/jquery.jsonp')
 require('../dep/toolbox.expose')
 require('../dep/jquery.easing')
 var uuid = require('uuid')
+var isOnline = require('is-online');
 var helpers = require('../dep/helpers')
 
 !(function ($) {
@@ -31,12 +32,14 @@ var helpers = require('../dep/helpers')
     onCancel: function () {},
     onError: function () {},
     onSuccess: function () {},
+    onDisconnect: function() {},
+    onReconnect: function() {},
     resumable: false,
     resumableEndpointPath: '/resumable/',
     interval: 2500,
     pollTimeout: 8000,
-    poll404Retries: 15,
-    pollConnectionRetries: 5,
+    poll404Retries: 1500,
+    pollConnectionRetries: 500,
     wait: false,
     processZeroFiles: true,
     triggerUploadOnFileSelection: false,
@@ -162,9 +165,16 @@ var helpers = require('../dep/helpers')
     this._durationLeft = null
     this._uploadFileIds = []
     this._resultFileIds = []
+    this._xhr = null
+
+    this._connectionCheckerInterval = null
+    this._isOnline = true
+    this._uploadIsInProgress = false
   }
 
   Uploader.prototype.init = function ($form, options) {
+    this._initInternetConnectionChecker()
+
     this._$form = $form
     this.options($.extend({}, OPTIONS, options || {}))
 
@@ -200,11 +210,14 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype.start = function () {
+    this._xhr = null
     this._started = false
     this._ended = false
     this._bytesReceivedBefore = 0
     this._uploadRate = null
     this._durationLeft = null
+    this._uploadIsInProgress = false
+    this._lastUploadSpeedUpdateOn = 0
     this._fullyUploaded = false
     this._pollRetries = 0
     this._uploads = []
@@ -288,11 +301,26 @@ var helpers = require('../dep/helpers')
     this._appendCustomFormData(formData)
 
     var url = this._getAssemblyRequestTargetUrl()
-    var f = new XMLHttpRequest()
-    f.upload.addEventListener("load", function() {
+    this._xhr = new XMLHttpRequest()
+
+    this._xhr.addEventListener("loadstart", function() {
+      self._uploadIsInProgress = true
+    })
+    this._xhr.addEventListener("error", function(err) {
+      self._xhr = null
+    })
+    this._xhr.addEventListener("abort", function(err) {
+      self._xhr = null
+    })
+    this._xhr.addEventListener("timeout", function(err) {
+      self._xhr = null
+    })
+
+    this._xhr.addEventListener("load", function() {
+      self._uploadIsInProgress = false
       self._fullyUploaded = true
     })
-    f.upload.addEventListener("progress", function progressFunction(evt){
+    this._xhr.upload.addEventListener("progress", function progressFunction(evt){
       if (!evt.lengthComputable) {
         return
       }
@@ -300,14 +328,13 @@ var helpers = require('../dep/helpers')
       self._options.onProgress(evt.loaded, evt.total, self._assembly)
     })
 
-    f.open('POST', url)
-    f.send(formData)
+    this._xhr.open('POST', url)
+    this._xhr.send(formData)
     cb()
   }
 
   Uploader.prototype._startWithResumabilitySupport = function (cb) {
     var self = this
-
     var formData = this._prepareFormData()
     this._appendTusFileCount(formData)
     this._appendFilteredFormFields(formData)
@@ -490,9 +517,15 @@ var helpers = require('../dep/helpers')
   Uploader.prototype.hideModal = function () {
     $.mask.close()
     this._$modal.remove()
+    this._$modal = null
   }
 
   Uploader.prototype.showModal = function () {
+    // Make sure to not show a second modal
+    if (this._$modal) {
+      return
+    }
+
     this._$modal =
       $('<div id="transloadit">' +
         '<div class="content">' +
@@ -613,7 +646,7 @@ var helpers = require('../dep/helpers')
           return
         }
 
-        var continuePolling = self._handleErroneousPoll(xhr, status, jsonpErr)
+        var continuePolling = self._handleErroneousPoll(url, xhr, status, jsonpErr)
         if (continuePolling) {
           var timeout = self._calcPollTimeout()
           setTimeout(function () {
@@ -680,7 +713,7 @@ var helpers = require('../dep/helpers')
     return true
   }
 
-  Uploader.prototype._handleErroneousPoll = function (xhr, status, jsonpErr) {
+  Uploader.prototype._handleErroneousPoll = function (url, xhr, status, jsonpErr) {
     this._pollRetries++
     if (this._pollRetries <= this._options.pollConnectionRetries) {
       return true
@@ -799,6 +832,8 @@ var helpers = require('../dep/helpers')
     // We want to make sure we display "0s left" when the upload is done
     updateSpeed = updateSpeed || progress === 100
 
+    var goingBackwards = this._bytesReceivedBefore && received < this._bytesReceivedBefore
+
     if (!this._animatedTo100 && updateSpeed) {
       var bytesReceived = received - this._bytesReceivedBefore
       var uploadRate = ((bytesReceived / 1024) / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(1)
@@ -822,23 +857,27 @@ var helpers = require('../dep/helpers')
     )
     this._$modal.$label.text(txt)
 
-    var totalWidth = parseInt(this._$modal.$progress.css('width'), 10)
+    var currentWidth = parseInt(this._$modal.$progress.css('width'), 10)
+    var currPercent = this._$modal.$progressBar.data('percent')
     var self = this
+
+    // if we are going backwards (due to a restart), do not animate, but reset the width
+    // of the progress bar in one go
+    if (currPercent > progress) {
+      this._$modal.$progressBar.stop().css('width', progress + '%')
+      this._$modal.$progressBar.data('percent', progress)
+      this._setProgressbarPercent(progress)
+      return
+    }
+
+    this._$modal.$progressBar.data('percent', progress)
     this._$modal.$progressBar.stop().animate(
       {width: progress + '%'},
       {
         duration: 1000,
         easing: 'linear',
         progress: function (promise, currPercent, remainingMs) {
-          var width = parseInt(self._$modal.$progressBar.css('width'), 10)
-
-          var percent = (width * 100 / totalWidth).toFixed(0)
-          if (percent > 100) {
-            percent = 100
-          }
-          if (percent > 13 && !self._animatedTo100) {
-            self._$modal.$percent.text(percent + '%')
-          }
+          var percent = self._setProgressbarPercent(currentWidth)
 
           if (percent == 100 && !self._animatedTo100) {
             self._animatedTo100 = true
@@ -851,6 +890,23 @@ var helpers = require('../dep/helpers')
         }
       }
     )
+  }
+
+  Uploader.prototype._setProgressbarPercent = function (totalWidth) {
+    var width = parseInt(this._$modal.$progressBar.css('width'), 10)
+
+    var percent = (width * 100 / totalWidth).toFixed(0)
+    if (percent > 100) {
+      percent = 100
+    }
+    if (percent > 13 && !self._animatedTo100) {
+      this._$modal.$percent.text(percent + '%')
+    }
+    if (percent <= 13) {
+      this._$modal.$percent.text('')
+    }
+
+    return percent
   }
 
   Uploader.prototype.includeCss = function () {
@@ -902,6 +958,50 @@ var helpers = require('../dep/helpers')
     this._ended = true
     this._renderError(err)
     this._options.onError(err)
+
+    if (this._xhr && typeof this._xhr.abort === "function") {
+      this._xhr.abort()
+    }
+  }
+
+  Uploader.prototype._onDisconnect = function () {
+    // display modal error message that the internet connection has disconnected
+    // and that we retry the upload as soon as it comes back online
+  }
+
+  Uploader.prototype._onReconnect = function () {
+    // If we had an upload in progress when we got the disconnect, retry it
+    if (!this._uploadIsInProgress) {
+      return
+    }
+
+    // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
+    // we have our own resume flag with tus support.
+    if (this._xhr && typeof this._xhr.abort === 'function') {
+      this._xhr.abort()
+    }
+    this.start()
+  }
+
+  Uploader.prototype._initInternetConnectionChecker = function () {
+    if (this._connectionCheckerInterval) {
+      return
+    }
+
+    var self = this
+    this._connectionCheckerInterval = setInterval (function() {
+      isOnline(function(online, a, b) {
+        if (self._isOnline && !online) {
+          self._onDisconnect()
+          self._options.onDisconnect()
+        }
+        if (!self._isOnline && online) {
+          self._onReconnect()
+          self._options.onReconnect()
+        }
+        self._isOnline = online
+      });
+    }, 3000)
   }
 
   Uploader.prototype.options = function (options) {
