@@ -9,16 +9,43 @@
  */
 require('../dep/json2')
 require('../dep/jquery.jsonp')
-require('../dep/toolbox.expose')
-require('../dep/jquery.easing')
+var Modal = require('./Modal')
 var uuid = require('uuid')
 var isOnline = require('is-online');
-var helpers = require('../dep/helpers')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
 
   var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/'
+
+  var I18N = {
+    en: {
+      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
+      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
+      'errors.unknown': 'There was an internal error.',
+      'errors.tryAgain': 'Please try your upload again.',
+      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
+          'please email us this information:',
+      cancel: 'Cancel',
+      details: 'Details',
+      startingUpload: 'Starting upload ...',
+      processingFiles: 'Upload done, now processing files ...',
+      uploadProgress: '%s / %s MB at %s kB/s | %s left'
+    },
+    ja: {
+      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
+      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
+      'errors.unknown': '通信環境に問題があります',
+      'errors.tryAgain': 'しばらくしてから再度投稿してください',
+      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
+          '下記の情報をメールでお送りください:',
+      cancel: 'キャンセル',
+      details: '詳細',
+      startingUpload: '投稿中 ...',
+      processingFiles: '接続中',
+      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
+    }
+  }
 
   var OPTIONS = {
     service: DEFAULT_SERVICE,
@@ -54,46 +81,7 @@ var helpers = require('../dep/helpers')
     locale: 'en'
   }
 
-  var I18N = {
-    en: {
-      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
-      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
-      'errors.unknown': 'There was an internal error.',
-      'errors.tryAgain': 'Please try your upload again.',
-      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
-          'please email us this information:',
-      cancel: 'Cancel',
-      details: 'Details',
-      startingUpload: 'Starting upload ...',
-      processingFiles: 'Upload done, now processing files ...',
-      uploadProgress: '%s / %s MB at %s kB/s | %s left'
-    },
-    ja: {
-      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
-      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
-      'errors.unknown': '通信環境に問題があります',
-      'errors.tryAgain': 'しばらくしてから再度投稿してください',
-      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
-          '下記の情報をメールでお送りください:',
-      cancel: 'キャンセル',
-      details: '詳細',
-      startingUpload: '投稿中 ...',
-      processingFiles: '接続中',
-      uploadProgress: '%s MB / %s MB (%s kB / 秒)'
-    }
-  }
   var CSS_LOADED = false
-
-  function sprintf (str, args) {
-    args = args || []
-    return str.replace(/(%[s])/g, function (m, i, s) {
-      var arg = args.shift()
-      if (!arg && arg !== 0) {
-        return ''
-      }
-      return arg + ''
-    })
-  }
 
   $.fn.transloadit = function () {
     var args = Array.prototype.slice.call(arguments)
@@ -151,18 +139,10 @@ var helpers = require('../dep/helpers')
     this._assembly = null
     this._params = null
 
-    this._bytesReceivedBefore = 0
-
     this._$params = null
     this._$form = null
     this._$files = null
-    this._$modal = null
 
-    this._animatedTo100 = false
-    this._lastUploadSpeedUpdateOn = 0
-    this._fullyUploaded = false
-    this._uploadRate = null
-    this._durationLeft = null
     this._uploadFileIds = []
     this._resultFileIds = []
     this._xhr = null
@@ -173,12 +153,20 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype.init = function ($form, options) {
+    var self = this
+    this._modal = new Modal({
+      onClose: function() {
+        self.cancel()
+      },
+      i18n: I18N,
+      locale: this._options.locale
+    })
+
     this._initInternetConnectionChecker()
 
     this._$form = $form
     this.options($.extend({}, OPTIONS, options || {}))
 
-    var self = this
     this._$form.bind('submit.transloadit', function () {
       self.validate()
       self._detectFileInputs()
@@ -213,18 +201,14 @@ var helpers = require('../dep/helpers')
     this._xhr = null
     this._started = false
     this._ended = false
-    this._bytesReceivedBefore = 0
-    this._uploadRate = null
-    this._durationLeft = null
     this._uploadIsInProgress = false
-    this._lastUploadSpeedUpdateOn = 0
-    this._fullyUploaded = false
     this._pollRetries = 0
     this._uploads = []
-    this._animatedTo100 = false
     this._uploadFileIds = []
     this._resultFileIds = []
     this._results = {}
+
+    this._modal.reset()
 
     var self = this
     var cb = function () {
@@ -288,7 +272,7 @@ var helpers = require('../dep/helpers')
     attempt()
 
     if (this._options.modal) {
-      this.showModal()
+      this._modal.show()
     }
   }
 
@@ -318,7 +302,6 @@ var helpers = require('../dep/helpers')
 
     this._xhr.addEventListener("load", function() {
       self._uploadIsInProgress = false
-      self._fullyUploaded = true
     })
     this._xhr.upload.addEventListener("progress", function progressFunction(evt){
       if (!evt.lengthComputable) {
@@ -488,7 +471,7 @@ var helpers = require('../dep/helpers')
     }
 
     if (this._options.modal) {
-      this.hideModal()
+      this._modal.hide()
     }
   }
 
@@ -512,66 +495,6 @@ var helpers = require('../dep/helpers')
         .unbind('submit.transloadit')
         .submit()
     }
-  }
-
-  Uploader.prototype.hideModal = function () {
-    $.mask.close()
-    this._$modal.remove()
-    this._$modal = null
-  }
-
-  Uploader.prototype.showModal = function () {
-    // Make sure to not show a second modal
-    if (this._$modal) {
-      return
-    }
-
-    this._$modal =
-      $('<div id="transloadit">' +
-        '<div class="content">' +
-          '<a href="#close" class="close">' + this.i18n('cancel') + '</a>' +
-          '<p class="status"></p>' +
-          '<div class="progress progress-striped">' +
-            '<div class="bar"><span class="percent"></span></div>' +
-          '</div>' +
-          '<label>' + this.i18n('startingUpload') + '</label>' +
-          '<p class="error"></p>' +
-          '<div class="error-details-toggle"><a href="#">' + this.i18n('details') + '</a></div>' +
-          '<p class="error-details"></p>' +
-        '</div>' +
-      '</div>')
-      .appendTo('body')
-
-    $.extend(this._$modal, {
-      '$content': this._$modal.find('.content'),
-      '$close': this._$modal.find('.close'),
-      '$label': this._$modal.find('label'),
-      '$progress': this._$modal.find('.progress'),
-      '$percent': this._$modal.find('.progress .percent'),
-      '$progressBar': this._$modal.find('.progress .bar'),
-      '$error': this._$modal.find('.error'),
-      '$errorDetails': this._$modal.find('.error-details'),
-      '$errorDetailsToggle': this._$modal.find('.error-details-toggle')
-    })
-
-    this._$modal.$error.hide()
-    this._$modal.$errorDetails.hide()
-    this._$modal.$errorDetailsToggle.hide()
-
-    this._$modal.expose({
-      api: true,
-      maskId: 'transloadit_expose',
-      opacity: 0.9,
-      loadSpeed: 250,
-      closeOnEsc: false,
-      closeOnClick: false
-    })
-
-    var self = this
-    this._$modal.$close.click(function () {
-      self.cancel()
-      return false
-    })
   }
 
   Uploader.prototype.validate = function () {
@@ -741,61 +664,9 @@ var helpers = require('../dep/helpers')
       return this.cancel()
     }
 
-    this._$modal.$content.addClass('content-error')
-    this._$modal.$progress.hide()
-    this._$modal.$label.hide()
-
-    var errorMsg = err.error + ': ' + err.message + '<br /><br />'
-    errorMsg += (err.reason || '')
-
-    var errorsRequiringDetails = [
-      'CONNECTION_ERROR',
-      'BORED_INSTANCE_ERROR',
-      'ASSEMBLY_NOT_FOUND'
-    ]
-    if ($.inArray(err.error, errorsRequiringDetails) === -1) {
-      this._$modal.$error.html(errorMsg).show()
-      return
-    }
-
-    var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain')
-    this._$modal.$error.html(text).show()
-
-    var assemblyId = err._assemblyId ? err._assemblyId : this._assemblyId
-    var self = this
-    var ip = null
-
-    $.getJSON(PROTOCOL + 'jsonip.com/', function (ipData) {
-      ip = ipData.ip
-    })
-    .always(function () {
-      var details = {
-        endpoint: err.url,
-        instance: self._instance,
-        assembly_id: assemblyId,
-        ip: ip,
-        time: helpers._getUTCDatetime(),
-        agent: navigator.userAgent,
-        poll_retries: self._pollRetries,
-        error: errorMsg
-      }
-      $.post(PROTOCOL + 'status.transloadit.com/client_error', details)
-
-      var detailsArr = []
-      for (var key in details) {
-        detailsArr.push(key + ': ' + details[key])
-      }
-
-      var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />'
-      self._$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
-
-      self._$modal.$errorDetailsToggle.show().find('a')
-        .off('click')
-        .on('click', function (e) {
-          e.preventDefault()
-          self._$modal.$errorDetails.toggle()
-        })
-    })
+    err.assemblyId = this._assemblyId
+    err.instance = this._instance
+    this._modal.renderError(err)
   }
 
   Uploader.prototype._detectFileInputs = function () {
@@ -815,98 +686,7 @@ var helpers = require('../dep/helpers')
     if (!this._options.modal) {
       return
     }
-
-    var progress = received / expected * 100
-    if (progress > 100) {
-      progress = 0
-    }
-
-    var timeSinceLastUploadSpeedUpdate = +new Date() - this._lastUploadSpeedUpdateOn
-    var mbReceived = (received / 1024 / 1024).toFixed(2)
-    var mbExpected = (expected / 1024 / 1024).toFixed(2)
-
-    // Only update speed and remaining time every 1 second at most, otherwise the values
-    // will fluctuate too much.
-    var updateSpeed = timeSinceLastUploadSpeedUpdate >= 1000
-
-    // We want to make sure we display "0s left" when the upload is done
-    updateSpeed = updateSpeed || progress === 100
-
-    var goingBackwards = this._bytesReceivedBefore && received < this._bytesReceivedBefore
-
-    if (!this._animatedTo100 && updateSpeed) {
-      var bytesReceived = received - this._bytesReceivedBefore
-      var uploadRate = ((bytesReceived / 1024) / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(1)
-
-      var outstanding = expected - received
-      var speedInBytes = (bytesReceived / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(1)
-
-      var durationLeft = ''
-      if (speedInBytes > 0) {
-        durationLeft = helpers._duration(outstanding / speedInBytes)
-      }
-
-      this._uploadRate = uploadRate
-      this._durationLeft = durationLeft
-      this._lastUploadSpeedUpdateOn = +new Date()
-      this._bytesReceivedBefore = received
-    }
-
-    var txt = this.i18n('uploadProgress',
-      mbReceived, mbExpected, this._uploadRate, this._durationLeft
-    )
-    this._$modal.$label.text(txt)
-
-    var currentWidth = parseInt(this._$modal.$progress.css('width'), 10)
-    var currPercent = this._$modal.$progressBar.data('percent')
-    var self = this
-
-    // if we are going backwards (due to a restart), do not animate, but reset the width
-    // of the progress bar in one go
-    if (currPercent > progress) {
-      this._$modal.$progressBar.stop().css('width', progress + '%')
-      this._$modal.$progressBar.data('percent', progress)
-      this._setProgressbarPercent(progress)
-      return
-    }
-
-    this._$modal.$progressBar.data('percent', progress)
-    this._$modal.$progressBar.stop().animate(
-      {width: progress + '%'},
-      {
-        duration: 1000,
-        easing: 'linear',
-        progress: function (promise, currPercent, remainingMs) {
-          var percent = self._setProgressbarPercent(currentWidth)
-
-          if (percent == 100 && !self._animatedTo100) {
-            self._animatedTo100 = true
-            setTimeout(function () {
-              self._$modal.$label.text(self.i18n('processingFiles'))
-              self._$modal.$progress.addClass('active')
-              self._$modal.$percent.text('')
-            }, 500)
-          }
-        }
-      }
-    )
-  }
-
-  Uploader.prototype._setProgressbarPercent = function (totalWidth) {
-    var width = parseInt(this._$modal.$progressBar.css('width'), 10)
-
-    var percent = (width * 100 / totalWidth).toFixed(0)
-    if (percent > 100) {
-      percent = 100
-    }
-    if (percent > 13 && !self._animatedTo100) {
-      this._$modal.$percent.text(percent + '%')
-    }
-    if (percent <= 13) {
-      this._$modal.$percent.text('')
-    }
-
-    return percent
+    this._modal.renderProgress(received, expected)
   }
 
   Uploader.prototype.includeCss = function () {
@@ -1018,17 +798,5 @@ var helpers = require('../dep/helpers')
     }
 
     this._options[key] = val
-  }
-
-  Uploader.prototype.i18n = function () {
-    var args = Array.prototype.slice.call(arguments)
-    var key = args.shift()
-    var locale = this._options.locale
-    var translated = I18N[locale] && I18N[locale][key] || I18N.en[key]
-    if (!translated) {
-      throw new Error('Unknown i18n key: ' + key)
-    }
-
-    return sprintf(translated, args)
   }
 }(window.jQuery))
