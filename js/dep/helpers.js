@@ -1,5 +1,5 @@
 var helpers = {
-  _getUTCDatetime: function () {
+  getUTCDatetime: function () {
     var now = new Date()
     var d = new Date(
       now.getUTCFullYear(),
@@ -31,7 +31,7 @@ var helpers = {
         pad(d.getMinutes()) + ':' +
         pad(d.getSeconds()) + tzs
   },
-  _duration: function (t) {
+  duration: function (t) {
     var min = 60
     var h = 60 * min
     var hours = Math.floor(t / h)
@@ -58,6 +58,16 @@ var helpers = {
     }
 
     return r
+  },
+  sprintf: function (str, args) {
+    args = args || []
+    return str.replace(/(%[s])/g, function (m, i, s) {
+      var arg = args.shift()
+      if (!arg && arg !== 0) {
+        return ''
+      }
+      return arg + ''
+    })
   }
 }
 

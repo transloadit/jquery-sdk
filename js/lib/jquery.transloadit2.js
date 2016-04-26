@@ -10,18 +10,21 @@
 require('../dep/json2')
 require('../dep/jquery.jsonp')
 var Modal = require('./Modal')
+var I18n = require('./I18n')
 var uuid = require('uuid')
 var isOnline = require('is-online');
+var helpers = require('../dep/helpers')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
 
   var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/'
 
-  var I18N = {
+  var I18nDict = {
     en: {
       'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
       'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
+      'errors.MAX_FILES_EXCEEDED': 'Please select at most %s files',
       'errors.unknown': 'There was an internal error.',
       'errors.tryAgain': 'Please try your upload again.',
       'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
@@ -78,7 +81,8 @@ var isOnline = require('is-online');
     signature: null,
     region: 'us-east-1',
     debug: true,
-    locale: 'en'
+    locale: 'en',
+    maxNumberOfUploadedFiles: -1
   }
 
   var CSS_LOADED = false
@@ -121,7 +125,7 @@ var isOnline = require('is-online');
     return (r === undefined) ? this : r
   }
 
-  $.fn.transloadit.i18n = I18N
+  $.fn.transloadit.i18n = I18nDict
 
   function Uploader () {
     this._assemblyId = null
@@ -154,12 +158,14 @@ var isOnline = require('is-online');
 
   Uploader.prototype.init = function ($form, options) {
     var self = this
+
+    this._i18n = new I18n(I18nDict, this._locale)
+
     this._modal = new Modal({
       onClose: function() {
         self.cancel()
       },
-      i18n: I18N,
-      locale: this._options.locale
+      i18n: this._i18n
     })
 
     this._initInternetConnectionChecker()
@@ -259,7 +265,7 @@ var isOnline = require('is-online');
 
           var err = {
             error: 'CONNECTION_ERROR',
-            message: self.i18n('errors.CONNECTION_ERROR'),
+            message: self._i18n.translate('errors.CONNECTION_ERROR'),
             reason: reason,
             url: url
           }
@@ -281,7 +287,12 @@ var isOnline = require('is-online');
 
     var self = this
     var formData = this._prepareFormData()
-    this._appendFilteredFormFields(formData, true)
+
+    var result = this._appendFilteredFormFields(formData, true)
+    if (!result) {
+      return
+    }
+
     this._appendCustomFormData(formData)
 
     var url = this._getAssemblyRequestTargetUrl()
@@ -401,15 +412,35 @@ var isOnline = require('is-online');
   Uploader.prototype._appendFilteredFormFields = function (formData, allowFiles) {
     var $fields = this._getFilteredFormFields(allowFiles)
 
+    var fileCount = 0
+
     $fields.each(function () {
       var name = $(this).attr('name')
       if (!name) {
         return
       }
+
+      fileCount += this.files.length
+
       for (var i = 0; i < this.files.length; i++) {
         formData.append(name, this.files[i])
       }
     })
+
+    console.log(">>>>", this._options.maxNumberOfUploadedFiles, fileCount)
+
+    if (this._options.maxNumberOfUploadedFiles != -1 && fileCount > this._options.maxNumberOfUploadedFiles) {
+      var max = this._options.maxNumberOfUploadedFiles
+      console.log(this._i18n.translate('errors.MAX_FILES_EXCEEDED'), max, helpers.sprintf(this._i18n.translate('errors.MAX_FILES_EXCEEDED'), max))
+      var err = {
+        error: 'MAX_FILES_EXCEEDED',
+        message: this._i18n.translate('errors.MAX_FILES_EXCEEDED', max)
+      }
+      this._errorOut(err)
+      return false
+    }
+
+    return true
   }
 
   Uploader.prototype._appendCustomFormData = function (formData) {
@@ -647,7 +678,7 @@ var isOnline = require('is-online');
 
     var err = {
       error: 'CONNECTION_ERROR',
-      message: this.i18n('errors.CONNECTION_ERROR'),
+      message: this._i18n.translate('errors.CONNECTION_ERROR'),
       reason: reason,
       url: url
     }

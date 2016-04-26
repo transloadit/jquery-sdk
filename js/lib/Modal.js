@@ -13,7 +13,6 @@ function Modal(opts) {
   this._animatedTo100 = false
 
   this._i18n = opts.i18n
-  this._locale = opts.locale
   this.onClose = opts.onClose || function() {}
 }
 
@@ -44,14 +43,14 @@ Modal.prototype.show = function () {
   this._$modal =
     $('<div id="transloadit">' +
       '<div class="content">' +
-        '<a href="#close" class="close">' + this.i18n('cancel') + '</a>' +
+        '<a href="#close" class="close">' + this._i18n.translate('cancel') + '</a>' +
         '<p class="status"></p>' +
         '<div class="progress progress-striped">' +
           '<div class="bar"><span class="percent"></span></div>' +
         '</div>' +
-        '<label>' + this.i18n('startingUpload') + '</label>' +
+        '<label>' + this._i18n.translate('startingUpload') + '</label>' +
         '<p class="error"></p>' +
-        '<div class="error-details-toggle"><a href="#">' + this.i18n('details') + '</a></div>' +
+        '<div class="error-details-toggle"><a href="#">' + this._i18n.translate('details') + '</a></div>' +
         '<p class="error-details"></p>' +
       '</div>' +
     '</div>')
@@ -107,7 +106,7 @@ Modal.prototype.renderError = function (err) {
     return
   }
 
-  var text = this.i18n('errors.unknown') + '<br/>' + this.i18n('errors.tryAgain')
+  var text = this._i18n.translate('errors.unknown') + '<br/>' + this._i18n.translate('errors.tryAgain')
   this._$modal.$error.html(text).show()
   var self = this
   var ip = null
@@ -121,7 +120,7 @@ Modal.prototype.renderError = function (err) {
       instance: err.instance,
       assembly_id: err.assemblyId,
       ip: ip,
-      time: helpers._getUTCDatetime(),
+      time: helpers.getUTCDatetime(),
       agent: navigator.userAgent,
       error: errorMsg
     }
@@ -132,7 +131,7 @@ Modal.prototype.renderError = function (err) {
       detailsArr.push(key + ': ' + details[key])
     }
 
-    var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />'
+    var detailsTxt = this._i18n.translate('errors.troubleshootDetails') + '<br /><br />'
     self._$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
 
     self._$modal.$errorDetailsToggle.show().find('a')
@@ -172,7 +171,7 @@ Modal.prototype.renderProgress = function (received, expected) {
 
     var durationLeft = ''
     if (speedInBytes > 0) {
-      durationLeft = helpers._duration(outstanding / speedInBytes)
+      durationLeft = helpers.duration(outstanding / speedInBytes)
     }
 
     this._uploadRate = uploadRate
@@ -181,7 +180,7 @@ Modal.prototype.renderProgress = function (received, expected) {
     this._bytesReceivedBefore = received
   }
 
-  var txt = this.i18n('uploadProgress',
+  var txt = this._i18n.translate('uploadProgress',
     mbReceived, mbExpected, this._uploadRate, this._durationLeft
   )
   this._$modal.$label.text(txt)
@@ -211,7 +210,7 @@ Modal.prototype.renderProgress = function (received, expected) {
         if (percent == 100 && !self._animatedTo100) {
           self._animatedTo100 = true
           setTimeout(function () {
-            self._$modal.$label.text(self.i18n('processingFiles'))
+            self._$modal.$label.text(self._i18n.translate('processingFiles'))
             self._$modal.$progress.addClass('active')
             self._$modal.$percent.text('')
           }, 500)
@@ -236,29 +235,6 @@ Modal.prototype._setProgressbarPercent = function (totalWidth) {
   }
 
   return percent
-}
-
-Modal.prototype._sprintf = function (str, args) {
-  args = args || []
-  return str.replace(/(%[s])/g, function (m, i, s) {
-    var arg = args.shift()
-    if (!arg && arg !== 0) {
-      return ''
-    }
-    return arg + ''
-  })
-}
-
-Modal.prototype.i18n = function () {
-  var args = Array.prototype.slice.call(arguments)
-  var key = args.shift()
-  var locale = this._locale
-  var translated = this._i18n[locale] && this._i18n[locale][key] || this._i18n.en[key]
-  if (!translated) {
-    throw new Error('Unknown i18n key: ' + key)
-  }
-
-  return this._sprintf(translated, args)
 }
 
 module.exports = Modal
