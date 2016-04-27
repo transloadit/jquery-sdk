@@ -174,8 +174,8 @@ var helpers = require('../dep/helpers')
     this.options($.extend({}, OPTIONS, options || {}))
 
     this._$form.bind('submit.transloadit', function () {
-      self.validate()
       self._detectFileInputs()
+      self.validate()
 
       if (!self._options['processZeroFiles'] && self._$files.length === 0) {
         if (self._options.beforeStart()) {
@@ -427,11 +427,8 @@ var helpers = require('../dep/helpers')
       }
     })
 
-    console.log(">>>>", this._options.maxNumberOfUploadedFiles, fileCount)
-
     if (this._options.maxNumberOfUploadedFiles != -1 && fileCount > this._options.maxNumberOfUploadedFiles) {
       var max = this._options.maxNumberOfUploadedFiles
-      console.log(this._i18n.translate('errors.MAX_FILES_EXCEEDED'), max, helpers.sprintf(this._i18n.translate('errors.MAX_FILES_EXCEEDED'), max))
       var err = {
         error: 'MAX_FILES_EXCEEDED',
         message: this._i18n.translate('errors.MAX_FILES_EXCEEDED', max)
@@ -545,6 +542,17 @@ var helpers = require('../dep/helpers')
       }
     } else {
       this._params = this._options.params
+    }
+
+    var fileInputFieldsAreGood = true
+    this._$files.each(function() {
+      var name = $(this).attr('name')
+      if (!name) {
+        fileInputFieldsAreGood = false
+      }
+    })
+    if (!fileInputFieldsAreGood) {
+      alert('Error: One of your file input fields does not contain a name attribute!')
     }
 
     if (this._params.redirect_url) {
