@@ -512,14 +512,11 @@ var helpers = require('../dep/helpers')
       $('<textarea/>')
         .attr('name', 'transloadit')
         .text(JSON.stringify(this._assembly))
-        .prependTo(this._$form)
-        .hide()
+        .prependTo(this._$form).hide()
     }
 
     if (this._options.autoSubmit) {
-      this._$form
-        .unbind('submit.transloadit')
-        .submit()
+      this._$form.unbind('submit.transloadit').submit()
     }
   }
 
