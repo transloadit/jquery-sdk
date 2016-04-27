@@ -151,7 +151,6 @@ var helpers = require('../dep/helpers')
 
     this._connectionCheckerInterval = null
     this._isOnline = true
-    this._uploadIsInProgress = false
   }
 
   Uploader.prototype.init = function ($form, options) {
@@ -205,7 +204,6 @@ var helpers = require('../dep/helpers')
     this._xhr = null
     this._started = false
     this._ended = false
-    this._uploadIsInProgress = false
     this._pollRetries = 0
     this._uploads = []
     this._uploadFileIds = []
@@ -296,9 +294,6 @@ var helpers = require('../dep/helpers')
     var url = this._getAssemblyRequestTargetUrl()
     this._xhr = new XMLHttpRequest()
 
-    this._xhr.addEventListener("loadstart", function() {
-      self._uploadIsInProgress = true
-    })
     this._xhr.addEventListener("error", function(err) {
       self._xhr = null
     })
@@ -308,10 +303,10 @@ var helpers = require('../dep/helpers')
     this._xhr.addEventListener("timeout", function(err) {
       self._xhr = null
     })
-
     this._xhr.addEventListener("load", function() {
-      self._uploadIsInProgress = false
+      self._xhr = null
     })
+
     this._xhr.upload.addEventListener("progress", function progressFunction(evt){
       if (!evt.lengthComputable) {
         return
@@ -781,16 +776,17 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._onReconnect = function () {
-    // If we had an upload in progress when we got the disconnect, retry it
-    if (!this._uploadIsInProgress) {
+    if (!this._xhr) {
       return
     }
 
     // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
     // we have our own resume flag with tus support.
-    if (this._xhr && typeof this._xhr.abort === 'function') {
+    if (typeof this._xhr.abort === 'function') {
       this._xhr.abort()
     }
+
+    // If we have an upload in progress when we get the disconnect, retry it
     this.start()
   }
 
@@ -801,7 +797,7 @@ var helpers = require('../dep/helpers')
 
     var self = this
     this._connectionCheckerInterval = setInterval (function() {
-      isOnline(function(online, a, b) {
+      isOnline(function(online) {
         if (self._isOnline && !online) {
           self._onDisconnect()
           self._options.onDisconnect()
