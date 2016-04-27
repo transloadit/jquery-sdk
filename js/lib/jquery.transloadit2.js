@@ -65,7 +65,6 @@ var helpers = require('../dep/helpers')
     onDisconnect: function() {},
     onReconnect: function() {},
     resumable: false,
-    resumableEndpointPath: '/resumable/',
     interval: 2500,
     pollTimeout: 8000,
     poll404Retries: 1500,
@@ -80,9 +79,9 @@ var helpers = require('../dep/helpers')
     params: null,
     signature: null,
     region: 'us-east-1',
-    debug: true,
     locale: 'en',
-    maxNumberOfUploadedFiles: -1
+    maxNumberOfUploadedFiles: -1,
+    debug: true
   }
 
   var CSS_LOADED = false
@@ -334,7 +333,7 @@ var helpers = require('../dep/helpers')
     this._appendCustomFormData(formData)
 
     function proceed () {
-      var endpoint = PROTOCOL + self._instance + self._options.resumableEndpointPath
+      var endpoint = PROTOCOL + self._instance + '/resumable/'
 
       self._$files.each(function () {
         var nameAttr = $(self).attr('name')
