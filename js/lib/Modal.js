@@ -144,6 +144,11 @@ Modal.prototype.renderError = function (err) {
 }
 
 Modal.prototype.renderProgress = function (received, expected) {
+  // this._$modal can actually be gone if cancel was hit in the meantime
+  if (!this._$modal) {
+    return
+  }
+
   var progress = received / expected * 100
   if (progress > 100) {
     progress = 0
@@ -205,11 +210,19 @@ Modal.prototype.renderProgress = function (received, expected) {
       duration: 1000,
       easing: 'linear',
       progress: function (promise, currPercent, remainingMs) {
+        // self._$modal can actually be gone if cancel was hit in the meantime
+        if (!self._$modal) {
+          return
+        }
         var percent = self._setProgressbarPercent(currentWidth)
 
         if (percent == 100 && !self._animatedTo100) {
           self._animatedTo100 = true
           setTimeout(function () {
+            // self._$modal can actually be gone if cancel was hit in the meantime
+            if (!self._$modal) {
+              return
+            }
             self._$modal.$label.text(self._i18n.translate('processingFiles'))
             self._$modal.$progress.addClass('active')
             self._$modal.$percent.text('')

@@ -235,3 +235,13 @@
 #transloadit .job_progress span{background-color: #B5E000 !important;}
 #transloadit .job_error span{background-color: #E40000 !important;}
 #transloadit_expose{background:#fff !important;}
+
+.transloadit-drop-area {
+  padding: 5px;
+  width: 200px;
+  height: 75px;
+  border: 2px dashed #ccc;
+}
+.transloadit-drop-area.hover {
+  border: 2px dashed #0af;
+}

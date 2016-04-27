@@ -9,11 +9,13 @@
  */
 require('../dep/json2')
 require('../dep/jquery.jsonp')
-var Modal = require('./Modal')
-var I18n = require('./I18n')
-var uuid = require('uuid')
+
+var Modal    = require('./Modal')
+var DragDrop = require('./DragDrop')
+var I18n     = require('./I18n')
+var uuid     = require('uuid')
 var isOnline = require('is-online');
-var helpers = require('../dep/helpers')
+var helpers  = require('../dep/helpers')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
@@ -73,6 +75,7 @@ var helpers = require('../dep/helpers')
     processZeroFiles: true,
     triggerUploadOnFileSelection: false,
     autoSubmit: true,
+    dragAndDrop: false,
     modal: true,
     exclude: '',
     fields: false,
@@ -148,6 +151,8 @@ var helpers = require('../dep/helpers')
     this._uploadFileIds = []
     this._resultFileIds = []
     this._xhr = null
+    this._dragDrop = null
+    this._formData = null
 
     this._connectionCheckerInterval = null
     this._isOnline = true
@@ -155,20 +160,18 @@ var helpers = require('../dep/helpers')
 
   Uploader.prototype.init = function ($form, options) {
     var self = this
+    this.options($.extend({}, OPTIONS, options || {}))
 
-    this._i18n = new I18n(I18nDict, this._locale)
-
-    this._modal = new Modal({
-      onClose: function() {
-        self.cancel()
-      },
-      i18n: this._i18n
-    })
-
+    this._initI18n()
+    this._initModal()
     this._initInternetConnectionChecker()
 
     this._$form = $form
-    this.options($.extend({}, OPTIONS, options || {}))
+    this._formData = this._prepareFormData()
+
+    if (this._options.dragAndDrop) {
+      this._initDragAndDrop()
+    }
 
     this._$form.bind('submit.transloadit', function () {
       self._detectFileInputs()
@@ -187,7 +190,7 @@ var helpers = require('../dep/helpers')
       return false
     })
 
-    if (this._options['triggerUploadOnFileSelection']) {
+    if (this._options.triggerUploadOnFileSelection) {
       this._$form.on('change', 'input[type="file"]', function () {
         self._$form.trigger('submit.transloadit')
       })
@@ -282,14 +285,12 @@ var helpers = require('../dep/helpers')
     this._assemblyId = uuid.v4().replace(/\-/g, "")
 
     var self = this
-    var formData = this._prepareFormData()
-
-    var result = this._appendFilteredFormFields(formData, true)
+    var result = this._appendFilteredFormFields(true)
     if (!result) {
       return
     }
 
-    this._appendCustomFormData(formData)
+    this._appendCustomFormData()
 
     var url = this._getAssemblyRequestTargetUrl()
     this._xhr = new XMLHttpRequest()
@@ -316,16 +317,15 @@ var helpers = require('../dep/helpers')
     })
 
     this._xhr.open('POST', url)
-    this._xhr.send(formData)
+    this._xhr.send(this._formData)
     cb()
   }
 
   Uploader.prototype._startWithResumabilitySupport = function (cb) {
     var self = this
-    var formData = this._prepareFormData()
-    this._appendTusFileCount(formData)
-    this._appendFilteredFormFields(formData)
-    this._appendCustomFormData(formData)
+    this._appendTusFileCount()
+    this._appendFilteredFormFields()
+    this._appendCustomFormData()
 
     function proceed () {
       var endpoint = PROTOCOL + self._instance + '/resumable/'
@@ -366,11 +366,11 @@ var helpers = require('../dep/helpers')
         proceed()
       }
     }
-    f.send(formData)
+    f.send(this._formData)
     cb()
   }
 
-  Uploader.prototype._prepareFormData = function (form) {
+  Uploader.prototype._prepareFormData = function () {
     var assemblyParams = this._options.params
     if (this._$params) {
       assemblyParams = this._$params.val()
@@ -383,7 +383,7 @@ var helpers = require('../dep/helpers')
     if (this._options.formData instanceof FormData) {
       result = this._options.formData
     } else {
-      result = new FormData(form)
+      result = new FormData()
     }
 
     result.append('params', assemblyParams)
@@ -394,17 +394,17 @@ var helpers = require('../dep/helpers')
     return result
   }
 
-  Uploader.prototype._appendTusFileCount = function (formData) {
+  Uploader.prototype._appendTusFileCount = function () {
     var fileCount = 0
     this._$files.each(function () {
       fileCount += this.files.length
     })
-    formData.append('tus_num_expected_upload_files', fileCount)
+    this._formData.append('tus_num_expected_upload_files', fileCount)
   }
 
-  Uploader.prototype._appendFilteredFormFields = function (formData, allowFiles) {
+  Uploader.prototype._appendFilteredFormFields = function (allowFiles) {
     var $fields = this._getFilteredFormFields(allowFiles)
-
+    var self = this
     var fileCount = 0
 
     $fields.each(function () {
@@ -416,7 +416,7 @@ var helpers = require('../dep/helpers')
       fileCount += this.files.length
 
       for (var i = 0; i < this.files.length; i++) {
-        formData.append(name, this.files[i])
+        self._formData.append(name, this.files[i])
       }
     })
 
@@ -433,14 +433,14 @@ var helpers = require('../dep/helpers')
     return true
   }
 
-  Uploader.prototype._appendCustomFormData = function (formData) {
+  Uploader.prototype._appendCustomFormData = function () {
     if (!this._options.formData) {
       return
     }
 
     for (var i = 0; i < this._options.formData.length; i++) {
       var tupel = this._options.formData[i]
-      formData.append(tupel[0], tupel[1], tupel[2])
+      this._formData.append(tupel[0], tupel[1], tupel[2])
     }
   }
 
@@ -487,6 +487,9 @@ var helpers = require('../dep/helpers')
     // @todo this has still a race condition if a new upload is started
     // while the cancel request is still being executed. Shouldn't happen
     // in real life, but needs fixing.
+    this._formData = this._prepareFormData()
+
+    this._abortUpload()
 
     if (!this._ended) {
       if (this._$params) {
@@ -761,7 +764,10 @@ var helpers = require('../dep/helpers')
     this._ended = true
     this._renderError(err)
     this._options.onError(err)
+    this._abortUpload()
+  }
 
+  Uploader.prototype._abortUpload = function () {
     if (this._xhr && typeof this._xhr.abort === "function") {
       this._xhr.abort()
     }
@@ -773,18 +779,44 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._onReconnect = function () {
-    if (!this._xhr) {
-      return
-    }
-
     // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
     // we have our own resume flag with tus support.
-    if (typeof this._xhr.abort === 'function') {
-      this._xhr.abort()
-    }
+    this._abortUpload()
 
     // If we have an upload in progress when we get the disconnect, retry it
     this.start()
+  }
+
+  Uploader.prototype._initI18n = function () {
+    this._i18n = new I18n(I18nDict, this._locale)
+  }
+
+  Uploader.prototype._initModal = function () {
+    var self = this
+    this._modal = new Modal({
+      onClose: function() {
+        self.cancel()
+      },
+      i18n: this._i18n
+    })
+  }
+
+  Uploader.prototype._initDragAndDrop = function () {
+    var self = this
+
+    var $dropArea = this._$form.find('.transloadit-drop-area')
+
+    this._dragDrop = new DragDrop({
+      onFileAdd: function (file) {
+        self._formData.append('file', file)
+
+        if (self._options.triggerUploadOnFileSelection) {
+          self._$form.trigger('submit.transloadit')
+        }
+        self._options.onFileSelect(file, $dropArea)
+      },
+      $el: $dropArea
+    })
   }
 
   Uploader.prototype._initInternetConnectionChecker = function () {
