@@ -485,6 +485,11 @@ var helpers = require('../dep/helpers')
     this._ended = true
   }
 
+  Uploader.prototype.destroy = function () {
+    this._$form.data('transloadit.uploader', null)
+    this._$form.unbind('submit.transloadit')
+  }
+
   Uploader.prototype.cancel = function () {
     // @todo this has still a race condition if a new upload is started
     // while the cancel request is still being executed. Shouldn't happen
