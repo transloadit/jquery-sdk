@@ -131,7 +131,6 @@ var helpers = require('../dep/helpers')
     this._assemblyId = null
 
     this._instance = null
-    this._documentTitle = null
     this._timer = null
     this._options = {}
     this._uploads = []
@@ -481,11 +480,11 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype.stop = function () {
-    document.title = this._documentTitle
     this._ended = true
   }
 
   Uploader.prototype.destroy = function () {
+    this.stop()
     this._$form.data('transloadit.uploader', null)
     this._$form.unbind('submit.transloadit')
   }
@@ -569,19 +568,11 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._poll = function (query) {
-    var self = this
     if (this._ended) {
       return
     }
 
-    // Reduce Firefox Title Flickering
-    var match = /(mozilla)(?:.*? rv:([\w.]+))?/.exec(navigator.userAgent)
-    var isMozilla = match && match[1]
-    this._documentTitle = document.title
-    if (isMozilla && !this._documentTitle) {
-      document.title = 'Loading...'
-    }
-
+    var self = this
     var instance = 'status-' + this._instance
     var url = PROTOCOL + instance + '/assemblies/' + this._assemblyId
 
@@ -658,14 +649,12 @@ var helpers = require('../dep/helpers')
 
     if (isCanceled) {
       this._ended = true
-      document.title = this._documentTitle
       this._options.onCancel(assembly)
       return false
     }
 
     if (isComplete || (!this._options['wait'] && isExecuting)) {
       this._ended = true
-      document.title = this._documentTitle
       assembly.uploads = this._uploads
       assembly.results = this._results
       this._options.onSuccess(assembly)
@@ -778,7 +767,6 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._errorOut = function (err) {
-    document.title = this._documentTitle
     this._ended = true
     this._renderError(err)
     this._options.onError(err)
