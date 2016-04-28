@@ -245,3 +245,24 @@
 .transloadit-drop-area.hover {
   border: 2px dashed #0af;
 }
+.transloadit-file-preview-area {
+  padding: 5px;
+  width: 200px;
+  height: 100px;
+  overflow-y: auto;
+  border: 2px solid #ccc;
+}
+.transloadit-file-preview-area ul {
+  margin: 0;
+}
+.transloadit-file-preview-area li {
+  border-top: 1px solid #ddd;
+  list-style-type: none;
+  display: inline-block;
+  width: 100%;
+  height: 25px;
+  padding: 3px;
+}
+.transloadit-file-preview-area li:first-child {
+  border-top: none;
+}

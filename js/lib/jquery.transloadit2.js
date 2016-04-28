@@ -10,12 +10,13 @@
 require('../dep/json2')
 require('../dep/jquery.jsonp')
 
-var Modal    = require('./Modal')
+var Modal = require('./Modal')
 var DragDrop = require('./DragDrop')
-var I18n     = require('./I18n')
-var uuid     = require('uuid')
+var FilePreview = require('./FilePreview')
+var I18n = require('./I18n')
+var uuid = require('uuid')
 var isOnline = require('is-online');
-var helpers  = require('../dep/helpers')
+var helpers = require('../dep/helpers')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
@@ -151,6 +152,7 @@ var helpers  = require('../dep/helpers')
     this._resultFileIds = []
     this._xhr = null
     this._dragDropObjects = []
+    this._previewAreaObjects = []
     this._formData = null
 
     this._connectionCheckerInterval = null
@@ -169,6 +171,7 @@ var helpers  = require('../dep/helpers')
     this._formData = this._prepareFormData()
 
     this._initDragAndDrop()
+    this._initFilePreview()
 
     this._$form.bind('submit.transloadit', function () {
       self._detectFileInputs()
@@ -818,11 +821,45 @@ var helpers  = require('../dep/helpers')
             self._$form.trigger('submit.transloadit')
           }
           self._options.onFileSelect(file, $(this))
+          self._addFileToPreviewAreas(file)
         },
         $el: $(this)
       })
       i++
     })
+  }
+
+  Uploader.prototype._initFilePreview = function () {
+    var $previewAreas = this._$form.find('.transloadit-file-preview-area')
+    if ($previewAreas.length === 0) {
+      return
+    }
+
+    var self = this
+    var i = 0
+    $previewAreas.each(function () {
+      var name = $(this).data('name') || 'files'
+
+      self._previewAreaObjects[i] = new FilePreview({
+        onFileRemove: function (file) {
+          self._removeFileFromPreviewAreas(file)
+        },
+        $el: $(this)
+      })
+      i++
+    })
+  }
+
+  Uploader.prototype._addFileToPreviewAreas = function (file) {
+    for (var i = 0; i < this._previewAreaObjects.length; i++) {
+      this._previewAreaObjects[i].addFile(file)
+    }
+  }
+
+  Uploader.prototype._removeFileFromPreviewAreas = function (file) {
+    for (var i = 0; i < this._previewAreaObjects.length; i++) {
+      this._previewAreaObjects[i].removeFile(file)
+    }
   }
 
   Uploader.prototype._initInternetConnectionChecker = function () {
