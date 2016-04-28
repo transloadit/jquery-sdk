@@ -24,14 +24,14 @@ FilePreview.prototype._bindEvents = function() {
       lastModified: $li.data('lastModified')
     }
     self.onFileRemove(file)
-    console.log('remove_file', file)
   })
 }
 
 FilePreview.prototype.addFile = function(file) {
-  console.log('>>>added', file)
+  var size = this._niceSize(file.size)
+
   var closeLink = '<a href="#" class="remove_file">X</a>'
-  var html = '<li>' + file.name + ' - ' + file.size + ' - ' + closeLink + '</li>'
+  var html = '<li>' + file.name + ' - ' + size + ' - ' + closeLink + '</li>'
   var $li = $(html).appendTo(this._$ul)
 
   $li.data('size', file.size)
@@ -49,7 +49,21 @@ FilePreview.prototype.removeFile = function(file) {
       $(this).remove()
     }
   })
-  console.log('>>>removed', file)
+}
+
+FilePreview.prototype._niceSize = function(bytes) {
+  var result = bytes + "bytes";
+  var aMultiples = ["KB", "MB", "GB"]
+  var nMultiple = 0
+  var nApprox = bytes / 1024
+
+  while (nApprox > 1) {
+    result = nApprox.toFixed(1) + aMultiples[nMultiple]
+    nApprox /= 1024
+    nMultiple++
+  }
+
+  return result
 }
 
 module.exports = FilePreview

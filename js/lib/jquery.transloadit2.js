@@ -154,6 +154,7 @@ var helpers = require('../dep/helpers')
     this._dragDropObjects = []
     this._previewAreaObjects = []
     this._formData = null
+    this._files = {}
 
     this._connectionCheckerInterval = null
     this._isOnline = true
@@ -168,8 +169,6 @@ var helpers = require('../dep/helpers')
     this._initInternetConnectionChecker()
 
     this._$form = $form
-    this._formData = this._prepareFormData()
-
     this._initDragAndDrop()
     this._initFilePreview()
 
@@ -282,14 +281,14 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._startWithXhr = function (cb) {
-    this._assemblyId = uuid.v4().replace(/\-/g, "")
-
     var self = this
+    this._assemblyId = uuid.v4().replace(/\-/g, "")
+    this._formData = this._prepareFormData()
+
     var result = this._appendFilteredFormFields(true)
     if (!result) {
       return
     }
-
     this._appendCustomFormData()
 
     var url = this._getAssemblyRequestTargetUrl()
@@ -324,6 +323,7 @@ var helpers = require('../dep/helpers')
 
   Uploader.prototype._startWithResumabilitySupport = function (cb) {
     var self = this
+    this._formData = this._prepareFormData()
     this._appendTusFileCount()
     this._appendFilteredFormFields()
     this._appendCustomFormData()
@@ -400,7 +400,24 @@ var helpers = require('../dep/helpers')
     this._$files.each(function () {
       fileCount += this.files.length
     })
+
+    for (var key in this._files) {
+      fileCount += this._files[key].length
+    }
+
     this._formData.append('tus_num_expected_upload_files', fileCount)
+  }
+
+  Uploader.prototype._appendDroppedFiles = function () {
+    var total = 0
+    for (var key in this._files) {
+      for (var i = 0; i < this._files[key].length; i++) {
+        this._formData.append(key, this._files[key][i])
+        total++
+      }
+    }
+
+    return total
   }
 
   Uploader.prototype._appendFilteredFormFields = function (allowFiles) {
@@ -420,6 +437,9 @@ var helpers = require('../dep/helpers')
         self._formData.append(name, this.files[i])
       }
     })
+
+    var droppedFilesCount = this._appendDroppedFiles()
+    fileCount += droppedFilesCount
 
     if (this._options.maxNumberOfUploadedFiles != -1 && fileCount > this._options.maxNumberOfUploadedFiles) {
       var max = this._options.maxNumberOfUploadedFiles
@@ -489,6 +509,8 @@ var helpers = require('../dep/helpers')
     // while the cancel request is still being executed. Shouldn't happen
     // in real life, but needs fixing.
     this._formData = this._prepareFormData()
+
+    // decide if we should emoty this._files here, probably not
 
     this._abortUpload()
 
@@ -815,7 +837,11 @@ var helpers = require('../dep/helpers')
 
       self._dragDropObjects[i] = new DragDrop({
         onFileAdd: function (file) {
-          self._formData.append(name, file)
+          if (self._files[name]) {
+            self._files[name].push(file)
+          } else {
+            self._files[name] = [file]
+          }
 
           if (self._options.triggerUploadOnFileSelection) {
             self._$form.trigger('submit.transloadit')
@@ -842,6 +868,7 @@ var helpers = require('../dep/helpers')
 
       self._previewAreaObjects[i] = new FilePreview({
         onFileRemove: function (file) {
+          self._removeFileFromFormData(file)
           self._removeFileFromPreviewAreas(file)
         },
         $el: $(this)
@@ -859,6 +886,27 @@ var helpers = require('../dep/helpers')
   Uploader.prototype._removeFileFromPreviewAreas = function (file) {
     for (var i = 0; i < this._previewAreaObjects.length; i++) {
       this._previewAreaObjects[i].removeFile(file)
+    }
+  }
+
+  Uploader.prototype._removeFileFromFormData = function (file) {
+    for (var i = 0; i < this._previewAreaObjects.length; i++) {
+      this._previewAreaObjects[i].removeFile(file)
+    }
+
+    for (var key in this._files) {
+      for (var i = 0; i < this._files[key].length; i++) {
+        var myFile = this._files[key][i]
+        if (myFile.size !== file.size || myFile.name !== file.name) {
+          continue
+        }
+
+        if (myFile.lastModified !== file.lastModified) {
+          continue
+        }
+
+        this._files[key].splice(i, 1);
+      }
     }
   }
 
