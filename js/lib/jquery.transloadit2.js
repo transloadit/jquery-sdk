@@ -75,7 +75,6 @@ var helpers  = require('../dep/helpers')
     processZeroFiles: true,
     triggerUploadOnFileSelection: false,
     autoSubmit: true,
-    dragAndDrop: false,
     modal: true,
     exclude: '',
     fields: false,
@@ -151,7 +150,7 @@ var helpers  = require('../dep/helpers')
     this._uploadFileIds = []
     this._resultFileIds = []
     this._xhr = null
-    this._dragDrop = null
+    this._dragDropObjects = []
     this._formData = null
 
     this._connectionCheckerInterval = null
@@ -169,9 +168,7 @@ var helpers  = require('../dep/helpers')
     this._$form = $form
     this._formData = this._prepareFormData()
 
-    if (this._options.dragAndDrop) {
-      this._initDragAndDrop()
-    }
+    this._initDragAndDrop()
 
     this._$form.bind('submit.transloadit', function () {
       self._detectFileInputs()
@@ -312,6 +309,7 @@ var helpers  = require('../dep/helpers')
       if (!evt.lengthComputable) {
         return
       }
+
       self._renderProgress(evt.loaded, evt.total)
       self._options.onProgress(evt.loaded, evt.total, self._assembly)
     })
@@ -802,20 +800,28 @@ var helpers  = require('../dep/helpers')
   }
 
   Uploader.prototype._initDragAndDrop = function () {
+    var $dropAreas = this._$form.find('.transloadit-drop-area')
+    if ($dropAreas.length === 0) {
+      return
+    }
+
     var self = this
+    var i = 0
+    $dropAreas.each(function () {
+      var name = $(this).data('name') || 'files'
 
-    var $dropArea = this._$form.find('.transloadit-drop-area')
+      self._dragDropObjects[i] = new DragDrop({
+        onFileAdd: function (file) {
+          self._formData.append(name, file)
 
-    this._dragDrop = new DragDrop({
-      onFileAdd: function (file) {
-        self._formData.append('file', file)
-
-        if (self._options.triggerUploadOnFileSelection) {
-          self._$form.trigger('submit.transloadit')
-        }
-        self._options.onFileSelect(file, $dropArea)
-      },
-      $el: $dropArea
+          if (self._options.triggerUploadOnFileSelection) {
+            self._$form.trigger('submit.transloadit')
+          }
+          self._options.onFileSelect(file, $(this))
+        },
+        $el: $(this)
+      })
+      i++
     })
   }
 

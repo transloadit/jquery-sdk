@@ -32,7 +32,27 @@ By default, this will display an overlay with a progress bar.
 
 ### Include drag and drop
 
-Please refer to [this project](https://github.com/tim-kos/transloadit-drag-and-drop) to add support for drag and drop.
+To enable drag and drop please add one ore more divs to your form like this:
+
+```html
+<div class="transloadit-drop-area" data-name="files">Please drag and drop files here</div>
+```
+
+You can change the text of course and also the value of the data-name attribute. If you do not have the data-name attribute set, we will default it to "files".
+
+This will create a drag and drop area with some default CSS in your form. This is the default CSS for it - feel free to overwrite it in your own CSS files:
+
+```css
+.transloadit-drop-area {
+  padding: 5px;
+  width: 200px;
+  height: 75px;
+  border: 2px dashed #ccc;
+}
+.transloadit-drop-area.hover {
+  border: 2px dashed #0af;
+}
+```
 
 ### Customize the progress bar
 
