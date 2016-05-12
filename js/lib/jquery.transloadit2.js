@@ -25,9 +25,11 @@ var helpers = require('../dep/helpers')
 
   var I18nDict = {
     en: {
-      'errors.BORED_INSTANCE_ERROR': 'Could not find a bored instance.',
-      'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
-      'errors.MAX_FILES_EXCEEDED': 'Please select at most %s files',
+      'errors.SERVER_CONNECTION_ERROR': 'There was a problem connecting to the upload server. Please reload your browser window and try again.',
+      'errors.ASSEMBLY_NOT_FOUND': 'There was a server problem finding the proper upload. Please reload your browser window and try again.',
+      'errors.INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS': 'Your internet connection seems to be offline. We will automatically retry the upload until the connection works again. Please leave the browser window open.',
+      'errors.INTERNET_CONNECTION_ERROR_UPLOAD_NOT_IN_PROGRESS': 'Your internet connection seems to be offline. Please leave the browser window open, so that we can retry fetching the status of your upload.',
+      'errors.MAX_FILES_EXCEEDED': 'Please select at most %s files.',
       'errors.unknown': 'There was an internal error.',
       'errors.tryAgain': 'Please try your upload again.',
       'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
@@ -39,8 +41,7 @@ var helpers = require('../dep/helpers')
       uploadProgress: '%s / %s MB at %s kB/s | %s left'
     },
     ja: {
-      'errors.BORED_INSTANCE_ERROR': 'サーバー接続に問題があります',
-      'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
+      'errors.SERVER_CONNECTION_ERROR': 'サーバー接続に問題があります',
       'errors.unknown': '通信環境に問題があります',
       'errors.tryAgain': 'しばらくしてから再度投稿してください',
       'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
@@ -70,8 +71,8 @@ var helpers = require('../dep/helpers')
     resumable: false,
     interval: 2500,
     pollTimeout: 8000,
-    poll404Retries: 1500,
-    pollConnectionRetries: 500,
+    poll404Retries: 15,
+    pollConnectionRetries: 5,
     wait: false,
     processZeroFiles: true,
     triggerUploadOnFileSelection: false,
@@ -252,9 +253,7 @@ var helpers = require('../dep/helpers')
           cb()
         },
         error: function (xhr, status, jsonpErr) {
-          attempts++
-
-          if (attempts < self._options.pollConnectionRetries) {
+          if (!self._isOnline) {
             return attempt()
           }
 
@@ -262,8 +261,8 @@ var helpers = require('../dep/helpers')
           reason += ', err: ' + jsonpErr
 
           var err = {
-            error: 'CONNECTION_ERROR',
-            message: self._i18n.translate('errors.CONNECTION_ERROR'),
+            error: 'SERVER_CONNECTION_ERROR',
+            message: self._i18n.translate('errors.SERVER_CONNECTION_ERROR'),
             reason: reason,
             url: url
           }
@@ -621,7 +620,13 @@ var helpers = require('../dep/helpers')
           return
         }
 
-        var continuePolling = self._handleErroneousPoll(url, xhr, status, jsonpErr)
+        var continuePolling = true
+        // If this is a server problem and not a client connection problem, check if we should
+        // continue polling or if we should abort.
+        if (self._isOnline) {
+          continuePolling = self._handleErroneousPoll(url, xhr, status, jsonpErr)
+        }
+
         if (continuePolling) {
           var timeout = self._calcPollTimeout()
           setTimeout(function () {
@@ -683,6 +688,12 @@ var helpers = require('../dep/helpers')
       return false
     }
 
+    // If the assembly is executing meaning all uploads are done, we will not get more progress
+    // events from XHR. But if there was a connection interruption in the meantime, we want to
+    // make sure all components (like the modal) now know that the error is gone.
+    if (isExecuting) {
+      this._renderProgress()
+    }
     return true
   }
 
@@ -696,8 +707,8 @@ var helpers = require('../dep/helpers')
     reason += ', err: ' + jsonpErr
 
     var err = {
-      error: 'CONNECTION_ERROR',
-      message: this._i18n.translate('errors.CONNECTION_ERROR'),
+      error: 'SERVER_CONNECTION_ERROR',
+      message: this._i18n.translate('errors.SERVER_CONNECTION_ERROR'),
       reason: reason,
       url: url
     }
@@ -784,6 +795,10 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._errorOut = function (err) {
+    if (!err.message) {
+      err.message = this._i18n.translate('errors.' + err.error)
+    }
+
     this._ended = true
     this._renderError(err)
     this._options.onError(err)
@@ -797,17 +812,30 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._onDisconnect = function () {
-    // display modal error message that the internet connection has disconnected
-    // and that we retry the upload as soon as it comes back online
+    var errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
+
+    if (!this._xhr) {
+      errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_NOT_IN_PROGRESS'
+    }
+
+    var err = {
+      error: errorType,
+      message: this._i18n.translate('errors.' + errorType)
+    }
+    this._renderError(err)
   }
 
   Uploader.prototype._onReconnect = function () {
-    // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
-    // we have our own resume flag with tus support.
-    this._abortUpload()
+    if (this._xhr) {
+      // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
+      // we have our own resume flag with tus support.
+      this._abortUpload()
 
-    // If we have an upload in progress when we get the disconnect, retry it
-    this.start()
+      // If we have an upload in progress when we get the disconnect, retry it.
+      // If we do not have an upload in progress, we keep polling automatically for the status.
+      // No need to take further action here for this case.
+      this.start()
+    }
   }
 
   Uploader.prototype._initI18n = function () {

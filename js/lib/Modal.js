@@ -89,16 +89,15 @@ Modal.prototype.show = function () {
 }
 
 Modal.prototype.renderError = function (err) {
-  this._$modal.$content.addClass('content-error')
-  this._$modal.$progress.hide()
-  this._$modal.$label.hide()
+  this._toggleErrorTexts(true)
+  this._toggleProgressTexts(false)
 
-  var errorMsg = err.error + ': ' + err.message + '<br /><br />'
-  errorMsg += (err.reason || '')
+  var errorMsg =  err.message + '<br /><br />'
+  var detailedErrMsg = errorMsg
+  detailedErrMsg += (err.reason || '')
 
   var errorsRequiringDetails = [
-    'CONNECTION_ERROR',
-    'BORED_INSTANCE_ERROR',
+    'SERVER_CONNECTION_ERROR',
     'ASSEMBLY_NOT_FOUND'
   ]
   if ($.inArray(err.error, errorsRequiringDetails) === -1) {
@@ -122,7 +121,7 @@ Modal.prototype.renderError = function (err) {
       ip: ip,
       time: helpers.getUTCDatetime(),
       agent: navigator.userAgent,
-      error: errorMsg
+      error: detailedErrMsg
     }
     $.post(PROTOCOL + 'status.transloadit.com/client_error', details)
 
@@ -149,9 +148,25 @@ Modal.prototype.renderProgress = function (received, expected) {
     return
   }
 
+  this._toggleErrorTexts(false)
+  this._toggleProgressTexts(true)
+
+  // make sure we can call this function with empty parameters to just render the previously
+  // rendered progress.
+  console.log(">>", received, expected, this._animatedTo100)
+  if (!received && this._animatedTo100) {
+    console.log(">>> render processing files")
+    return this._renderProcessingFiles()
+  }
+
   var progress = received / expected * 100
   if (progress > 100) {
     progress = 0
+  }
+
+  // Due to possible connection drops and retries, we sometimes need to reset this variable.
+  if (progress < 100) {
+    this._animatedTo100 = false
   }
 
   var timeSinceLastUploadSpeedUpdate = +new Date() - this._lastUploadSpeedUpdateOn
@@ -223,14 +238,18 @@ Modal.prototype.renderProgress = function (received, expected) {
             if (!self._$modal) {
               return
             }
-            self._$modal.$label.text(self._i18n.translate('processingFiles'))
-            self._$modal.$progress.addClass('active')
-            self._$modal.$percent.text('')
+            self._renderProcessingFiles()
           }, 500)
         }
       }
     }
   )
+}
+
+Modal.prototype._renderProcessingFiles = function () {
+  this._$modal.$label.text(this._i18n.translate('processingFiles'))
+  this._$modal.$progress.addClass('active')
+  this._$modal.$percent.text('')
 }
 
 Modal.prototype._setProgressbarPercent = function (totalWidth) {
@@ -248,6 +267,22 @@ Modal.prototype._setProgressbarPercent = function (totalWidth) {
   }
 
   return percent
+}
+
+Modal.prototype._toggleErrorTexts = function (mode) {
+  this._$modal.$error.toggle(mode)
+  this._$modal.$content.toggleClass('content-error', mode)
+
+  // error details have their own toggle-show mechanism
+  if (!mode) {
+    this._$modal.$errorDetails.toggle(mode)
+    this._$modal.$errorDetailsToggle.toggle(mode)
+  }
+}
+
+Modal.prototype._toggleProgressTexts = function (mode) {
+  this._$modal.$progress.toggle(mode)
+  this._$modal.$label.toggle(mode)
 }
 
 module.exports = Modal
