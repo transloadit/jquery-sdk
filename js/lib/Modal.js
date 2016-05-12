@@ -270,6 +270,10 @@ Modal.prototype._setProgressbarPercent = function (totalWidth) {
 }
 
 Modal.prototype._toggleErrorTexts = function (mode) {
+  if (!this._$modal) {
+    return
+  }
+
   this._$modal.$error.toggle(mode)
   this._$modal.$content.toggleClass('content-error', mode)
 
@@ -281,6 +285,10 @@ Modal.prototype._toggleErrorTexts = function (mode) {
 }
 
 Modal.prototype._toggleProgressTexts = function (mode) {
+  if (!this._$modal) {
+    return
+  }
+
   this._$modal.$progress.toggle(mode)
   this._$modal.$label.toggle(mode)
 }
