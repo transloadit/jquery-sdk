@@ -1,7 +1,20 @@
-- this._files should hold both file input fields files and drag/dropped files
- -> this implies that when the user chooses one or more files via a file input field, they should also be added to file preview areas and
-    can subsequently also be removed again from there (and thus from the formData). So you could have selected a file in the input field, but after removal from the preview area
-    it will in fact not be uploaded at all. :)
+- To test things locally checkout the "tus_support" branch in the crm, then browse to 192.168.33.2:8080/demos/image-manipulation/resize-to-75x75.
+  - You should have drag/drop areas and file preview areas in that demo. The demo is also set to be resumable.
+  - You need to run the tus_support branch in the API locally and make sure the tusd service is running (tlsvc -s tusd start)
+  - Then you can select some files or drag/drop them, start the upload and interrupt your internet connection.
+    Then put it back in and see if the files resume uploading and the progress bar acts accordingly.
+  - Posting to your local vbox.transloadit.com might be too fast. You may need to select large files to test things. :/
+    I will soon push the api2 tus_support branch to production so we can test this better.
 
-- we need to test locally if the resuming will work at all
+- this._files should hold both file input fields files and drag/dropped files;
+  currently file input fields files are in this._$files and drag/dropped files are in this._files
+ -> this implies that after this change when the user chooses one or more files via a file input field, they should also be added to file preview areas and
+    can subsequently also be removed again from there (and thus from the formData). For that check this._initDragAndDrop() and this._addFileToPreviewAreas(). :>
+
+    So in theory one could have selected a file in a file input field, but after removal from the preview area(s)
+    it will in fact not be uploaded at all. :) This is how it should be. Both file input fields and drag and drop areas should be connected to file preview areas.
+
+- we need to test locally if the resuming works at all
   -> check for the resumable case in this._onReconnect()
+
+- it would be nice to have little preview images for images or videos in the file preview areas
