@@ -150,6 +150,8 @@ var helpers = require('../dep/helpers')
     this._$form = null
     this._$files = null
 
+    this._resumableUploads = []
+
     this._uploadFileIds = []
     this._resultFileIds = []
     this._xhr = null
@@ -211,6 +213,7 @@ var helpers = require('../dep/helpers')
     this._pollRetries = 0
     this._fileCount = 0
     this._uploads = []
+    this._resumableUploads = []
     this._uploadFileIds = []
     this._resultFileIds = []
     this._results = {}
@@ -227,7 +230,12 @@ var helpers = require('../dep/helpers')
 
     this._getInstance(function (err) {
       if (err) {
-        return;
+        return
+      }
+
+      self._countAddedFiles()
+      if (!self._checkFileCountExceeded()) {
+        return
       }
 
       if (self._options.resumable) {
@@ -291,10 +299,6 @@ var helpers = require('../dep/helpers')
     this._formData = this._prepareFormData()
 
     this._appendFilteredFormFields(true)
-    var result = this._checkFileCountExceeded()
-    if (!result) {
-      return
-    }
     this._appendCustomFormData()
 
     var url = this._getAssemblyRequestTargetUrl()
@@ -331,67 +335,79 @@ var helpers = require('../dep/helpers')
     console.log(">>> HERE")
     var self = this
     this._formData = this._prepareFormData()
-    this._appendTusFileCount()
+    this._formData.append('tus_num_expected_upload_files', this._fileCount)
+
     this._appendFilteredFormFields()
     this._appendCustomFormData()
-
-    var result = this._checkFileCountExceeded()
-    if (!result) {
-      return
-    }
-    // @todo handle this properly
 
     // We need this to control retries/resumes
     this._xhr = true
 
     function proceed () {
-      var endpoint = PROTOCOL + self._instance + '/resumable/'
-
+      // add uploads from file input fields
       self._$files.each(function () {
         var nameAttr = $(this).attr('name')
         for (var i = 0; i < this.files.length; i++) {
           var file = this.files[i]
+          var upload = self._addResumableUpload(nameAttr, file)
+          upload.start()
+        }
+      })
 
-          //var upload = self._addResumableUpload(nameAttr, file)
-          var upload = new tus.Upload(file, {
-            endpoint: endpoint,
-            resume: true,
-            metadata: {
-              fieldname: nameAttr,
-              filename: file.name,
-              assembly_id: self._assemblyId
-            },
-            onError: function (error) {
-              self._xhr = false
-            },
-            onSuccess: function() {
-              self._xhr = false
-            },
-            onProgress: function (bytesUploaded, bytesTotal) {
-              self._renderProgress(bytesUploaded, bytesTotal)
-              self._options.onProgress(bytesUploaded, bytesTotal, self._assembly)
-            }
-          })
+      // adding uploads from drag/dropped files
+      for (var name in self._files) {
+        if (self._files[name].length === 0) {
+          continue
+        }
+
+        for (var i = 0; i < self._files[name].length; i++) {
+          var file = self._files[name][i]
+          var upload = self._addResumableUpload(name, file)
           upload.start()
         }
       })
     }
 
     var url = this._options['service'] + "/assemblies"
-    console.log(">>> url", url)
     var f = new XMLHttpRequest()
     f.open('POST', url)
     f.onreadystatechange = function () {
       if (f.readyState === 4 && f.status === 200) {
         var resp = JSON.parse(f.responseText)
         self._assemblyId = resp.id
-        //self._instance = resp._instance
         proceed()
-
         cb()
       }
     }
     f.send(this._formData)
+  }
+
+  Uploader.prototype._addResumableUpload = function (nameAttr, file) {
+    var self = this
+    var endpoint = PROTOCOL + this._instance + '/resumable/'
+
+    var upload = new tus.Upload(file, {
+      endpoint: endpoint,
+      resume: true,
+      metadata: {
+        fieldname: nameAttr,
+        filename: file.name,
+        assembly_id: this._assemblyId
+      },
+      onError: function (error) {
+        self._xhr = false
+      },
+      onSuccess: function() {
+        self._xhr = false
+      },
+      onProgress: function (bytesUploaded, bytesTotal) {
+        self._renderProgress(bytesUploaded, bytesTotal)
+        self._options.onProgress(bytesUploaded, bytesTotal, self._assembly)
+      }
+    })
+    this._resumableUploads.push upload
+
+    return upload
   }
 
   Uploader.prototype._prepareFormData = function () {
@@ -418,23 +434,6 @@ var helpers = require('../dep/helpers')
     return result
   }
 
-  Uploader.prototype._appendTusFileCount = function () {
-    // TODO: redunant code. Maybe counting the files should be done in start()?
-    var fileCount = 0
-
-    this._$files.each(function () {
-      var name = $(this).attr('name')
-      if (!name) {
-        return
-      }
-
-      fileCount += this.files.length
-    })
-
-    this._formData.append('tus_num_expected_upload_files', fileCount)
-    this._fileCount = fileCount
-  }
-
   Uploader.prototype._appendDroppedFiles = function () {
     for (var key in this._files) {
       for (var i = 0; i < this._files[key].length; i++) {
@@ -444,18 +443,37 @@ var helpers = require('../dep/helpers')
     }
   }
 
+  Uploader.prototype._countAddedFiles = function () {
+    var self = this
+    this._fileCount = 0
+
+    // file input fields
+    this._$files.each(function () {
+      var name = $(this).attr('name')
+      if (!name) {
+        return
+      }
+      self._fileCount += this.files.length
+    })
+
+    // drag/dropped files
+    for (var key in this._files) {
+      for (var i = 0; i < this._files[key].length; i++) {
+        this._fileCount++
+      }
+    }
+  }
+
+
   Uploader.prototype._appendFilteredFormFields = function (allowFiles) {
     var $fields = this._getFilteredFormFields(allowFiles)
     var self = this
-    var fileCount = 0
 
     $fields.each(function () {
       var name = $(this).attr('name')
       if (!name) {
         return
       }
-
-      self._fileCount += this.files.length
 
       if (allowFiles) {
         for (var i = 0; i < this.files.length; i++) {
@@ -464,7 +482,9 @@ var helpers = require('../dep/helpers')
       }
     })
 
-    this._appendDroppedFiles()
+    if (allowFiles) {
+      this._appendDroppedFiles()
+    }
   }
 
   Uploader.prototype._checkFileCountExceeded = function () {
