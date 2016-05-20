@@ -6,6 +6,9 @@
   - Posting to your local vbox.transloadit.com might be too fast. You may need to select large files to test things. :/
     I will soon push the api2 tus_support branch to production so we can test this better.
 
+- You can do "npm run dev" after changes that you want to test. That will build the project and move the built files into the crm repo. Just refresh that demo page then
+  and it should run on the newest version. :)
+
 - this._files should hold both file input fields files and drag/dropped files;
   currently file input fields files are in this._$files and drag/dropped files are in this._files
  -> this implies that after this change when the user chooses one or more files via a file input field, they should also be added to file preview areas and
@@ -18,3 +21,4 @@
   -> check for the resumable case in this._onReconnect()
 
 - it would be nice to have little preview images for images or videos in the file preview areas
+- we need some automated tests
