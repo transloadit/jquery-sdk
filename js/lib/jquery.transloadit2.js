@@ -878,7 +878,13 @@ var helpers = require('../dep/helpers')
   }
 
   Uploader.prototype._onReconnect = function () {
-    if (this._xhr) {
+    // If no upload is in progress anyway, then we do not need to do anything here.
+    // Polling for the assembly status will auto-continue without us doing anything here.
+    if (!this._xhr) {
+      return
+    }
+
+    if (!this._options.resumable) {
       // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
       // we have our own resume flag with tus support.
       this._abortUpload()
@@ -886,7 +892,13 @@ var helpers = require('../dep/helpers')
       // If we have an upload in progress when we get the disconnect, retry it.
       // If we do not have an upload in progress, we keep polling automatically for the status.
       // No need to take further action here for this case.
-      this.start()
+      return this.start()
+    }
+
+    // Resume all our uploads in the resumable case. :)
+    for (var i = 0; i < this._resumableUploads.length; i++) {
+      var upload = this._resumableUploads[i]
+      upload.resume()
     }
   }
 

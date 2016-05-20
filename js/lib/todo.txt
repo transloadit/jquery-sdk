@@ -2,3 +2,6 @@
  -> this implies that when the user chooses one or more files via a file input field, they should also be added to file preview areas and
     can subsequently also be removed again from there (and thus from the formData). So you could have selected a file in the input field, but after removal from the preview area
     it will in fact not be uploaded at all. :)
+
+- we need to test locally if the resuming will work at all
+  -> check for the resumable case in this._onReconnect()
