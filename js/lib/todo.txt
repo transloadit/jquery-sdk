@@ -1,6 +1,11 @@
 - To test things locally checkout the "tus_support" branch in the crm, then browse to 192.168.33.2:8080/demos/image-manipulation/resize-to-75x75.
   - You should have drag/drop areas and file preview areas in that demo. The demo is also set to be resumable.
-  - You need to run the tus_support branch in the API locally and make sure the tusd service is running (tlsvc -s tusd start)
+  - You need to run the tus_support branch in the API locally:
+    `tlsvc -s tusd start` (I have had problems locally starting it recently: tla:Services Service 'tusd' dead according ps pattern '(bin/|^)tusd' with no matches.  +124ms) This needs investigation ...
+    `tlsvc -s haproxy start`
+    `node api2/bin/server`
+    and in a separate panel `node api2/bin/worker`
+
   - Then you can select some files or drag/drop them, start the upload and interrupt your internet connection.
     Then put it back in and see if the files resume uploading and the progress bar acts accordingly.
   - Posting to your local vbox.transloadit.com might be too fast. You may need to select large files to test things. :/
