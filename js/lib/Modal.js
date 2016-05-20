@@ -89,6 +89,10 @@ Modal.prototype.show = function () {
 }
 
 Modal.prototype.renderError = function (err) {
+  if (!this._$modal) {
+    return
+  }
+
   this._toggleErrorTexts(true)
   this._toggleProgressTexts(false)
 
