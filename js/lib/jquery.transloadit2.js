@@ -365,7 +365,7 @@ var helpers = require('../dep/helpers')
           var upload = self._addResumableUpload(name, file)
           upload.start()
         }
-      })
+      }
     }
 
     var url = this._options['service'] + "/assemblies"
@@ -405,7 +405,7 @@ var helpers = require('../dep/helpers')
         self._options.onProgress(bytesUploaded, bytesTotal, self._assembly)
       }
     })
-    this._resumableUploads.push upload
+    this._resumableUploads.push(upload)
 
     return upload
   }
