@@ -17,6 +17,7 @@ var I18n = require('./I18n')
 var uuid = require('uuid')
 var isOnline = require('is-online');
 var helpers = require('../dep/helpers')
+var tus = require('../dep/tus')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
@@ -301,7 +302,6 @@ var helpers = require('../dep/helpers')
     this._appendFilteredFormFields(true)
     this._appendCustomFormData()
 
-    var url = this._getAssemblyRequestTargetUrl()
     this._xhr = new XMLHttpRequest()
 
     this._xhr.addEventListener("error", function(err) {
@@ -326,13 +326,13 @@ var helpers = require('../dep/helpers')
       self._options.onProgress(evt.loaded, evt.total, self._assembly)
     })
 
+    var url = this._getAssemblyRequestTargetUrl(this._assemblyId)
     this._xhr.open('POST', url)
     this._xhr.send(this._formData)
     cb()
   }
 
   Uploader.prototype._startWithResumabilitySupport = function (cb) {
-    console.log(">>> HERE")
     var self = this
     this._formData = this._prepareFormData()
     this._formData.append('tus_num_expected_upload_files', this._fileCount)
@@ -347,6 +347,10 @@ var helpers = require('../dep/helpers')
       // add uploads from file input fields
       self._$files.each(function () {
         var nameAttr = $(this).attr('name')
+        if (!this.files) {
+          return
+        }
+
         for (var i = 0; i < this.files.length; i++) {
           var file = this.files[i]
           var upload = self._addResumableUpload(nameAttr, file)
@@ -368,8 +372,8 @@ var helpers = require('../dep/helpers')
       }
     }
 
-    var url = this._options['service'] + "/assemblies"
     var f = new XMLHttpRequest()
+    var url = this._getAssemblyRequestTargetUrl()
     f.open('POST', url)
     f.onreadystatechange = function () {
       if (f.readyState === 4 && f.status === 200) {
@@ -475,7 +479,7 @@ var helpers = require('../dep/helpers')
         return
       }
 
-      if (allowFiles) {
+      if (allowFiles && this.files) {
         for (var i = 0; i < this.files.length; i++) {
           self._formData.append(name, this.files[i])
         }
@@ -516,9 +520,13 @@ var helpers = require('../dep/helpers')
     }
   }
 
-  Uploader.prototype._getAssemblyRequestTargetUrl = function () {
-    var result = PROTOCOL + this._instance + '/assemblies/'
-    result += this._assemblyId + '?redirect=false'
+  Uploader.prototype._getAssemblyRequestTargetUrl = function (assemblyId) {
+    var result = PROTOCOL + this._instance + '/assemblies'
+
+    if (assemblyId) {
+        result += '/' + assemblyId + '?redirect=false'
+    }
+
     return result
   }
 

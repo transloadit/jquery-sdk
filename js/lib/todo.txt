@@ -27,3 +27,8 @@
 
 - it would be nice to have little preview images for images or videos in the file preview areas
 - we need some automated tests
+
+
+KNOWN ISSUES:
+
+- I cannot start tusd locally for some reason which naturally results in "XMLHttpRequest cannot load http://vbox.transloadit.com/resumable/" errors in the browser.
