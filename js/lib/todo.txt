@@ -1,0 +1,4 @@
+- this._files should hold both file input fields files and drag/dropped files
+ -> this implies that when the user chooses one or more files via a file input field, they should also be added to file preview areas and
+    can subsequently also be removed again from there (and thus from the formData). So you could have selected a file in the input field, but after removal from the preview area
+    it will in fact not be uploaded at all. :)
