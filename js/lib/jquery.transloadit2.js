@@ -146,6 +146,7 @@ var tus = require('../dep/tus')
     this._assembly = null
     this._params = null
     this._fileCount = 0
+    this._filesSize = 0
 
     this._$params = null
     this._$form = null
@@ -213,6 +214,8 @@ var tus = require('../dep/tus')
     this._ended = false
     this._pollRetries = 0
     this._fileCount = 0
+    this._filesSize = 0
+    this._uploadedBytes = 0
     this._uploads = []
     this._resumableUploads = []
     this._uploadFileIds = []
@@ -234,7 +237,7 @@ var tus = require('../dep/tus')
         return
       }
 
-      self._countAddedFiles()
+      self._countAddedFilesAndSizes()
       if (!self._checkFileCountExceeded()) {
         return
       }
@@ -390,6 +393,10 @@ var tus = require('../dep/tus')
     var self = this
     var endpoint = PROTOCOL + this._instance + '/resumable/'
 
+    // Store the last value of bytesUploaded of the progress event from tus
+    // for calculating the number of all bytes uploaded accross all uploads
+    var lastBytesUploaded = 0
+
     var upload = new tus.Upload(file, {
       endpoint: endpoint,
       resume: true,
@@ -405,8 +412,13 @@ var tus = require('../dep/tus')
         self._xhr = false
       },
       onProgress: function (bytesUploaded, bytesTotal) {
-        self._renderProgress(bytesUploaded, bytesTotal)
-        self._options.onProgress(bytesUploaded, bytesTotal, self._assembly)
+        // Calculate the number of uploaded bytes of all uploads by removing
+        // the last known value and then adding the new value.
+        self._uploadedBytes = self._uploadedBytes - lastBytesUploaded + bytesUploaded
+        lastBytesUploaded = bytesUploaded
+
+        self._renderProgress(self._uploadedBytes, self._filesSize)
+        self._options.onProgress(self._uploadedBytes, self._filesSize, self._assembly)
       }
     })
     this._resumableUploads.push(upload)
@@ -447,9 +459,10 @@ var tus = require('../dep/tus')
     }
   }
 
-  Uploader.prototype._countAddedFiles = function () {
+  Uploader.prototype._countAddedFilesAndSizes = function () {
     var self = this
     this._fileCount = 0
+    this._filesSize = 0
 
     // file input fields
     this._$files.each(function () {
@@ -458,12 +471,17 @@ var tus = require('../dep/tus')
         return
       }
       self._fileCount += this.files.length
+
+      for(var i = 0, file; file = this.files[i++];) {
+        self._filesSize += file.size
+      }
     })
 
     // drag/dropped files
     for (var key in this._files) {
       for (var i = 0; i < this._files[key].length; i++) {
         this._fileCount++
+        this._filesSize = this._files[key][i].size
       }
     }
   }
