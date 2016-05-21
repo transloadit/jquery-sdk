@@ -405,6 +405,14 @@ var tus = require('../dep/tus')
         filename: file.name,
         assembly_id: this._assemblyId
       },
+      fingerprint: function(file) {
+        // Prepend the assembly ID to the fingerprint to allow uploading the
+        // same file to different assemblies.
+        // TODO: consider using the file index (0, 1, etc.) instead of
+        // tus' buildin fingerprinter since it does not have a 100% accuracy
+        // and if two files share the same fingerprint, things will break.
+        return self._assemblyId + "_" + tus.defaultOptions.fingerprint(file)
+      },
       onError: function (error) {
         self._xhr = false
       },
