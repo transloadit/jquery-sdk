@@ -150,7 +150,7 @@ var tus = require('../dep/tus')
 
     this._$params = null
     this._$form = null
-    this._$files = null
+    this._$inputs = null
 
     this._resumableUploads = []
 
@@ -178,31 +178,24 @@ var tus = require('../dep/tus')
     this._initDragAndDrop()
     this._initFilePreview()
 
+    this._detectFileInputs()
+
     this._$form.bind('submit.transloadit', function () {
-      self._detectFileInputs()
       self.validate()
 
-      if (!self._options['processZeroFiles'] && self._$files.length === 0) {
-        if (self._options.beforeStart()) {
-          self.submitForm()
-        }
-      } else {
-        if (self._options.beforeStart()) {
-          self.start()
-        }
-      }
+      self.start()
 
       return false
     })
 
-    if (this._options.triggerUploadOnFileSelection) {
-      this._$form.on('change', 'input[type="file"]', function () {
-        self._$form.trigger('submit.transloadit')
-      })
-    }
+    this._$inputs.on('change', function () {
+      var $input = $(this)
+      self._updateInputFileSelection($input)
+      self._options.onFileSelect($input.val(), $input)
 
-    this._$form.on('change', 'input[type="file"]', function () {
-      self._options.onFileSelect($(this).val(), $(this))
+      if(self._options.triggerUploadOnFileSelection) {
+        self._$form.trigger('submit.transloadit')
+      }
     })
 
     this.includeCss()
@@ -231,14 +224,28 @@ var tus = require('../dep/tus')
       }, 300)
     }
 
+    this._countAddedFilesAndSizes()
+
+    // Simply submit the form if we should not process without files
+    if (this._fileCount === 0 && !this._options.processZeroFiles) {
+      if (this._options.beforeStart()) {
+        this.submitForm()
+      }
+
+      return
+    }
+
+    // Run beforeStart callback before doing any heavy lifting
+    if (!this._options.beforeStart()) {
+      return
+    }
+
+    if (!this._checkFileCountExceeded()) {
+      return
+    }
 
     this._getInstance(function (err) {
       if (err) {
-        return
-      }
-
-      self._countAddedFilesAndSizes()
-      if (!self._checkFileCountExceeded()) {
         return
       }
 
@@ -347,26 +354,8 @@ var tus = require('../dep/tus')
     this._xhr = true
 
     function proceed () {
-      // add uploads from file input fields
-      self._$files.each(function () {
-        var nameAttr = $(this).attr('name')
-        if (!this.files) {
-          return
-        }
-
-        for (var i = 0; i < this.files.length; i++) {
-          var file = this.files[i]
-          var upload = self._addResumableUpload(nameAttr, file)
-          upload.start()
-        }
-      })
-
-      // adding uploads from drag/dropped files
+      // adding uploads from drag/dropped files and input fields
       for (var name in self._files) {
-        if (self._files[name].length === 0) {
-          continue
-        }
-
         for (var i = 0; i < self._files[name].length; i++) {
           var file = self._files[name][i]
           var upload = self._addResumableUpload(name, file)
@@ -467,33 +456,44 @@ var tus = require('../dep/tus')
     }
   }
 
-  Uploader.prototype._countAddedFilesAndSizes = function () {
-    var self = this
-    this._fileCount = 0
-    this._filesSize = 0
+  Uploader.prototype._updateInputFileSelection = function ($input) {
+    var files = $input[0].files
+    var name = $input.attr('name')
+    if (!name) {
+      return
+    }
 
-    // file input fields
-    this._$files.each(function () {
-      var name = $(this).attr('name')
-      if (!name) {
-        return
+    // Remove old selection from preview areas if possible
+    if(name in this._files) {
+      var oldFiles = this._files[name]
+      for(var i = 0; i < oldFiles.length; i++) {
+        this._removeFileFromPreviewAreas(oldFiles[i])
       }
-      self._fileCount += this.files.length
+    }
 
-      for(var i = 0, file; file = this.files[i++];) {
-        self._filesSize += file.size
-      }
-    })
+    if(files.length === 0) {
+      delete this._files[name]
+    } else {
+      this._files[name] = files
 
-    // drag/dropped files
-    for (var key in this._files) {
-      for (var i = 0; i < this._files[key].length; i++) {
-        this._fileCount++
-        this._filesSize = this._files[key][i].size
+      // Add new selection to preview areas
+      for(var i = 0; i < files.length; i++) {
+        this._addFileToPreviewAreas(files[i])
       }
     }
   }
 
+  Uploader.prototype._countAddedFilesAndSizes = function () {
+    this._fileCount = 0
+    this._filesSize = 0
+
+    for (var key in this._files) {
+      for (var i = 0; i < this._files[key].length; i++) {
+        this._fileCount++
+        this._filesSize += this._files[key][i].size
+      }
+    }
+  }
 
   Uploader.prototype._appendFilteredFormFields = function (allowFiles) {
     var $fields = this._getFilteredFormFields(allowFiles)
@@ -651,7 +651,7 @@ var tus = require('../dep/tus')
     }
 
     var fileInputFieldsAreGood = true
-    this._$files.each(function() {
+    this._$inputs.each(function() {
       var name = $(this).attr('name')
       if (!name) {
         fileInputFieldsAreGood = false
@@ -817,16 +817,16 @@ var tus = require('../dep/tus')
   }
 
   Uploader.prototype._detectFileInputs = function () {
-    var $files = this._$form
+    var $inputs = this._$form
       .find('input[type=file]')
       .not(this._options.exclude)
 
     if (!this._options['processZeroFiles']) {
-      $files = $files.filter(function () {
+      $inputs = $inputs.filter(function () {
         return this.value !== ''
       })
     }
-    this._$files = $files
+    this._$inputs = $inputs
   }
 
   Uploader.prototype._renderProgress = function (received, expected) {
