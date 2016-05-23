@@ -231,7 +231,6 @@ var tus = require('../dep/tus')
       if (this._options.beforeStart()) {
         this.submitForm()
       }
-
       return
     }
 
@@ -311,6 +310,7 @@ var tus = require('../dep/tus')
 
     this._appendFilteredFormFields(true)
     this._appendCustomFormData()
+    this._appendFiles()
 
     this._xhr = new XMLHttpRequest()
 
@@ -447,7 +447,7 @@ var tus = require('../dep/tus')
     return result
   }
 
-  Uploader.prototype._appendDroppedFiles = function () {
+  Uploader.prototype._appendFiles = function () {
     for (var key in this._files) {
       for (var i = 0; i < this._files[key].length; i++) {
         this._formData.append(key, this._files[key][i])
@@ -464,21 +464,25 @@ var tus = require('../dep/tus')
     }
 
     // Remove old selection from preview areas if possible
-    if(name in this._files) {
+    if (name in this._files) {
       var oldFiles = this._files[name]
-      for(var i = 0; i < oldFiles.length; i++) {
+      for (var i = 0; i < oldFiles.length; i++) {
         this._removeFileFromPreviewAreas(oldFiles[i])
       }
     }
 
-    if(files.length === 0) {
+    if (files.length === 0) {
       delete this._files[name]
     } else {
-      this._files[name] = files
+      if (!(name in this._files)) {
+        this._files[name] = []
+      }
 
       // Add new selection to preview areas
-      for(var i = 0; i < files.length; i++) {
-        this._addFileToPreviewAreas(files[i])
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i]
+        this._files[name].push(file)
+        this._addFileToPreviewAreas(file)
       }
     }
   }
@@ -495,8 +499,8 @@ var tus = require('../dep/tus')
     }
   }
 
-  Uploader.prototype._appendFilteredFormFields = function (allowFiles) {
-    var $fields = this._getFilteredFormFields(allowFiles)
+  Uploader.prototype._appendFilteredFormFields = function () {
+    var $fields = this._getFilteredFormFields()
     var self = this
 
     $fields.each(function () {
@@ -505,16 +509,10 @@ var tus = require('../dep/tus')
         return
       }
 
-      if (allowFiles && this.files) {
-        for (var i = 0; i < this.files.length; i++) {
-          self._formData.append(name, this.files[i])
-        }
+      for (var i = 0; i < this.files.length; i++) {
+        self._formData.append(name, this.files[i])
       }
     })
-
-    if (allowFiles) {
-      this._appendDroppedFiles()
-    }
   }
 
   Uploader.prototype._checkFileCountExceeded = function () {
@@ -556,25 +554,20 @@ var tus = require('../dep/tus')
     return result
   }
 
-  Uploader.prototype._getFilteredFormFields = function (allowFiles) {
+  Uploader.prototype._getFilteredFormFields = function () {
     var fieldsFilter = '[name=params], [name=signature]'
     if (this._options.fields === true) {
       fieldsFilter = '*'
     } else if (typeof this._options.fields === 'string') {
       fieldsFilter += ', ' + this._options.fields
-    } else {
-      // fields is false, but let's attach file fields, otherwise we will not have uploads. :)
-      if (allowFiles) {
-        fieldsFilter += ", [type=file]"
-      }
     }
 
     // Filter out submit elements right away as they will cause funny behavior
     // in the shadow form.
     var $fields = this._$form.find(':input[type!=submit]')
-    if (!allowFiles) {
-      $fields = $fields.filter('[type!=file]')
-    }
+
+    // Do not fetch file input fields as we handle uploads over this._files
+    $fields = $fields.filter('[type!=file]')
 
     return $fields.filter(fieldsFilter)
   }
