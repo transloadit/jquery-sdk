@@ -18,6 +18,7 @@
   -> check for the resumable case in this._onReconnect()
 
 - it would be nice to have little preview images for images or videos in the file preview areas
+- and otherwise icons for the file types
 - we need some automated tests
 
 
