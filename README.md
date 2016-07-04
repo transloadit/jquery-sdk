@@ -149,6 +149,15 @@ The plugin supports several parameters.
 </tr>
 <tr>
  <td markdown="1">
+  <code>service</code>
+ </td>
+ <td markdown="1">
+  The service URL to use. By default this is `document.location.protocol + "//api2.transloadit.com/"`, which makes use of our entire api.
+  If you want to temporarily switch regions, because we are down in one region, you can switch this to `document.location.protocol + "//api2-us-east-1.transloadit.com/"` or `document.location.protocol + "//api2-eu-west-1.transloadit.com/"`.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
   <code>wait</code>
  </td>
  <td markdown="1">
