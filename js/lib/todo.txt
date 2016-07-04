@@ -20,7 +20,7 @@
 - it would be nice to have little preview images for images or videos in the file preview areas
 - and otherwise icons for the file types
 - we need some automated tests
-
+- [ ] when there is no file upload the jQuery plugin should not say "uploading files"
 
 KNOWN ISSUES:
 
