@@ -394,22 +394,33 @@ var tus = require('../dep/tus')
 
     var upload = new tus.Upload(file, {
       endpoint: endpoint,
-      resume: true,
+      // Setting resume to false, may seem a bit counterproductive but you need
+      // to keep the actual effects of this setting in mind:
+      //   a boolean indicating whether the client should attempt to resume the
+      //   upload if the upload has been started in the past. This includes
+      //   storing the file's fingerprint. Use false to force an entire reupload.
+      // Right now, always want to upload the entire file for two reasons:
+      // 1. Transloadit is not able to use the file uploaded from assembly A
+      //    in assembly B, so we need to transfer the file for each assembly
+      //    again and,
+      // 2. there is no mechanism for resuming the uploading for an assembly if
+      //    the Uploader object gets destroyed (for example, if the page is
+      //    reloaded) so we do not know to which assembly a file belongs and
+      //    more.
+      resume: false,
       metadata: {
         fieldname: nameAttr,
         filename: file.name,
         assembly_id: this._assemblyId
       },
       fingerprint: function(file) {
-        // Prepend the assembly ID to the fingerprint to allow uploading the
-        // same file to different assemblies.
-        // TODO: consider using the file index (0, 1, etc.) instead of
-        // tus' buildin fingerprinter since it does not have a 100% accuracy
-        // and if two files share the same fingerprint, things will break.
-        return self._assemblyId + "_" + tus.defaultOptions.fingerprint(file)
+        // Fingerprinting is not necessary any more since we have disabled
+        // the resuming of previous uploads.
+        throw new Error("fingerprinting should not happend")
       },
       onError: function (error) {
         self._xhr = false
+        self._errorOut(error)
       },
       onSuccess: function() {
         self._xhr = false
