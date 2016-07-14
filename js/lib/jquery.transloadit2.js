@@ -248,7 +248,9 @@ var tus = require('../dep/tus')
         return
       }
 
-      if (self._options.resumable) {
+      // Only use tus, if it is supported in this browser.
+      // TODO: test
+      if (self._options.resumable && tus.isSupported) {
         self._startWithResumabilitySupport(cb)
       } else {
         self._startWithXhr(cb)
@@ -380,7 +382,11 @@ var tus = require('../dep/tus')
 
   Uploader.prototype._addResumableUpload = function (nameAttr, file) {
     var self = this
-    var endpoint = PROTOCOL + this._instance + '/resumable/'
+    // We need to force HTTPS in this case, because - only if the website is on
+    // plain HTTP - the response to the CORS preflight request, will contain a
+    // redirect to a HTTPS url. However, redirects are not allowed a responses
+    // to preflight requests and causes the tus upload creation to fail.
+    var endpoint = 'https://' + this._instance + '/resumable/'
 
     // Store the last value of bytesUploaded of the progress event from tus
     // for calculating the number of all bytes uploaded accross all uploads
