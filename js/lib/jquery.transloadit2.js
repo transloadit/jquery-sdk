@@ -386,7 +386,7 @@ var tus = require('../dep/tus')
     // plain HTTP - the response to the CORS preflight request, will contain a
     // redirect to a HTTPS url. However, redirects are not allowed a responses
     // to preflight requests and causes the tus upload creation to fail.
-    var endpoint = 'https://' + this._instance + '/resumable/'
+    var endpoint = 'https://' + this._instance + '/resumable/files/'
 
     // Store the last value of bytesUploaded of the progress event from tus
     // for calculating the number of all bytes uploaded accross all uploads
