@@ -373,6 +373,7 @@ var tus = require('../dep/tus')
       if (f.readyState === 4 && f.status === 200) {
         var resp = JSON.parse(f.responseText)
         self._assemblyId = resp.id
+        self._assemblyUrl = resp.status_endpoint
         proceed()
         cb()
       }
@@ -411,7 +412,7 @@ var tus = require('../dep/tus')
       metadata: {
         fieldname: nameAttr,
         filename: file.name,
-        assembly_id: this._assemblyId
+        assembly_url: this._assemblyUrl
       },
       fingerprint: function(file) {
         // Fingerprinting is not necessary any more since we have disabled
