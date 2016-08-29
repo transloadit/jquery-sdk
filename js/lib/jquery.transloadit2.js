@@ -17,7 +17,7 @@ var I18n = require('./I18n')
 var uuid = require('uuid')
 var isOnline = require('is-online');
 var helpers = require('../dep/helpers')
-var tus = require('../dep/tus')
+var tus = require('tus-js-client')
 
 !(function ($) {
   var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'

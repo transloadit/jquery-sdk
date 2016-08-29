@@ -28,6 +28,7 @@
   ],
   "dependencies": {
     "is-online": "git://github.com/tim-kos/is-online",
+    "tus-js-client": "^1.2.1",
     "uuid": "2.0.2"
   },
   "devDependencies": {
