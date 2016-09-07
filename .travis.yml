@@ -3,7 +3,7 @@ node_js:
 - '0.10'
 before_install:
 - npm install -g npm@1.4
-- wget --retry-connrefused http://phantomjs.googlecode.com/files/phantomjs-1.8.0-linux-x86_64.tar.bz2
+- wget --retry-connrefused https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/phantomjs/phantomjs-1.8.0-linux-x86_64.tar.bz2
 - tar jxf phantomjs-1.8.0-linux-x86_64.tar.bz2
 - sudo cp -Raf phantomjs-*/* /usr/local/
 - wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.0.3
