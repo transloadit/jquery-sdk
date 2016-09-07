@@ -8,7 +8,7 @@ before_install:
 - sudo cp -Raf phantomjs-*/* /usr/local/
 - wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.0.3
 - tar zvxf 1.0.3
-- sudo cp -Raf n1k0-casperjs-*/* /usr/local/
+- sudo cp -Raf casperjs-casperjs-*/* /usr/local/
 notifications:
   email: false
   slack:
