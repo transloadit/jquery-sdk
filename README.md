@@ -130,12 +130,12 @@ Please consult the [plugin's source code](https://github.com/transloadit/jquery-
 
 #### Latest
 
-This is always the latest version, and for now points to v2.7.2. This is the **recommended version** to use.<br />
+This is always the latest version, and for now points to v2.7.2.<br />
 <https://assets.transloadit.com/js/jquery.transloadit2-latest.js>
 
 #### Version 2 Latest
 
-This is always the latest version of the 2.x.x branch, and for now points to v2.7.2.<br />
+This is always the latest version of the 2.x.x branch, and for now points to v2.7.2. This is the **recommended version** to use.<br />
 <https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js>
 
 ### Plugin parameters
