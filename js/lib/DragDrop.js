@@ -39,7 +39,7 @@ DragDrop.prototype.dropCb = function(e) {
   e.preventDefault()
   this._$el.removeClass('hover')
 
-  if (e.originalEvent && !e.originalEvent.dataTransfer) {
+  if (e.originalEvent && e.originalEvent.dataTransfer) {
     var files = e.originalEvent.dataTransfer.files
     for (var i in files) {
       if (typeof files[i] === 'object') {
