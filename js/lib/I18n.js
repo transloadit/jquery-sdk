@@ -1,4 +1,4 @@
-var helpers = require('../dep/helpers')
+var helpers = require('./helpers')
 
 function I18n(dict, locale) {
   this._dict = dict

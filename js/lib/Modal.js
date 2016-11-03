@@ -1,4 +1,4 @@
-var helpers = require('../dep/helpers')
+var helpers = require('./helpers')
 require('../dep/toolbox.expose')
 require('../dep/jquery.easing')
 

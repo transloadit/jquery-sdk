@@ -16,7 +16,7 @@ var FilePreview = require('./FilePreview')
 var I18n = require('./I18n')
 var uuid = require('uuid')
 var isOnline = require('is-online');
-var helpers = require('../dep/helpers')
+var helpers = require('./helpers')
 var tus = require('tus-js-client')
 
 !(function ($) {
