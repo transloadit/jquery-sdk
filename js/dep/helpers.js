@@ -1,7 +1,7 @@
 var helpers = {
   getUTCDatetime: function () {
     var now = new Date()
-    var d = new Date(
+    var dateObj = new Date(
       now.getUTCFullYear(),
       now.getUTCMonth(),
       now.getUTCDate(),
@@ -10,26 +10,27 @@ var helpers = {
       now.getUTCSeconds()
     )
 
-    var pad = function (n) {
-      return n < 10 ? '0' + n : n
-    }
-    var tz = d.getTimezoneOffset()
-    var tzs = (tz > 0 ? '-' : '+') + pad(parseInt(tz / 60, 10))
-
-    if (tz % 60 !== 0) {
-      tzs += pad(tz % 60)
+    var zeroPad = function (numberToPad) {
+      return numberToPad < 10 ? '0' + numberToPad : numberToPad
     }
 
-    if (tz === 0) {
+    var timezoneOffset = dateObj.getTimezoneOffset()
+    var tzs = (timezoneOffset > 0 ? '-' : '+') + zeroPad(parseInt(timezoneOffset / 60, 10))
+
+    if (timezoneOffset % 60 !== 0) {
+      tzs += zeroPad(timezoneOffset % 60)
+    }
+
+    if (timezoneOffset === 0) {
       tzs = 'Z'
     }
 
-    return d.getFullYear() + '-' +
-        pad(d.getMonth() + 1) + '-' +
-        pad(d.getDate()) + 'T' +
-        pad(d.getHours()) + ':' +
-        pad(d.getMinutes()) + ':' +
-        pad(d.getSeconds()) + tzs
+    return dateObj.getFullYear() + '-' +
+        zeroPad(dateObj.getMonth() + 1) + '-' +
+        zeroPad(dateObj.getDate()) + 'T' +
+        zeroPad(dateObj.getHours()) + ':' +
+        zeroPad(dateObj.getMinutes()) + ':' +
+        zeroPad(dateObj.getSeconds()) + tzs
   },
   duration: function (t) {
     var min = 60

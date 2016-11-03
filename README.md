@@ -32,7 +32,7 @@ By default, this will display an overlay with a progress bar.
 
 ### Include drag and drop
 
-To enable drag and drop please add one ore more divs to your form like this:
+To enable drag and drop please add one or more divs to your form like this:
 
 ```html
 <div class="transloadit-drop-area" data-name="files">Please drag and drop files here</div>
