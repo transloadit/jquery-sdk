@@ -157,9 +157,7 @@ Modal.prototype.renderProgress = function (received, expected) {
 
   // make sure we can call this function with empty parameters to just render the previously
   // rendered progress.
-  console.log(">>", received, expected, this._animatedTo100)
   if (!received && this._animatedTo100) {
-    console.log(">>> render processing files")
     return this._renderProcessingFiles()
   }
 
