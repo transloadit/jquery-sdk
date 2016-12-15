@@ -1,4 +1,27 @@
 {
+  "name": "transloadit-jquery-sdk",
+  "description": "Integrate Transloadit's uploading and encoding capabilites into browsers using jQuery",
+  "version": "2.7.1",
+  "main": "js/lib/jquery.transloadit2.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/transloadit/jquery-sdk.git"
+  },
+  "keywords": [
+    "upload",
+    "encode",
+    "images",
+    "video"
+  ],
+  "author": "Transloadit",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/transloadit/jquery-sdk/issues"
+  },
+  "homepage": "https://github.com/transloadit/jquery-sdk#readme",
   "dependencies": {
     "debug": "2.2.0",
     "jshint": "2.8.0"
