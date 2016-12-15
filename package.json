@@ -1,5 +1,5 @@
 {
-  "name": "transloadit-jquery-sdk",
+  "name": "transloadit-jquery",
   "description": "Integrate Transloadit's uploading and encoding capabilites into browsers using jQuery",
   "version": "2.7.1",
   "main": "js/lib/jquery.transloadit2.js",
