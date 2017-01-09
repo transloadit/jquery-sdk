@@ -747,7 +747,12 @@ var tus = require('tus-js-client')
       return true
     }
 
-    if (assembly.error) {
+    if (assembly.error || assembly.ok === 'REQUEST_ABORTED') {
+      if (assembly.ok === 'REQUEST_ABORTED') {
+        assembly.error = 'REQUEST_ABORTED';
+        assembly.msg   = 'Your internet connection is flaky and was offline for at least a moment. Please try again.';
+      }
+
       this._errorOut(assembly)
       return false
     }
