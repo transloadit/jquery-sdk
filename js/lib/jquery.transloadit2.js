@@ -571,7 +571,12 @@
           }, 400);
           return;
         }
-        if (assembly.error) {
+
+        if (assembly.error || assembly.ok === 'REQUEST_ABORTED') {
+          if (assembly.ok === 'REQUEST_ABORTED') {
+            assembly.error = 'REQUEST_ABORTED';
+            assembly.msg   = 'Your internet connection is flaky and was offline for at least a moment. Please try again.';
+          }
           self.ended = true;
           self.renderError(assembly);
           document.title = self.documentTitle;
