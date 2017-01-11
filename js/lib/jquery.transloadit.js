@@ -20,10 +20,6 @@ var helpers = require('./helpers')
 var tus = require('tus-js-client')
 
 !(function ($) {
-  var PROTOCOL = (document.location.protocol === 'https:') ? 'https://' : 'http://'
-
-  var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/'
-
   var I18nDict = {
     en: {
       'errors.SERVER_CONNECTION_ERROR': 'There was a problem connecting to the upload server. Please reload your browser window and try again.',
@@ -56,8 +52,9 @@ var tus = require('tus-js-client')
   }
 
   var OPTIONS = {
-    service: DEFAULT_SERVICE,
-    assets: PROTOCOL + 'assets.transloadit.com/',
+    protocol: 'https://',
+    service: 'https://api2.transloadit.com/',
+    assets: 'https://assets.transloadit.com/',
     beforeStart: function () { return true },
     onFileSelect: function () {},
     onStart: function () {},
@@ -388,7 +385,7 @@ var tus = require('tus-js-client')
     // plain HTTP - the response to the CORS preflight request, will contain a
     // redirect to a HTTPS url. However, redirects are not allowed a responses
     // to preflight requests and causes the tus upload creation to fail.
-    var endpoint = 'https://' + this._instance + '/resumable/files/'
+    var endpoint = this._options.protocol + this._instance + '/resumable/files/'
 
     // Store the last value of bytesUploaded of the progress event from tus
     // for calculating the number of all bytes uploaded accross all uploads
@@ -564,7 +561,7 @@ var tus = require('tus-js-client')
   }
 
   Uploader.prototype._getAssemblyRequestTargetUrl = function (assemblyId) {
-    var result = PROTOCOL + this._instance + '/assemblies'
+    var result = this._options.protocol + this._instance + '/assemblies'
 
     if (assemblyId) {
       result += '/' + assemblyId + '?redirect=false'
@@ -689,7 +686,7 @@ var tus = require('tus-js-client')
 
     var self = this
     var instance = 'status-' + this._instance
-    var url = PROTOCOL + instance + '/assemblies/' + this._assemblyId
+    var url = this._options.protocol + instance + '/assemblies/' + this._assemblyId
 
     if (query) {
       url += query
