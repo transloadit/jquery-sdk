@@ -1,6 +1,5 @@
 var helpers = require('./helpers')
 require('../dep/toolbox.expose')
-require('../dep/jquery.easing')
 
 function Modal(opts) {
   opts = opts || {}
@@ -161,9 +160,11 @@ Modal.prototype.renderProgress = function (received, expected) {
     return this._renderProcessingFiles()
   }
 
-  var progress = received / expected * 100
+  var progress    = received / expected * 100
+  var progressInt = Math.floor(progress)
   if (progress > 100) {
-    progress = 0
+    progress    = 0
+    progressInt = 0
   }
 
   // Due to possible connection drops and retries, we sometimes need to reset this variable.
@@ -207,45 +208,35 @@ Modal.prototype.renderProgress = function (received, expected) {
   )
   this._$modal.$label.text(txt)
 
-  var currentWidth = parseInt(this._$modal.$progress.css('width'), 10)
   var currPercent = this._$modal.$progressBar.data('percent')
-  var self = this
 
   // if we are going backwards (due to a restart), do not animate, but reset the width
   // of the progress bar in one go
   if (currPercent > progress) {
     this._$modal.$progressBar.stop().css('width', progress + '%')
     this._$modal.$progressBar.data('percent', progress)
-    this._setProgressbarPercent(progress)
+    this._setProgressbarPercent(progressInt)
     return
   }
 
-  this._$modal.$progressBar.data('percent', progress)
-  this._$modal.$progressBar.stop().animate(
-    {width: progress + '%'},
-    {
-      duration: 1000,
-      easing: 'linear',
-      progress: function (promise, currPercent, remainingMs) {
-        // self._$modal can actually be gone if cancel was hit in the meantime
-        if (!self._$modal) {
-          return
-        }
-        var percent = self._setProgressbarPercent(currentWidth)
+  if (!this._animatedTo100) {
+    this._$modal.$progressBar.data('percent', progress)
+  }
 
-        if (percent == 100 && !self._animatedTo100) {
-          self._animatedTo100 = true
-          setTimeout(function () {
-            // self._$modal can actually be gone if cancel was hit in the meantime
-            if (!self._$modal) {
-              return
-            }
-            self._renderProcessingFiles()
-          }, 500)
-        }
+  this._$modal.$progressBar.stop().css('width', progress + '%')
+  this._setProgressbarPercent(progressInt)
+  var self = this
+
+  if (progressInt == 100 && !this._animatedTo100) {
+    this._animatedTo100 = true
+    setTimeout(function () {
+      // self._$modal can actually be gone if cancel was hit in the meantime
+      if (!self._$modal) {
+        return
       }
-    }
-  )
+      self._renderProcessingFiles()
+    }, 250)
+  }
 }
 
 Modal.prototype._renderProcessingFiles = function () {
@@ -254,21 +245,16 @@ Modal.prototype._renderProcessingFiles = function () {
   this._$modal.$percent.text('')
 }
 
-Modal.prototype._setProgressbarPercent = function (totalWidth) {
-  var width = parseInt(this._$modal.$progressBar.css('width'), 10)
-
-  var percent = (width * 100 / totalWidth).toFixed(0)
+Modal.prototype._setProgressbarPercent = function (percent) {
   if (percent > 100) {
     percent = 100
   }
-  if (percent > 13 && !this._animatedTo100) {
+  if (percent > 20 && !this._animatedTo100) {
     this._$modal.$percent.text(percent + '%')
   }
-  if (percent <= 13) {
+  if (percent <= 20) {
     this._$modal.$percent.text('')
   }
-
-  return percent
 }
 
 Modal.prototype._toggleErrorTexts = function (mode) {
