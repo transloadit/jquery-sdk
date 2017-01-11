@@ -859,7 +859,7 @@ var tus = require('tus-js-client')
     }
 
     CSS_LOADED = true
-    $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2-latest.css" />')
+    $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit3-latest.css" />')
       .appendTo('head')
   }
 
