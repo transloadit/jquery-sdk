@@ -188,12 +188,12 @@ var tus = require('tus-js-client')
       return false
     })
 
-    this._$inputs.on('change', function () {
+    this._$inputs.on('change.transloadit', function () {
       var $input = $(this)
       self._updateInputFileSelection($input)
       self._options.onFileSelect($input.val(), $input)
 
-      if(self._options.triggerUploadOnFileSelection) {
+      if (self._options.triggerUploadOnFileSelection) {
         self._$form.trigger('submit.transloadit')
       }
     })
@@ -598,6 +598,7 @@ var tus = require('tus-js-client')
     this.stop()
     this._$form.data('transloadit.uploader', null)
     this._$form.unbind('submit.transloadit')
+    this._$inputs.unbind('change.transloadit')
   }
 
   Uploader.prototype.cancel = function () {
