@@ -14,6 +14,7 @@
     $(function() {
       $('#upload-form').transloadit({
         wait: true,
+        autoSubmit: false,
         assets: 'http://localjquerysdk.com/build/',
         triggerUploadOnFileSelection: true,
         params: {
@@ -26,7 +27,13 @@
               height: 75
             }
           }
-        }
+        },
+        onSuccess: function (assembly) {
+          console.log('Assembly finished successfully with', assembly.ok);
+        },
+        onError: function (assembly) {
+          console.log('Assembly got an error:', assembly.error);
+        },
       });
     });
     </script>

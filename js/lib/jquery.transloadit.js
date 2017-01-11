@@ -86,6 +86,7 @@ var tus = require('tus-js-client')
     region: 'us-east-1',
     locale: 'en',
     maxNumberOfUploadedFiles: -1,
+    connectionCheckInterval: 3000,
     debug: true
   }
 
@@ -566,7 +567,7 @@ var tus = require('tus-js-client')
     var result = PROTOCOL + this._instance + '/assemblies'
 
     if (assemblyId) {
-        result += '/' + assemblyId + '?redirect=false'
+      result += '/' + assemblyId + '?redirect=false'
     }
 
     return result
@@ -785,7 +786,7 @@ var tus = require('tus-js-client')
       this._options.onSuccess(assembly)
 
       if (this._options.modal) {
-        this.cancel()
+        this._modal.hide()
       }
       this.submitForm()
       return false
@@ -1071,7 +1072,7 @@ var tus = require('tus-js-client')
         }
         self._isOnline = online
       });
-    }, 3000)
+    }, this._options.connectionCheckInterval)
   }
 
   Uploader.prototype.options = function (options) {
