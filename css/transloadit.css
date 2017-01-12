@@ -220,7 +220,7 @@
 
 #transloadit label{
   margin: 0!important;
-  display: block!important;
+  display: block;
   z-index: 999!important;
   padding: 0 !important;
   width: 100% !important;

@@ -145,6 +145,10 @@ Modal.prototype.renderError = function (err) {
   })
 }
 
+Modal.prototype.renderCancelling = function (received, expected) {
+  this._$modal.$label.text(this._i18n.translate('cancelling'))
+}
+
 Modal.prototype.renderProgress = function (received, expected) {
   // this._$modal can actually be gone if cancel was hit in the meantime
   if (!this._$modal) {

@@ -32,6 +32,7 @@ var tus = require('tus-js-client')
       'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
           'please email us this information:',
       cancel: 'Cancel',
+      cancelling: 'Cancelling ...',
       details: 'Details',
       startingUpload: 'Starting upload ...',
       processingFiles: 'Upload done, now processing files ...',
@@ -44,6 +45,7 @@ var tus = require('tus-js-client')
       'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
           '下記の情報をメールでお送りください:',
       cancel: 'キャンセル',
+      cancelling: 'キャンセル ...',
       details: '詳細',
       startingUpload: '投稿中 ...',
       processingFiles: '接続中',
@@ -144,7 +146,7 @@ var tus = require('tus-js-client')
     this._assembly = null
     this._params = null
     this._fileCount = 0
-    this._filesSize = 0
+    this._fileSizes = 0
 
     this._$params = null
     this._$form = null
@@ -205,7 +207,7 @@ var tus = require('tus-js-client')
     this._ended = false
     this._pollRetries = 0
     this._fileCount = 0
-    this._filesSize = 0
+    this._fileSizes = 0
     this._uploadedBytes = 0
     this._uploads = []
     this._resumableUploads = []
@@ -430,8 +432,8 @@ var tus = require('tus-js-client')
         self._uploadedBytes = self._uploadedBytes - lastBytesUploaded + bytesUploaded
         lastBytesUploaded = bytesUploaded
 
-        self._renderProgress(self._uploadedBytes, self._filesSize)
-        self._options.onProgress(self._uploadedBytes, self._filesSize, self._assembly)
+        self._renderProgress(self._uploadedBytes, self._fileSizes)
+        self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assembly)
       }
     })
     this._resumableUploads.push(upload)
@@ -505,12 +507,12 @@ var tus = require('tus-js-client')
 
   Uploader.prototype._countAddedFilesAndSizes = function () {
     this._fileCount = 0
-    this._filesSize = 0
+    this._fileSizes = 0
 
     for (var key in this._files) {
       for (var i = 0; i < this._files[key].length; i++) {
         this._fileCount++
-        this._filesSize += this._files[key][i].size
+        this._fileSizes += this._files[key][i].size
       }
     }
   }
@@ -592,33 +594,46 @@ var tus = require('tus-js-client')
     this._ended = true
   }
 
-  Uploader.prototype.destroy = function () {
-    this.stop()
-    this._$form.data('transloadit.uploader', null)
+  Uploader.prototype.reset = function () {
+    this._files = {}
+    this._fileCount = 0
+    this._fileSizes = 0
+  }
+
+  Uploader.prototype.unbindEvents = function () {
     this._$form.unbind('submit.transloadit')
     this._$inputs.unbind('change.transloadit')
   }
 
+  Uploader.prototype.destroy = function () {
+    this.stop()
+    this.reset()
+    this.unbindEvents()
+    this._$form.data('transloadit.uploader', null)
+  }
+
   Uploader.prototype.cancel = function () {
-    // @todo this has still a race condition if a new upload is started
-    // while the cancel request is still being executed. Shouldn't happen
-    // in real life, but needs fixing.
     this._formData = this._prepareFormData()
-
-    // decide if we should emoty this._files here, probably not
-
     this._abortUpload()
+    this.reset()
+
+    var self = this
+    function hideModal () {
+      if (self._options.modal) {
+        self._modal.hide()
+      }
+    }
 
     if (!this._ended) {
       if (this._$params) {
         this._$params.prependTo(this._$form)
       }
       clearTimeout(this._timer)
-      this._poll('?method=delete')
-    }
 
-    if (this._options.modal) {
-      this._modal.hide()
+      self._modal.renderCancelling()
+      this._poll('?method=delete', hideModal)
+    } else {
+      hideModal()
     }
   }
 
@@ -679,10 +694,12 @@ var tus = require('tus-js-client')
     }
   }
 
-  Uploader.prototype._poll = function (query) {
+  Uploader.prototype._poll = function (query, cb) {
     if (this._ended) {
       return
     }
+
+    cb = cb || function() {}
 
     var self = this
     var instance = 'status-' + this._instance
@@ -700,7 +717,7 @@ var tus = require('tus-js-client')
       callbackParameter: 'callback',
       success: function (assembly) {
         if (self._ended) {
-          return
+          return cb()
         }
 
         var continuePolling = self._handleSuccessfulPoll(assembly)
@@ -710,10 +727,12 @@ var tus = require('tus-js-client')
             self._poll()
           }, timeout)
         }
+
+        cb()
       },
       error: function (xhr, status, jsonpErr) {
         if (self._ended) {
-          return
+          return cb()
         }
 
         var continuePolling = true
@@ -729,6 +748,8 @@ var tus = require('tus-js-client')
             self._poll()
           }, timeout)
         }
+
+        cb()
       }
     })
   }
@@ -781,6 +802,8 @@ var tus = require('tus-js-client')
       assembly.uploads = this._uploads
       assembly.results = this._results
       this._options.onSuccess(assembly)
+
+      this.reset()
 
       if (this._options.modal) {
         this._modal.hide()
