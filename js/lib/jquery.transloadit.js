@@ -152,6 +152,8 @@ var tus = require('tus-js-client')
     this._$form = null
     this._$inputs = null
 
+    this._resumableUploads = []
+
     this._uploadFileIds = []
     this._resultFileIds = []
     this._xhr = null
@@ -437,6 +439,8 @@ var tus = require('tus-js-client')
         self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assembly)
       }
     })
+
+    this._resumableUploads.push(upload)
     return upload
   }
 
@@ -596,6 +600,7 @@ var tus = require('tus-js-client')
 
   Uploader.prototype.reset = function () {
     this._files = {}
+    this._resumableUploads = []
     this._fileCount = 0
     this._fileSizes = 0
   }
@@ -932,6 +937,11 @@ var tus = require('tus-js-client')
   Uploader.prototype._abortUpload = function () {
     if (this._xhr && typeof this._xhr.abort === "function") {
       this._xhr.abort()
+    }
+
+    for (var i = 0; i < this._resumableUploads.length; i++) {
+      var upload = this._resumableUploads[i]
+      upload.abort()
     }
   }
 
