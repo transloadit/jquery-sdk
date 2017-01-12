@@ -217,6 +217,10 @@ var tus = require('tus-js-client')
 
     this._modal.reset()
 
+    // Remove textareas with encoding results from previous uploads to not send them
+    // as form fields.
+    this._$form.find('textarea[name=transloadit]').remove()
+
     var self = this
     var cb = function () {
       setTimeout(function () {
@@ -310,7 +314,7 @@ var tus = require('tus-js-client')
     this._assemblyId = uuid.v4().replace(/\-/g, "")
     this._formData = this._prepareFormData()
 
-    this._appendFilteredFormFields(true)
+    this._appendFilteredFormFields()
     this._appendCustomFormData()
     this._appendFiles()
 
@@ -470,6 +474,7 @@ var tus = require('tus-js-client')
       for (var i = 0; i < this._files[key].length; i++) {
         this._formData.append(key, this._files[key][i])
         this._fileCount++
+        this._fileSizes += this._files[key][i].size
       }
     }
   }
@@ -527,8 +532,8 @@ var tus = require('tus-js-client')
         return
       }
 
-      for (var i = 0; i < this.files.length; i++) {
-        self._formData.append(name, this.files[i])
+      if (!this.files) { // Files are added via appendFiles
+        self._formData.append(name, $(this).val())
       }
     })
   }
