@@ -171,6 +171,11 @@ Modal.prototype.renderProgress = function (received, expected) {
     progressInt = 0
   }
 
+  // For some reason we sometimes get several events for 100%. Make sure to only use the first.
+  if (progress == 100 && this._animatedTo100) {
+    return
+  }
+
   // Due to possible connection drops and retries, we sometimes need to reset this variable.
   if (progress < 100) {
     this._animatedTo100 = false
@@ -227,7 +232,7 @@ Modal.prototype.renderProgress = function (received, expected) {
     this._$modal.$progressBar.data('percent', progress)
   }
 
-  this._$modal.$progressBar.stop().css('width', progress + '%')
+  this._$modal.$progressBar.css('width', progress + '%')
   this._setProgressbarPercent(progressInt)
   var self = this
 

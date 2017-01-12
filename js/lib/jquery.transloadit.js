@@ -152,8 +152,6 @@ var tus = require('tus-js-client')
     this._$form = null
     this._$inputs = null
 
-    this._resumableUploads = []
-
     this._uploadFileIds = []
     this._resultFileIds = []
     this._xhr = null
@@ -210,7 +208,6 @@ var tus = require('tus-js-client')
     this._fileSizes = 0
     this._uploadedBytes = 0
     this._uploads = []
-    this._resumableUploads = []
     this._uploadFileIds = []
     this._resultFileIds = []
     this._results = {}
@@ -440,8 +437,6 @@ var tus = require('tus-js-client')
         self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assembly)
       }
     })
-    this._resumableUploads.push(upload)
-
     return upload
   }
 
@@ -972,11 +967,7 @@ var tus = require('tus-js-client')
       return this.start()
     }
 
-    // Resume all our uploads in the resumable case. :)
-    for (var i = 0; i < this._resumableUploads.length; i++) {
-      var upload = this._resumableUploads[i]
-      upload.resume()
-    }
+    // Resuming of uploads is done automatically for us in the tus client
   }
 
   Uploader.prototype._initI18n = function () {
