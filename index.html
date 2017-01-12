@@ -6,6 +6,8 @@
   <body>
     <form id="upload-form" action="/uploads" enctype="multipart/form-data" method="POST">
       <input type="file" name="my_file" multiple="multiple" />
+      <div class="transloadit-drop-area">Drag and drop files here</div>
+      <div class="transloadit-file-preview-area"></div>
       <input type="text" name="album_id" value="foo_id" />
       <input type="submit" value="Upload">
     </form>
@@ -24,7 +26,7 @@
         wait: true,
         autoSubmit: false,
         assets: 'http://localjquerysdk.com/build/',
-        triggerUploadOnFileSelection: true,
+        // triggerUploadOnFileSelection: true,
         fields: '*',
         resumable: true,
         params: {

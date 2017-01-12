@@ -603,6 +603,10 @@ var tus = require('tus-js-client')
     this._resumableUploads = []
     this._fileCount = 0
     this._fileSizes = 0
+
+    for (var i = 0; i < this._previewAreaObjects.length; i++) {
+      this._previewAreaObjects[i].removeAllFiles()
+    }
   }
 
   Uploader.prototype.unbindEvents = function () {

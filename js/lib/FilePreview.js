@@ -30,7 +30,7 @@ FilePreview.prototype._bindEvents = function() {
 FilePreview.prototype.addFile = function(file) {
   var size = this._niceSize(file.size)
 
-  var closeLink = '<a href="#" class="remove_file">X</a>'
+  var closeLink = '<a href="#" class="remove_file">Remove</a>'
   var html = '<li>' + file.name + ' - ' + size + ' - ' + closeLink + '</li>'
   var $li = $(html).appendTo(this._$ul)
 
@@ -49,6 +49,10 @@ FilePreview.prototype.removeFile = function(file) {
       $(this).remove()
     }
   })
+}
+
+FilePreview.prototype.removeAllFiles = function(file) {
+  this._$ul.find('li').remove()
 }
 
 FilePreview.prototype._niceSize = function(bytes) {
