@@ -165,6 +165,10 @@
       self.validate();
       self.detectFileInputs();
 
+      // Remove textareas with encoding results from previous uploads to not send them
+      // as form fields.
+      $form.find('textarea[name=transloadit]').remove()
+
       if (!self._options['processZeroFiles'] && self.$files.length === 0) {
         if (self._options.beforeStart()) {
           self.submitForm();
