@@ -1,0 +1,51 @@
+<!-- Test at http://localjquerysdk.com/ -->
+<html>
+  <head>
+    <title>Testing the jQuery plugin</title>
+  </head>
+  <body>
+    <form id="upload-form" action="/uploads" enctype="multipart/form-data" method="POST">
+      <input type="file" name="my_file" multiple="multiple" />
+      <input type="text" name="album_id" value="foo_id" />
+      <input type="submit" value="Upload">
+    </form>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://localjquerysdk.com/build/jquery.transloadit2-latest.js"></script>
+
+    <script type="text/javascript">
+    window.YOUR_TRANSLOADIT_AUTH_KEY='YOUR_AUTH_KEY'
+    </script>
+    <script src="http://localjquerysdk.com/auth_key.js"></script>
+
+    <script type="text/javascript">
+    $(function() {
+      $('#upload-form').transloadit({
+        wait: true,
+        autoSubmit: false,
+        assets: 'http://localjquerysdk.com/build/',
+        triggerUploadOnFileSelection: true,
+        fields: '*',
+        resumable: true,
+        params: {
+          auth: { key: window.YOUR_TRANSLOADIT_AUTH_KEY },
+          steps: {
+            resize_to_75: {
+              robot: "/image/resize",
+              use: ":original",
+              width: 75,
+              height: 75
+            }
+          }
+        },
+        onSuccess: function (assembly) {
+          console.log('Assembly finished successfully with', assembly.ok);
+        },
+        onError: function (assembly) {
+          console.log('Assembly got an error:', assembly.error);
+        },
+      });
+    });
+    </script>
+  </body>
+</html>
