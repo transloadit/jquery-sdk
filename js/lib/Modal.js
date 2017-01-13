@@ -113,7 +113,7 @@ Modal.prototype.renderError = function (err) {
   var self = this
   var ip = null
 
-  $.getJSON(PROTOCOL + 'jsonip.com/', function (ipData) {
+  $.getJSON('https://jsonip.com/', function (ipData) {
     ip = ipData.ip
   })
   .always(function () {
@@ -126,7 +126,7 @@ Modal.prototype.renderError = function (err) {
       agent: navigator.userAgent,
       error: detailedErrMsg
     }
-    $.post(PROTOCOL + 'status.transloadit.com/client_error', details)
+    $.post('https://status.transloadit.com/client_error', details)
 
     var detailsArr = []
     for (var key in details) {

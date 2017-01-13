@@ -181,9 +181,7 @@ var tus = require('tus-js-client')
 
     this._$form.bind('submit.transloadit', function () {
       self.validate()
-
       self.start()
-
       return false
     })
 
@@ -213,19 +211,10 @@ var tus = require('tus-js-client')
     this._resultFileIds = []
     this._results = {}
 
-    this._modal.reset()
-
     // Remove textareas with encoding results from previous uploads to not send them
     // as form fields.
     this._$form.find('textarea[name=transloadit]').remove()
-
-    var self = this
-    var cb = function () {
-      setTimeout(function () {
-        self._poll()
-      }, 300)
-    }
-
+    this._modal.reset()
     this._countAddedFilesAndSizes()
 
     // Simply submit the form if we should not process without files
@@ -245,9 +234,16 @@ var tus = require('tus-js-client')
       return
     }
 
+    var self = this
     this._getInstance(function (err) {
       if (err) {
         return
+      }
+
+      var cb = function () {
+        setTimeout(function () {
+          self._poll()
+        }, 300)
       }
 
       if (self._options.resumable && tus.isSupported) {
@@ -946,41 +942,6 @@ var tus = require('tus-js-client')
     }
   }
 
-  Uploader.prototype._onDisconnect = function () {
-    var errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
-
-    if (!this._xhr) {
-      errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_NOT_IN_PROGRESS'
-    }
-
-    var err = {
-      error: errorType,
-      message: this._i18n.translate('errors.' + errorType)
-    }
-    this._renderError(err)
-  }
-
-  Uploader.prototype._onReconnect = function () {
-    // If no upload is in progress anyway, then we do not need to do anything here.
-    // Polling for the assembly status will auto-continue without us doing anything here.
-    if (!this._xhr) {
-      return
-    }
-
-    if (!this._options.resumable) {
-      // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
-      // we have our own resume flag with tus support.
-      this._abortUpload()
-
-      // If we have an upload in progress when we get the disconnect, retry it.
-      // If we do not have an upload in progress, we keep polling automatically for the status.
-      // No need to take further action here for this case.
-      return this.start()
-    }
-
-    // Resuming of uploads is done automatically for us in the tus client
-  }
-
   Uploader.prototype._initI18n = function () {
     this._i18n = new I18n(I18nDict, this._locale)
   }
@@ -1087,11 +1048,40 @@ var tus = require('tus-js-client')
     this._internetConnectionChecker = new InternetConnectionChecker({
       intervalLength: this._options.connectionCheckInterval,
       onDisconnect: function () {
-        self._onDisconnect()
+        var errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
+
+        if (!this._xhr) {
+          errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_NOT_IN_PROGRESS'
+        }
+
+        var err = {
+          error: errorType,
+          message: self._i18n.translate('errors.' + errorType)
+        }
+        self._renderError(err)
+
         self._options.onDisconnect()
       },
       onReconnect: function () {
-        self._onReconnect()
+        // If no upload is in progress anyway, then we do not need to do anything here.
+        // Polling for the assembly status will auto-continue without us doing anything here.
+        if (!self._xhr) {
+          return
+        }
+
+        if (!self._options.resumable) {
+          // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
+          // we have our own resume flag with tus support.
+          self._abortUpload()
+
+          // If we have an upload in progress when we get the disconnect, retry it.
+          // If we do not have an upload in progress, we keep polling automatically for the status.
+          // No need to take further action here for this case.
+          return self.start()
+        }
+
+        // Resuming of uploads is done automatically for us in the tus client
+
         self._options.onReconnect()
       }
     })
