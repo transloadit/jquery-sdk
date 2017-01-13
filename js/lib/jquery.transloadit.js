@@ -13,9 +13,9 @@ require('../dep/jquery.jsonp')
 var Modal = require('./Modal')
 var DragDrop = require('./DragDrop')
 var FilePreview = require('./FilePreview')
+var InternetConnectionChecker = require('./InternetConnectionChecker');
 var I18n = require('./I18n')
 var uuid = require('uuid')
-var isOnline = require('is-online');
 var helpers = require('./helpers')
 var tus = require('tus-js-client')
 
@@ -162,8 +162,7 @@ var tus = require('tus-js-client')
     this._formData = null
     this._files = {}
 
-    this._connectionCheckerInterval = null
-    this._isOnline = true
+    this._internetConnectionChecker = null
   }
 
   Uploader.prototype.init = function ($form, options) {
@@ -251,8 +250,6 @@ var tus = require('tus-js-client')
         return
       }
 
-      // Only use tus, if it is supported in this browser.
-      // TODO: test
       if (self._options.resumable && tus.isSupported) {
         self._startWithResumabilitySupport(cb)
       } else {
@@ -282,7 +279,7 @@ var tus = require('tus-js-client')
           cb()
         },
         error: function (xhr, status, jsonpErr) {
-          if (!self._isOnline) {
+          if (!self._internetConnectionChecker.isOnline()) {
             return attempt()
           }
 
@@ -747,7 +744,7 @@ var tus = require('tus-js-client')
         var continuePolling = true
         // If this is a server problem and not a client connection problem, check if we should
         // continue polling or if we should abort.
-        if (self._isOnline) {
+        if (self._internetConnectionChecker.isOnline()) {
           continuePolling = self._handleErroneousPoll(url, xhr, status, jsonpErr)
         }
 
@@ -1085,24 +1082,20 @@ var tus = require('tus-js-client')
   }
 
   Uploader.prototype._initInternetConnectionChecker = function () {
-    if (this._connectionCheckerInterval) {
-      return
-    }
-
     var self = this
-    this._connectionCheckerInterval = setInterval (function() {
-      isOnline(function(online) {
-        if (self._isOnline && !online) {
-          self._onDisconnect()
-          self._options.onDisconnect()
-        }
-        if (!self._isOnline && online) {
-          self._onReconnect()
-          self._options.onReconnect()
-        }
-        self._isOnline = online
-      });
-    }, this._options.connectionCheckInterval)
+
+    this._internetConnectionChecker = new InternetConnectionChecker({
+      intervalLength: this._options.connectionCheckInterval,
+      onDisconnect: function () {
+        self._onDisconnect()
+        self._options.onDisconnect()
+      },
+      onReconnect: function () {
+        self._onReconnect()
+        self._options.onReconnect()
+      }
+    })
+    this._internetConnectionChecker.start()
   }
 
   Uploader.prototype.options = function (options) {
