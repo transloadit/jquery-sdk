@@ -231,6 +231,7 @@
   line-height: 20px !important;
   font-weight: normal !important;
   color: #333!important;
+  display: block;
 }
 #transloadit .job_progress span{background-color: #B5E000 !important;}
 #transloadit .job_error span{background-color: #E40000 !important;}
