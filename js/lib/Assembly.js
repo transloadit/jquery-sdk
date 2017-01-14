@@ -76,10 +76,9 @@ Assembly.prototype._poll = function (query, cb) {
 
       var continuePolling = self._handleSuccessfulPoll(assembly)
       if (continuePolling) {
-        var timeout = self._calcPollTimeout()
         self._pollTimer = setTimeout(function () {
           self._poll()
-        }, timeout)
+        }, self._pollTimeout)
       }
 
       cb()
@@ -97,10 +96,9 @@ Assembly.prototype._poll = function (query, cb) {
       }
 
       if (continuePolling) {
-        var timeout = self._calcPollTimeout()
         setTimeout(function () {
           self._poll()
-        }, timeout)
+        }, self._pollTimeout)
       }
 
       cb()
@@ -221,12 +219,6 @@ Assembly.prototype.getRequestTargetUrl = function (withId) {
   }
 
   return result
-}
-
-Assembly.prototype._calcPollTimeout = function () {
-  var ping = this._pollStarted - +new Date()
-  console.log(">>> ping", ping, this._pollinterval)
-  return ping < this._pollinterval ? this._pollinterval : ping
 }
 
 Assembly.prototype.getInstance = function () {
