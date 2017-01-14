@@ -10,12 +10,12 @@
 require('../dep/json2')
 require('../dep/jquery.jsonp')
 
+var Assembly = require('./Assembly')
 var Modal = require('./Modal')
 var DragDrop = require('./DragDrop')
 var FilePreview = require('./FilePreview')
 var InternetConnectionChecker = require('./InternetConnectionChecker');
 var I18n = require('./I18n')
-var uuid = require('uuid')
 var helpers = require('./helpers')
 var tus = require('tus-js-client')
 
@@ -132,9 +132,7 @@ var tus = require('tus-js-client')
   $.fn.transloadit.i18n = I18nDict
 
   function Uploader () {
-    this._assemblyId = null
-
-    this._instance = null
+    this._assembly = null
     this._timer = null
     this._options = {}
     this._uploads = []
@@ -143,7 +141,6 @@ var tus = require('tus-js-client')
     this._pollStarted = null
     this._pollRetries = 0
     this._started = false
-    this._assembly = null
     this._params = null
     this._fileCount = 0
     this._fileSizes = 0
@@ -235,15 +232,18 @@ var tus = require('tus-js-client')
     }
 
     var self = this
-    this._getInstance(function (err) {
+    this._getInstance(function (err, instance) {
       if (err) {
         return
       }
 
+      self._assembly = new Assembly({
+        instance: instance,
+        protocol: self._options.protocol
+      })
+
       var cb = function () {
-        setTimeout(function () {
-          self._poll()
-        }, 300)
+        self._poll()
       }
 
       if (self._options.resumable && tus.isSupported) {
@@ -257,7 +257,6 @@ var tus = require('tus-js-client')
   Uploader.prototype._getInstance = function (cb) {
     var self = this
 
-    this._instance = null
     var url = this._options['service']
     var attempts = 0
 
@@ -271,8 +270,7 @@ var tus = require('tus-js-client')
             return self._errorOut(result)
           }
 
-          self._instance = result.hostname
-          cb()
+          cb(null, result.hostname)
         },
         error: function (xhr, status, jsonpErr) {
           if (!self._internetConnectionChecker.isOnline()) {
@@ -303,7 +301,6 @@ var tus = require('tus-js-client')
 
   Uploader.prototype._startWithXhr = function (cb) {
     var self = this
-    this._assemblyId = uuid.v4().replace(/\-/g, "")
     this._formData = this._prepareFormData()
 
     this._appendFilteredFormFields()
@@ -331,10 +328,10 @@ var tus = require('tus-js-client')
       }
 
       self._renderProgress(evt.loaded, evt.total)
-      self._options.onProgress(evt.loaded, evt.total, self._assembly)
+      self._options.onProgress(evt.loaded, evt.total, self._assemblyResult)
     })
 
-    var url = this._getAssemblyRequestTargetUrl(this._assemblyId)
+    var url = this._assembly.getRequestTargetUrl(true)
     this._xhr.open('POST', url)
     this._xhr.send(this._formData)
     cb()
@@ -363,13 +360,13 @@ var tus = require('tus-js-client')
     }
 
     var f = new XMLHttpRequest()
-    var url = this._getAssemblyRequestTargetUrl()
+    var url = this._assembly.getRequestTargetUrl()
     f.open('POST', url)
     f.onreadystatechange = function () {
       if (f.readyState === 4 && f.status === 200) {
         var resp = JSON.parse(f.responseText)
-        self._assemblyId = resp.id
-        self._assemblyUrl = resp.status_endpoint
+        self._assembly.setId(resp.id)
+        self._assembly.setUrl(resp.status_endpoint)
         proceed()
         cb()
       }
@@ -383,7 +380,7 @@ var tus = require('tus-js-client')
     // plain HTTP - the response to the CORS preflight request, will contain a
     // redirect to a HTTPS url. However, redirects are not allowed a responses
     // to preflight requests and causes the tus upload creation to fail.
-    var endpoint = this._options.protocol + this._instance + '/resumable/files/'
+    var endpoint = this._options.protocol + this._assembly.getInstance() + '/resumable/files/'
 
     // Store the last value of bytesUploaded of the progress event from tus
     // for calculating the number of all bytes uploaded accross all uploads
@@ -408,7 +405,7 @@ var tus = require('tus-js-client')
       metadata: {
         fieldname: nameAttr,
         filename: file.name,
-        assembly_url: this._assemblyUrl
+        assembly_url: this._assembly.getUrl()
       },
       fingerprint: function(file) {
         // Fingerprinting is not necessary any more since we have disabled
@@ -429,7 +426,7 @@ var tus = require('tus-js-client')
         lastBytesUploaded = bytesUploaded
 
         self._renderProgress(self._uploadedBytes, self._fileSizes)
-        self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assembly)
+        self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assemblyResult)
       }
     })
 
@@ -559,16 +556,6 @@ var tus = require('tus-js-client')
     }
   }
 
-  Uploader.prototype._getAssemblyRequestTargetUrl = function (assemblyId) {
-    var result = this._options.protocol + this._instance + '/assemblies'
-
-    if (assemblyId) {
-      result += '/' + assemblyId + '?redirect=false'
-    }
-
-    return result
-  }
-
   Uploader.prototype._getFilteredFormFields = function () {
     var fieldsFilter = '[name=params], [name=signature]'
     if (this._options.fields === true) {
@@ -646,10 +633,10 @@ var tus = require('tus-js-client')
       this._$form.removeAttr('enctype')
     }
 
-    if (this._assembly !== null) {
+    if (this._assemblyResult !== null) {
       $('<textarea/>')
         .attr('name', 'transloadit')
-        .text(JSON.stringify(this._assembly))
+        .text(JSON.stringify(this._assemblyResult))
         .prependTo(this._$form).hide()
     }
 
@@ -704,8 +691,8 @@ var tus = require('tus-js-client')
     cb = cb || function() {}
 
     var self = this
-    var instance = 'status-' + this._instance
-    var url = this._options.protocol + instance + '/assemblies/' + this._assemblyId
+    var instance = 'status-' + this._assembly.getInstance()
+    var url = this._assembly.getUrl()
 
     if (query) {
       url += query
@@ -757,7 +744,7 @@ var tus = require('tus-js-client')
   }
 
   Uploader.prototype._handleSuccessfulPoll = function (assembly) {
-    this._assembly = assembly
+    this._assemblyResult = assembly
 
     if (assembly.error === 'ASSEMBLY_NOT_FOUND') {
       this._pollRetries++
@@ -851,8 +838,8 @@ var tus = require('tus-js-client')
       return this.cancel()
     }
 
-    err.assemblyId = this._assemblyId
-    err.instance = this._instance
+    err.assemblyId = this._assembly.getId()
+    err.instance = this._assembly.getInstance()
     this._modal.renderError(err)
   }
 
