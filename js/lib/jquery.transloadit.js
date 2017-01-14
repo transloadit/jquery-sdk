@@ -11,6 +11,7 @@ require('../dep/json2')
 require('../dep/jquery.jsonp')
 
 var Assembly = require('./Assembly')
+var InstanceFetcher = require('./InstanceFetcher')
 var Modal = require('./Modal')
 var DragDrop = require('./DragDrop')
 var FilePreview = require('./FilePreview')
@@ -185,10 +186,21 @@ var tus = require('tus-js-client')
       return
     }
 
+    if (this._options.modal) {
+      this._modal.show()
+    }
+
     var self = this
-    this._getInstance(function (err, instance) {
+
+    instanceFetcher = new InstanceFetcher({
+      service: this._options.service,
+      timeout: this._options.pollTimeout,
+      i18n: this._i18n,
+      internetConnectionChecker: this._internetConnectionChecker
+    })
+    instanceFetcher.fetch(function (err, instance) {
       if (err) {
-        return
+        return self._errorOut(err)
       }
 
       self._assembly = new Assembly({
@@ -245,51 +257,6 @@ var tus = require('tus-js-client')
         self._startWithXhr(cb)
       }
     })
-  }
-
-  Uploader.prototype._getInstance = function (cb) {
-    var self = this
-
-    var url = this._options['service']
-    var attempts = 0
-
-    function attempt () {
-      $.jsonp({
-        url: url,
-        timeout: self._options.pollTimeout,
-        callbackParameter: 'callback',
-        success: function (result) {
-          if (result.error) {
-            return self._errorOut(result)
-          }
-
-          cb(null, result.hostname)
-        },
-        error: function (xhr, status, jsonpErr) {
-          if (!self._internetConnectionChecker.isOnline()) {
-            return attempt()
-          }
-
-          var reason = 'JSONP assembly_id request status: ' + status
-          reason += ', err: ' + jsonpErr
-
-          var err = {
-            error: 'SERVER_CONNECTION_ERROR',
-            message: self._i18n.translate('errors.SERVER_CONNECTION_ERROR'),
-            reason: reason,
-            url: url
-          }
-          self._errorOut(err)
-          cb(err)
-        }
-      })
-    }
-
-    attempt()
-
-    if (this._options.modal) {
-      this._modal.show()
-    }
   }
 
   Uploader.prototype._startWithXhr = function (cb) {
