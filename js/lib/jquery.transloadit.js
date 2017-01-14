@@ -251,7 +251,7 @@ var tus = require('tus-js-client')
           if (self._options.modal) {
             self._modal.hide()
           }
-          self.submitForm()
+          self.submitForm(assemblyResult)
         },
         onCancel: function (assemblyResult) {
           self._ended = true
@@ -650,22 +650,22 @@ var tus = require('tus-js-client')
       this._$params.prependTo(this._$form)
     }
 
-    this._assembly.stopStatusFetching()
     this._modal.renderCancelling()
+    this._assembly.stopStatusFetching()
     this._assembly.cancel(hideModal)
   }
 
-  Uploader.prototype.submitForm = function () {
+  Uploader.prototype.submitForm = function (assemblyData) {
     // prevent that files are uploaded to the final destination
     // after all that is what we use this plugin for :)
     if (this._$form.attr('enctype') === 'multipart/form-data') {
       this._$form.removeAttr('enctype')
     }
 
-    if (this._assemblyResult !== null) {
+    if (assemblyData !== null) {
       $('<textarea/>')
         .attr('name', 'transloadit')
-        .text(JSON.stringify(this._assemblyResult))
+        .text(JSON.stringify(assemblyData))
         .prependTo(this._$form).hide()
     }
 
