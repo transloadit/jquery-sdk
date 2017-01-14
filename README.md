@@ -5,6 +5,12 @@
 The official docs for our jQuery plugin / SDK are on the
 [transloadit website](https://transloadit.com/docs/#jquery-plugin).
 
+## Version 3
+
+API changes from version 2 to version 3:
+
+- The option `interval` is now named `pollInterval`
+
 ### Basics
 
 The Transloadit jQuery plugin allows you to

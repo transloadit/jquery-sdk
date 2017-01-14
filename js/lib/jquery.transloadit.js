@@ -69,7 +69,7 @@ var tus = require('tus-js-client')
     onDisconnect: function() {},
     onReconnect: function() {},
     resumable: false,
-    interval: 2500,
+    pollInterval: 2500,
     pollTimeout: 8000,
     poll404Retries: 15,
     pollConnectionRetries: 5,
@@ -133,14 +133,9 @@ var tus = require('tus-js-client')
 
   function Uploader () {
     this._assembly = null
-    this._timer = null
     this._options = {}
-    this._uploads = []
-    this._results = {}
     this._ended = null
-    this._pollStarted = null
-    this._pollRetries = 0
-    this._started = false
+
     this._params = null
     this._fileCount = 0
     this._fileSizes = 0
@@ -151,8 +146,6 @@ var tus = require('tus-js-client')
 
     this._resumableUploads = []
 
-    this._uploadFileIds = []
-    this._resultFileIds = []
     this._xhr = null
     this._dragDropObjects = []
     this._previewAreaObjects = []
@@ -197,16 +190,10 @@ var tus = require('tus-js-client')
 
   Uploader.prototype.start = function () {
     this._xhr = null
-    this._started = false
     this._ended = false
-    this._pollRetries = 0
     this._fileCount = 0
     this._fileSizes = 0
     this._uploadedBytes = 0
-    this._uploads = []
-    this._uploadFileIds = []
-    this._resultFileIds = []
-    this._results = {}
 
     // Remove textareas with encoding results from previous uploads to not send them
     // as form fields.
@@ -238,12 +225,51 @@ var tus = require('tus-js-client')
       }
 
       self._assembly = new Assembly({
+        wait: self._options['wait'],
         instance: instance,
-        protocol: self._options.protocol
+        protocol: self._options.protocol,
+        internetConnectionChecker: self._internetConnectionChecker,
+        pollTimeout: self._options.pollTimeout,
+        poll404Retries: self._options.poll404Retries,
+        pollConnectionRetries: self._options.pollConnectionRetries,
+        pollInterval: self._options.pollInterval,
+
+        onStart: function (assemblyResult) {
+          self._options.onStart(assemblyResult)
+        },
+        onExecuting: function (assemblyResult) {
+          // If the assembly is executing meaning all uploads are done, we will not get more progress
+          // events from XHR. But if there was a connection interruption in the meantime, we want to
+          // make sure all components (like the modal) now know that the error is gone.
+          self._renderProgress()
+        },
+        onSuccess: function (assemblyResult) {
+          self._ended = true
+          self._options.onSuccess(assemblyResult)
+          self.reset()
+
+          if (self._options.modal) {
+            self._modal.hide()
+          }
+          self.submitForm()
+        },
+        onCancel: function (assemblyResult) {
+          self._ended = true
+          self._options.onCancel(assemblyResult)
+        },
+        onError: function (assemblyObjContainingError) {
+          self._errorOut(assemblyObjContainingError)
+        },
+        onUpload: function (upload, assemblyResult) {
+          self._options.onUpload(upload, assemblyResult)
+        },
+        onResult: function (step, result, assemblyResult) {
+          self._options.onResult(step, result, assemblyResult)
+        }
       })
 
       var cb = function () {
-        self._poll()
+        self._assembly.fetchStatus()
       }
 
       if (self._options.resumable && tus.isSupported) {
@@ -575,6 +601,9 @@ var tus = require('tus-js-client')
   }
 
   Uploader.prototype.stop = function () {
+    if (this._assembly) {
+      this._assembly.stopStatusFetching()
+    }
     this._ended = true
   }
 
@@ -613,17 +642,17 @@ var tus = require('tus-js-client')
       }
     }
 
-    if (!this._ended) {
-      if (this._$params) {
-        this._$params.prependTo(this._$form)
-      }
-      clearTimeout(this._timer)
-
-      self._modal.renderCancelling()
-      this._poll('?method=delete', hideModal)
-    } else {
-      hideModal()
+    if (this._ended) {
+      return hideModal()
     }
+
+    if (this._$params) {
+      this._$params.prependTo(this._$form)
+    }
+
+    this._assembly.stopStatusFetching()
+    this._modal.renderCancelling()
+    this._assembly.cancel(hideModal)
   }
 
   Uploader.prototype.submitForm = function () {
@@ -683,152 +712,6 @@ var tus = require('tus-js-client')
     }
   }
 
-  Uploader.prototype._poll = function (query, cb) {
-    if (this._ended) {
-      return
-    }
-
-    cb = cb || function() {}
-
-    var self = this
-    var instance = 'status-' + this._assembly.getInstance()
-    var url = this._assembly.getUrl()
-
-    if (query) {
-      url += query
-    }
-
-    this._pollStarted = +new Date()
-
-    $.jsonp({
-      url: url,
-      timeout: self._options.pollTimeout,
-      callbackParameter: 'callback',
-      success: function (assembly) {
-        if (self._ended) {
-          return cb()
-        }
-
-        var continuePolling = self._handleSuccessfulPoll(assembly)
-        if (continuePolling) {
-          var timeout = self._calcPollTimeout()
-          self._timer = setTimeout(function () {
-            self._poll()
-          }, timeout)
-        }
-
-        cb()
-      },
-      error: function (xhr, status, jsonpErr) {
-        if (self._ended) {
-          return cb()
-        }
-
-        var continuePolling = true
-        // If this is a server problem and not a client connection problem, check if we should
-        // continue polling or if we should abort.
-        if (self._internetConnectionChecker.isOnline()) {
-          continuePolling = self._handleErroneousPoll(url, xhr, status, jsonpErr)
-        }
-
-        if (continuePolling) {
-          var timeout = self._calcPollTimeout()
-          setTimeout(function () {
-            self._poll()
-          }, timeout)
-        }
-
-        cb()
-      }
-    })
-  }
-
-  Uploader.prototype._handleSuccessfulPoll = function (assembly) {
-    this._assemblyResult = assembly
-
-    if (assembly.error === 'ASSEMBLY_NOT_FOUND') {
-      this._pollRetries++
-
-      if (this._pollRetries > this._options.poll404Retries) {
-        this._errorOut(assembly)
-        return false
-      }
-      return true
-    }
-
-    if (assembly.error || assembly.ok === 'REQUEST_ABORTED') {
-      if (assembly.ok === 'REQUEST_ABORTED') {
-        assembly.error = 'REQUEST_ABORTED';
-        assembly.msg   = 'Your internet connection is flaky and was offline for at least a moment. Please try again.';
-      }
-
-      this._errorOut(assembly)
-      return false
-    }
-
-    if (!this._started && assembly.bytes_expected > 0) {
-      this._started = true
-      this._options.onStart(assembly)
-    }
-
-    this._pollRetries = 0
-
-    var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
-    var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
-    var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
-
-    this._mergeUploads(assembly)
-    this._mergeResults(assembly)
-
-    if (isCanceled) {
-      this._ended = true
-      this._options.onCancel(assembly)
-      return false
-    }
-
-    if (isComplete || (!this._options['wait'] && isExecuting)) {
-      this._ended = true
-      assembly.uploads = this._uploads
-      assembly.results = this._results
-      this._options.onSuccess(assembly)
-
-      this.reset()
-
-      if (this._options.modal) {
-        this._modal.hide()
-      }
-      this.submitForm()
-      return false
-    }
-
-    // If the assembly is executing meaning all uploads are done, we will not get more progress
-    // events from XHR. But if there was a connection interruption in the meantime, we want to
-    // make sure all components (like the modal) now know that the error is gone.
-    if (isExecuting) {
-      this._renderProgress()
-    }
-    return true
-  }
-
-  Uploader.prototype._handleErroneousPoll = function (url, xhr, status, jsonpErr) {
-    this._pollRetries++
-    if (this._pollRetries <= this._options.pollConnectionRetries) {
-      return true
-    }
-
-    var reason = 'JSONP status poll request status: ' + status
-    reason += ', err: ' + jsonpErr
-
-    var err = {
-      error: 'SERVER_CONNECTION_ERROR',
-      message: this._i18n.translate('errors.SERVER_CONNECTION_ERROR'),
-      reason: reason,
-      url: url
-    }
-    this._errorOut(err)
-    return false
-  }
-
   Uploader.prototype._renderError = function (err) {
     if (!this._options.modal) {
       return
@@ -871,40 +754,6 @@ var tus = require('tus-js-client')
     CSS_LOADED = true
     $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit3-latest.css" />')
       .appendTo('head')
-  }
-
-  Uploader.prototype._calcPollTimeout = function () {
-    var ping = this._pollStarted - +new Date()
-    return ping < this._options.interval ? this._options.interval : ping
-  }
-
-  Uploader.prototype._mergeUploads = function (assembly) {
-    for (var i = 0; i < assembly.uploads.length; i++) {
-      var upload = assembly.uploads[i]
-
-      if ($.inArray(upload.id, this._uploadFileIds) === -1) {
-        this._options.onUpload(upload, assembly)
-        this._uploads.push(upload)
-        this._uploadFileIds.push(upload.id)
-      }
-    }
-  }
-
-  Uploader.prototype._mergeResults = function (assembly) {
-    for (var step in assembly.results) {
-      this._results[step] = this._results[step] || []
-
-      for (var j = 0; j < assembly.results[step].length; j++) {
-        var result = assembly.results[step][j]
-        var resultId = step + '_' + result.id
-
-        if ($.inArray(resultId, this._resultFileIds) === -1) {
-          this._options.onResult(step, result, assembly)
-          this._results[step].push(result)
-          this._resultFileIds.push(resultId)
-        }
-      }
-    }
   }
 
   Uploader.prototype._errorOut = function (err) {
