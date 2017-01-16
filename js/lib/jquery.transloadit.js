@@ -9,6 +9,7 @@
  */
 require('../dep/json2')
 require('../dep/jquery.jsonp')
+var io = require('../dep/socket.io.min')
 
 var Assembly = require('./Assembly')
 var InstanceFetcher = require('./InstanceFetcher')
@@ -124,6 +125,28 @@ var tus = require('tus-js-client')
   }
 
   Uploader.prototype.init = function ($form, options) {
+    var socket = io.connect('http://vbox.transloadit.com', {path: '/ws8105'});
+    console.log(socket)
+    socket.on("error", function(error) {
+      console.log('WebSocket Error: ' + error)
+    })
+
+    socket.on("connect", function(event) {
+      console.log('Connected!')
+      socket.send("HEY MISTER TIM!")
+    })
+
+    socket.on("message", function(event) {
+      console.log("message", event)
+      var message = event.data;
+      console.log('Websocket message: ' + message)
+    })
+
+    socket.on("disconnect", function(event) {
+      console.log("Disconnected", event)
+      console.log('Disconnected from WebSocket.')
+    })
+
     var self = this
     this.options($.extend({}, OPTIONS, options || {}))
 
@@ -206,6 +229,7 @@ var tus = require('tus-js-client')
       self._assembly = new Assembly({
         wait: self._options['wait'],
         instance: instance,
+        port: 8105,
         protocol: self._options.protocol,
         internetConnectionChecker: self._internetConnectionChecker,
         pollTimeout: self._options.pollTimeout,
@@ -585,7 +609,6 @@ var tus = require('tus-js-client')
     }
 
     this._modal.renderCancelling()
-    this._assembly.stopStatusFetching()
     this._assembly.cancel(hideModal)
   }
 

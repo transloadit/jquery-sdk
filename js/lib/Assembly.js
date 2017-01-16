@@ -32,6 +32,12 @@ function Assembly(opts) {
 
   this._started = false
   this._pollingDisabled = false
+
+  this._socket = null
+  // this._websocketUrl = 'ws://api2-' + this._instance + '.transloadit.com/ws-' + this._port
+  // this._websocketUrl = 'ws://vbox.transloadit.com/ws-' + this._port
+  this._websocketUrl = 'ws://vbox.transloadit.com/ws' + this._port
+  this._createSocket()
 }
 
 Assembly.prototype.stopStatusFetching = function () {
@@ -45,12 +51,11 @@ Assembly.prototype.fetchStatus = function (query, cb) {
 
 Assembly.prototype.cancel = function (cb) {
   cb = cb || function() {}
-
-  oldVal = this._pollingDisabled
-  this._pollingDisabled = false
+  var self = this
 
   this._poll('?method=delete', function () {
-    self._pollingDisabled = oldVal
+    self.stopStatusFetching()
+    self._end()
     cb()
   })
 }
@@ -133,6 +138,7 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
       assembly.msg   = 'Your internet connection is flaky and was offline for at least a moment. Please try again.';
     }
 
+    this._end()
     this._onError(assembly)
     return false
   }
@@ -153,6 +159,7 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
 
   if (isCanceled) {
     this._pollingDisabled = true
+    this._end()
     this._onCancel(assembly)
     return false
   }
@@ -161,6 +168,7 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
     this._pollingDisabled = true
     assembly.uploads = this._uploads
     assembly.results = this._results
+    this._end()
     this._onSuccess(assembly)
     return false
   }
@@ -188,6 +196,35 @@ Assembly.prototype._handleErroneousPoll = function (url, xhr, status, jsonpErr) 
   }
   this._onError(err)
   return false
+}
+
+Assembly.prototype._end = function () {
+  if (this._socket) {
+    this._socket.close()
+  }
+  this._socket = null
+}
+
+Assembly.prototype._createSocket = function () {
+  var socket = new WebSocket(this._websocketUrl)
+  // var self = this
+
+  socket.onerror = function(error) {
+    console.log('WebSocket Error: ' + error)
+  }
+
+  socket.onopen = function(event) {
+    console.log('Connected to: ' + event.currentTarget.URL)
+  }
+
+  socket.onmessage = function(event) {
+    var message = event.data;
+    console.log('Websocket message: ' + message)
+  }
+
+  socket.onclose = function(event) {
+    console.log('Disconnected from WebSocket.')
+  }
 }
 
 Assembly.prototype._mergeUploads = function (assembly) {
