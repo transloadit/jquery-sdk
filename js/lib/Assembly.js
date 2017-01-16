@@ -31,11 +31,11 @@ function Assembly(opts) {
   this._pollTimer = null
 
   this._started = false
-  this._ended = false
+  this._pollingDisabled = false
 }
 
 Assembly.prototype.stopStatusFetching = function () {
-  this._ended = true
+  this._pollingDisabled = true
   clearTimeout(this._pollTimer)
 }
 
@@ -44,14 +44,23 @@ Assembly.prototype.fetchStatus = function (query, cb) {
 }
 
 Assembly.prototype.cancel = function (cb) {
-  this._poll('?method=delete', hideModal)
+  cb = cb || function() {}
+
+  oldVal = this._pollingDisabled
+  this._pollingDisabled = false
+
+  this._poll('?method=delete', function () {
+    self._pollingDisabled = oldVal
+    cb()
+  })
 }
 
 Assembly.prototype._poll = function (query, cb) {
-  if (this._ended) {
+  if (this._pollingDisabled) {
     return
   }
 
+  query = query || null
   cb = cb || function() {}
 
   var instance = 'status-' + this._instance
@@ -70,7 +79,7 @@ Assembly.prototype._poll = function (query, cb) {
     timeout: self._pollTimeout,
     callbackParameter: 'callback',
     success: function (assembly) {
-      if (self._ended) {
+      if (self._pollingDisabled) {
         return cb()
       }
 
@@ -80,11 +89,10 @@ Assembly.prototype._poll = function (query, cb) {
           self._poll()
         }, self._pollTimeout)
       }
-
       cb()
     },
     error: function (xhr, status, jsonpErr) {
-      if (self._ended) {
+      if (self._pollingDisabled) {
         return cb()
       }
 
@@ -144,13 +152,13 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
   this._mergeResults(assembly)
 
   if (isCanceled) {
-    this._ended = true
+    this._pollingDisabled = true
     this._onCancel(assembly)
     return false
   }
 
   if (isComplete || (!this._wait && isExecuting)) {
-    this._ended = true
+    this._pollingDisabled = true
     assembly.uploads = this._uploads
     assembly.results = this._results
     this._onSuccess(assembly)
