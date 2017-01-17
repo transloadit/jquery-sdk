@@ -9,7 +9,6 @@
  */
 require('../dep/json2')
 require('../dep/jquery.jsonp')
-var io = require('../dep/socket.io.min')
 
 var Assembly = require('./Assembly')
 var InstanceFetcher = require('./InstanceFetcher')
@@ -121,32 +120,11 @@ var tus = require('tus-js-client')
     this._formData = null
     this._files = {}
 
+    this._websocketPath = null
     this._internetConnectionChecker = null
   }
 
   Uploader.prototype.init = function ($form, options) {
-    var socket = io.connect('http://vbox.transloadit.com', {path: '/ws8105'});
-    console.log(socket)
-    socket.on("error", function(error) {
-      console.log('WebSocket Error: ' + error)
-    })
-
-    socket.on("connect", function(event) {
-      console.log('Connected!')
-      socket.send("HEY MISTER TIM!")
-    })
-
-    socket.on("message", function(event) {
-      console.log("message", event)
-      var message = event.data;
-      console.log('Websocket message: ' + message)
-    })
-
-    socket.on("disconnect", function(event) {
-      console.log("Disconnected", event)
-      console.log('Disconnected from WebSocket.')
-    })
-
     var self = this
     this.options($.extend({}, OPTIONS, options || {}))
 
@@ -221,21 +199,23 @@ var tus = require('tus-js-client')
       i18n: this._i18n,
       internetConnectionChecker: this._internetConnectionChecker
     })
-    instanceFetcher.fetch(function (err, instance) {
+    instanceFetcher.fetch(function (err, instance, websocketPath) {
       if (err) {
         return self._errorOut(err)
       }
 
       self._assembly = new Assembly({
-        wait: self._options['wait'],
         instance: instance,
-        port: 8105,
+        websocketPath: websocketPath,
+        service: self._options.service,
         protocol: self._options.protocol,
         internetConnectionChecker: self._internetConnectionChecker,
         pollTimeout: self._options.pollTimeout,
         poll404Retries: self._options.poll404Retries,
         pollConnectionRetries: self._options.pollConnectionRetries,
         pollInterval: self._options.pollInterval,
+
+        wait: self._options['wait'],
 
         onStart: function (assemblyResult) {
           self._options.onStart(assemblyResult)
@@ -271,15 +251,21 @@ var tus = require('tus-js-client')
         }
       })
 
-      var cb = function () {
-        self._assembly.fetchStatus()
-      }
+      self._assembly.init(function(err) {
+        if (err) {
+          self._errorOut(err)
+        }
 
-      if (self._options.resumable && tus.isSupported) {
-        self._startWithResumabilitySupport(cb)
-      } else {
-        self._startWithXhr(cb)
-      }
+        var cb = function () {
+          self._assembly.fetchStatus()
+        }
+
+        if (self._options.resumable && tus.isSupported) {
+          self._startWithResumabilitySupport(cb)
+        } else {
+          self._startWithXhr(cb)
+        }
+      })
     })
   }
 

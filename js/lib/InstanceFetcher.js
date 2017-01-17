@@ -15,7 +15,7 @@ InstanceFetcher.prototype.fetch = function (cb) {
       timeout: self._timeout,
       callbackParameter: 'callback',
       success: function (result) {
-        cb(result.error, result.hostname)
+        cb(result.error, result.hostname, result.websocket_path)
       },
       error: function (xhr, status, jsonpErr) {
         if (!self._internetConnectionChecker.isOnline()) {

@@ -1,7 +1,10 @@
 var uuid = require('uuid')
+var io = require('../dep/socket.io.min')
 
 function Assembly(opts) {
   this._instance = opts.instance
+  this._service = opts.service
+  this._websocketPath = opts.websocketPath
   this._protocol = opts.protocol
   this._internetConnectionChecker = opts.internetConnectionChecker
   this._wait = opts.wait
@@ -34,10 +37,10 @@ function Assembly(opts) {
   this._pollingDisabled = false
 
   this._socket = null
-  // this._websocketUrl = 'ws://api2-' + this._instance + '.transloadit.com/ws-' + this._port
-  // this._websocketUrl = 'ws://vbox.transloadit.com/ws-' + this._port
-  this._websocketUrl = 'ws://vbox.transloadit.com/ws' + this._port
-  this._createSocket()
+}
+
+Assembly.prototype.init = function (cb) {
+  this._createSocket(cb)
 }
 
 Assembly.prototype.stopStatusFetching = function () {
@@ -205,26 +208,41 @@ Assembly.prototype._end = function () {
   this._socket = null
 }
 
-Assembly.prototype._createSocket = function () {
-  var socket = new WebSocket(this._websocketUrl)
-  // var self = this
+Assembly.prototype._createSocket = function (cb) {
+  console.log(this._service, this._websocketPath)
+  var socket = io.connect(this._service, {path: this._websocketPath})
+  var cbCalled = false
+  var self = this
 
-  socket.onerror = function(error) {
-    console.log('WebSocket Error: ' + error)
-  }
+  socket.on("error", function(error) {
+    if (!cbCalled) {
+      cbCalled = true
+      cb(error)
+    }
+  })
 
-  socket.onopen = function(event) {
-    console.log('Connected to: ' + event.currentTarget.URL)
-  }
+  socket.on("connect", function(event) {
+    if (!cbCalled) {
+      console.log("Connected", "assembly_" + self._id)
+      cbCalled = true
+      // socket.send("assembly_" + this._id, function(err) {
+      //   console.log("SENT", err)
+      // })
+      socket.send("Hey Mister Tim")
+      cb()
+    }
+  })
 
-  socket.onmessage = function(event) {
+  socket.on("message", function(event) {
+    console.log("message", event)
     var message = event.data;
     console.log('Websocket message: ' + message)
-  }
+  })
 
-  socket.onclose = function(event) {
+  socket.on("disconnect", function(event) {
+    console.log("Disconnected", event)
     console.log('Disconnected from WebSocket.')
-  }
+  })
 }
 
 Assembly.prototype._mergeUploads = function (assembly) {
