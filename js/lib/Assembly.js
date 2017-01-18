@@ -209,37 +209,38 @@ Assembly.prototype._end = function () {
 }
 
 Assembly.prototype._createSocket = function (cb) {
-  console.log(this._service, this._websocketPath)
   var socket = io.connect(this._service, {path: this._websocketPath})
   var cbCalled = false
   var self = this
 
-  socket.on("error", function(error) {
+  socket.on("error", function (error) {
+    console.log("Websocket Error", error)
     if (!cbCalled) {
       cbCalled = true
       cb(error)
     }
   })
 
-  socket.on("connect", function(event) {
+  socket.on("connect", function (event) {
     if (!cbCalled) {
       console.log("Connected", "assembly_" + self._id)
+      socket.send("connect_assembly_" + self._id)
       cbCalled = true
-      // socket.send("assembly_" + this._id, function(err) {
-      //   console.log("SENT", err)
-      // })
-      socket.send("Hey Mister Tim")
       cb()
     }
   })
 
-  socket.on("message", function(event) {
+  socket.on("message", function (event) {
     console.log("message", event)
     var message = event.data;
     console.log('Websocket message: ' + message)
   })
 
-  socket.on("disconnect", function(event) {
+  socket.on("end_assembly", function () {
+    console.log("end_assembly")
+  })
+
+  socket.on("disconnect", function (event) {
     console.log("Disconnected", event)
     console.log('Disconnected from WebSocket.')
   })
