@@ -1,7 +1,7 @@
 {
   "name": "transloadit-jquery",
   "description": "Integrate Transloadit's uploading and encoding capabilites into browsers using jQuery",
-  "version": "2.7.3",
+  "version": "2.8.0",
   "scripts": {
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",

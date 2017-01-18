@@ -29,6 +29,7 @@
     wait                         : false,
     processZeroFiles             : true,
     triggerUploadOnFileSelection : false,
+    requireUploadMetaData        : false,
     autoSubmit                   : true,
     modal                        : true,
     exclude                      : '',
@@ -594,10 +595,11 @@
         }
 
         self.pollRetries = 0;
-        var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING';
-        var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING';
-        var isCanceled  = assembly.ok === 'ASSEMBLY_CANCELED';
-        var isComplete  = assembly.ok === 'ASSEMBLY_COMPLETED';
+        var isUploading             = assembly.ok === 'ASSEMBLY_UPLOADING';
+        var isExecuting             = assembly.ok === 'ASSEMBLY_EXECUTING';
+        var isCanceled              = assembly.ok === 'ASSEMBLY_CANCELED';
+        var isComplete              = assembly.ok === 'ASSEMBLY_COMPLETED';
+        var uploadMetaDataExtracted = assembly.upload_meta_data_extracted;
 
         if (assembly.bytes_expected > 0) {
           self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
@@ -635,7 +637,19 @@
           return;
         }
 
-        var isEnded = isComplete || (!self._options['wait'] && isExecuting);
+        var isEnded = false
+
+        if (isComplete) {
+          isEnded = true
+        }
+
+        if (isExecuting && !self._options['wait']) {
+          isEnded = true
+
+          if (self._options['requireUploadMetaData'] && !uploadMetaDataExtracted) {
+            isEnded = false
+          }
+        }
 
         if (assembly.bytes_expected > 0) {
           self.renderProgress(assembly, isEnded, self._options['wait']);

@@ -11,7 +11,8 @@
     </form>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="http://localjquerysdk.com/build/jquery.transloadit2-latest.js"></script>
+    <!-- <script src="http://localjquerysdk.com/build/jquery.transloadit2-latest.js"></script> -->
+    <script src="https://assets.transloadit.com/js/jquery.transloadit2-v2.8.0.js"></script>
 
     <script type="text/javascript">
     window.YOUR_TRANSLOADIT_AUTH_KEY='YOUR_AUTH_KEY'
@@ -21,9 +22,10 @@
     <script type="text/javascript">
     $(function() {
       $('#upload-form').transloadit({
-        wait: true,
+        wait: false,
         autoSubmit: false,
         assets: 'http://localjquerysdk.com/build/',
+        requireUploadMetaData: true,
         triggerUploadOnFileSelection: true,
         fields: '*',
         resumable: true,
