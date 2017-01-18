@@ -174,7 +174,7 @@ The plugin supports several parameters.
 
   However, if you set <code>wait</code> to <code>false</code>, the <code>onSuccess</code> callback is fired as soon as the uploading is finished. The  <code>uploads</code> array in the passed assembly object will be empty in this case. If you need this uploads array to be populated, set this option to <code>true</code>.
 
-  This is <code>false</code> by default, to fire the <code>onSuccess</code> callback as soon as possible to increase perceived performance.
+  This option is <code>false</code> by default to fire the <code>onSuccess</code> callback as soon as possible to increase perceived performance.
  </td>
 </tr>
 <tr>
