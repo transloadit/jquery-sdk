@@ -664,7 +664,10 @@ var tus = require('tus-js-client')
       return this.cancel()
     }
 
-    err.assemblyId = this._assembly.getId()
+    if (this._assembly) {
+      err.assemblyId = this._assembly.getId()
+    }
+
     err.instance = this._assembly.getInstance()
     this._modal.renderError(err)
   }
