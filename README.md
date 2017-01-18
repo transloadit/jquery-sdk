@@ -352,9 +352,11 @@ The fields that you send here will be available as <code>${fields.*}</code> vari
   <code>onUpload(upload)</code>
  </td>
  <td markdown="1">
-  This is fired once for each file uploaded. This is useful for custom renderings of multiple file uploads.
+  This is fired once for each uploaded file. This is useful for custom renderings of multiple file uploads.
 
   Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
+
+  Please set <code>requireUploadMetaData</code> to true if you use this callback.
  </td>
 </tr>
 
