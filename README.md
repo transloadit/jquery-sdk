@@ -9,8 +9,11 @@ The official docs for our jQuery plugin / SDK are on the
 
 Changes from version 2 to version 3:
 
+- Performance for uploading and result fetching has been improved tremendously.
+- Drag and Drop support has been added.
+- Support for file preview lists has been added.
 - All options related to polling have been removed.
--
+- The onStart() callback no longer receives the assembly object as a parameter, and is also called much sooner in the process.
 
 ### Basics
 
@@ -343,7 +346,7 @@ The fields that you send here will be available as <code>${fields.*}</code> vari
 </tr>
 <tr>
  <td markdown="1">
-  <code>onStart(assembly)</code>
+  <code>onStart()</code>
  </td>
  <td markdown="1">
   This is fired whenever an upload begins.

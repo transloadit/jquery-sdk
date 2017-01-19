@@ -64,7 +64,6 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
     url += query
   }
 
-  console.log(">>> fetch")
   var self = this
   $.jsonp({
     url: url,
@@ -118,6 +117,8 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
   if (isCanceled) {
     this._onCancel(assembly)
   } else {
+    // We only call this when uploading is finished and based on our wait parameter and
+    // the requireUploadMetaData parameter. Hence, we can safely call onSuccess here.
     this._onSuccess(assembly)
   }
 
