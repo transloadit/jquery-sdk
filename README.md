@@ -183,6 +183,19 @@ The plugin supports several parameters.
 </tr>
 <tr>
  <td markdown="1">
+  <code>requireUploadMetaData</code>
+ </td>
+ <td markdown="1">
+  Specifies whether the plugin should wait for meta data of uploaded files to first be extracted before it calls the <code>onSuccess</code> callback.
+  If you set <code>wait</code> to <code>true</code>, this option does not have any effect, because extracting meta of uploaded files is a prerequisite for the files to be transcoded.
+
+  However, if you set <code>wait</code> to <code>false</code>, the <code>onSuccess</code> callback is fired as soon as the uploading is finished. The  <code>uploads</code> array in the passed assembly object will be empty in this case. If you need this uploads array to be populated, set this option to <code>true</code>.
+
+  This option is <code>false</code> by default to fire the <code>onSuccess</code> callback as soon as possible to increase perceived performance.
+ </td>
+</tr>
+<tr>
+ <td markdown="1">
   <code>params</code>
  </td>
  <td markdown="1">
@@ -359,6 +372,8 @@ The fields that you send here will be available as <code>${fields.*}</code> vari
   This is fired once for each file uploaded. This is useful for custom renderings of multiple file uploads.
 
   Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
+
+  Please set <code>requireUploadMetaData</code> to true if you use this callback.
  </td>
 </tr>
 

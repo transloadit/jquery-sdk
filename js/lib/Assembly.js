@@ -8,6 +8,7 @@ function Assembly(opts) {
   this._protocol = opts.protocol
   this._internetConnectionChecker = opts.internetConnectionChecker
   this._wait = opts.wait
+  this._requireUploadMetaData = opts.requireUploadMetaData
 
   this._onStart = opts.onStart || function() {}
   this._onExecuting = opts.onExecuting || function() {}
@@ -81,7 +82,6 @@ Assembly.prototype._poll = function (query, cb) {
   this._pollStarted = +new Date()
 
   var self = this
-
   $.jsonp({
     url: url,
     timeout: self._pollTimeout,
@@ -95,7 +95,7 @@ Assembly.prototype._poll = function (query, cb) {
       if (continuePolling) {
         self._pollTimer = setTimeout(function () {
           self._poll()
-        }, self._pollTimeout)
+        }, self._pollInterval)
       }
       cb()
     },
@@ -156,6 +156,7 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
   var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
   var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
   var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
+  var uploadMetaDataExtracted = assembly.upload_meta_data_extracted
 
   this._mergeUploads(assembly)
   this._mergeResults(assembly)
@@ -167,7 +168,25 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
     return false
   }
 
-  if (isComplete || (!this._wait && isExecuting)) {
+  var isEnded = false
+  console.log('ended false1', isComplete, assembly.ok)
+
+  if (isComplete) {
+    isEnded = true
+    console.log('ended true1')
+  }
+
+  if (isExecuting && !this._wait) {
+    isEnded = true
+    console.log('ended true2')
+
+    if (this._requireUploadMetaData && !uploadMetaDataExtracted) {
+      console.log('ended false2')
+      isEnded = false
+    }
+  }
+
+  if (isEnded) {
     this._pollingDisabled = true
     assembly.uploads = this._uploads
     assembly.results = this._results
@@ -236,8 +255,16 @@ Assembly.prototype._createSocket = function (cb) {
     console.log('Websocket message: ' + message)
   })
 
-  socket.on("end_assembly", function () {
-    console.log("end_assembly")
+  socket.on("assembly_uploading_finished", function () {
+    console.log("upload finished")
+  })
+
+  socket.on("assembly_upload_meta_data_extracted", function () {
+    console.log("upload meta data extracted")
+  })
+
+  socket.on("assembly_finished", function () {
+    console.log("assembly finished")
   })
 
   socket.on("disconnect", function (event) {

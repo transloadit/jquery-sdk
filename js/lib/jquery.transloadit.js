@@ -37,13 +37,13 @@ var tus = require('tus-js-client')
     onDisconnect: function() {},
     onReconnect: function() {},
     resumable: false,
-    pollInterval: 2500,
     pollTimeout: 8000,
     poll404Retries: 15,
     pollConnectionRetries: 5,
     wait: false,
     processZeroFiles: true,
     triggerUploadOnFileSelection: false,
+    requireUploadMetaData: false,
     autoSubmit: true,
     modal: true,
     exclude: '',
@@ -216,6 +216,7 @@ var tus = require('tus-js-client')
         pollInterval: self._options.pollInterval,
 
         wait: self._options['wait'],
+        requireUploadMetaData: self._options['requireUploadMetaData'],
 
         onStart: function (assemblyResult) {
           self._options.onStart(assemblyResult)

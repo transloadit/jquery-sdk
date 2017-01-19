@@ -29,7 +29,7 @@ InstanceFetcher.prototype.fetch = function (cb) {
           error: 'SERVER_CONNECTION_ERROR',
           message: self._i18n.translate('errors.SERVER_CONNECTION_ERROR'),
           reason: reason,
-          url: url
+          url: self._service
         }
         cb(err)
       }
