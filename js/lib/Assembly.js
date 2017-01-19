@@ -249,12 +249,6 @@ Assembly.prototype._createSocket = function (cb) {
     }
   })
 
-  socket.on("message", function (event) {
-    console.log("message", event)
-    var message = event.data;
-    console.log('Websocket message: ' + message)
-  })
-
   socket.on("assembly_uploading_finished", function () {
     console.log("upload finished")
   })
