@@ -758,11 +758,13 @@ var tus = require('tus-js-client')
             self._files[name] = [file]
           }
 
+          self._options.onFileSelect(file, $(this))
+          self._addFileToPreviewAreas(file)
+        },
+        onDrop: function () {
           if (self._options.triggerUploadOnFileSelection) {
             self._$form.trigger('submit.transloadit')
           }
-          self._options.onFileSelect(file, $(this))
-          self._addFileToPreviewAreas(file)
         },
         $el: $(this)
       })

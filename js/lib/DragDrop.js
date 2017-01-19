@@ -4,7 +4,8 @@ function DragDrop(opts) {
   }
 
   this._$el = opts.$el
-  this.onFileAdd = opts.onFileAdd || function() {}
+  this._onFileAdd = opts.onFileAdd || function() {}
+  this._onDrop = opts.onDrop || function() {}
 
   this._bindEvents()
 }
@@ -43,10 +44,12 @@ DragDrop.prototype.dropCb = function(e) {
     var files = e.originalEvent.dataTransfer.files
     for (var i in files) {
       if (typeof files[i] === 'object') {
-        this.onFileAdd(files[i])
+        this._onFileAdd(files[i])
       }
     }
   }
+
+  this._onDrop(e)
 
   return false
 }
