@@ -23,11 +23,11 @@
     <script type="text/javascript">
     $(function() {
       $('#upload-form').transloadit({
-        wait: false,
+        wait: true,
         autoSubmit: false,
         service: 'http://vbox.transloadit.com',
         assets: 'http://localjquerysdk.com/build/',
-        requireUploadMetaData: false,
+        requireUploadMetaData: true,
         triggerUploadOnFileSelection: true,
         pollInterval: 2500,
         fields: '*',

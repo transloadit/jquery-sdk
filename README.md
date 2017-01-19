@@ -7,9 +7,10 @@ The official docs for our jQuery plugin / SDK are on the
 
 ## Version 3
 
-API changes from version 2 to version 3:
+Changes from version 2 to version 3:
 
-- The option `interval` is now named `pollInterval`
+- All options related to polling have been removed.
+-
 
 ### Basics
 

@@ -37,9 +37,6 @@ var tus = require('tus-js-client')
     onDisconnect: function() {},
     onReconnect: function() {},
     resumable: false,
-    pollTimeout: 8000,
-    poll404Retries: 15,
-    pollConnectionRetries: 5,
     wait: false,
     processZeroFiles: true,
     triggerUploadOnFileSelection: false,
@@ -195,7 +192,6 @@ var tus = require('tus-js-client')
 
     instanceFetcher = new InstanceFetcher({
       service: this._options.service,
-      timeout: this._options.pollTimeout,
       i18n: this._i18n,
       internetConnectionChecker: this._internetConnectionChecker
     })
@@ -210,17 +206,10 @@ var tus = require('tus-js-client')
         service: self._options.service,
         protocol: self._options.protocol,
         internetConnectionChecker: self._internetConnectionChecker,
-        pollTimeout: self._options.pollTimeout,
-        poll404Retries: self._options.poll404Retries,
-        pollConnectionRetries: self._options.pollConnectionRetries,
-        pollInterval: self._options.pollInterval,
 
         wait: self._options['wait'],
         requireUploadMetaData: self._options['requireUploadMetaData'],
 
-        onStart: function (assemblyResult) {
-          self._options.onStart(assemblyResult)
-        },
         onExecuting: function (assemblyResult) {
           // If the assembly is executing meaning all uploads are done, we will not get more progress
           // events from XHR. But if there was a connection interruption in the meantime, we want to
@@ -257,20 +246,20 @@ var tus = require('tus-js-client')
           self._errorOut(err)
         }
 
-        var cb = function () {
-          self._assembly.fetchStatus()
-        }
+        self._options.onStart()
 
         if (self._options.resumable && tus.isSupported) {
-          self._startWithResumabilitySupport(cb)
+          self._startWithResumabilitySupport()
         } else {
-          self._startWithXhr(cb)
+          self._startWithXhr()
         }
       })
     })
   }
 
   Uploader.prototype._startWithXhr = function (cb) {
+    cb = cb || function() {}
+
     var self = this
     this._formData = this._prepareFormData()
 
@@ -309,6 +298,8 @@ var tus = require('tus-js-client')
   }
 
   Uploader.prototype._startWithResumabilitySupport = function (cb) {
+    cb = cb || function() {}
+
     var self = this
     this._formData = this._prepareFormData()
     this._formData.append('tus_num_expected_upload_files', this._fileCount)

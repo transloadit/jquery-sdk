@@ -26,17 +26,7 @@ function Assembly(opts) {
   this._id = uuid.v4().replace(/\-/g, "")
   this._url = this._protocol + this._instance + '/assemblies/' + this._id
 
-  this._pollInterval = opts.pollInterval,
-  this._pollTimeout = opts.pollTimeout,
-  this._poll404Retries = opts.poll404Retries,
-  this._pollConnectionRetries = opts.pollConnectionRetries
-  this._pollStarted = null
-  this._pollRetries = 0
-  this._pollTimer = null
-
   this._started = false
-  this._pollingDisabled = false
-
   this._socket = null
 }
 
@@ -44,31 +34,26 @@ Assembly.prototype.init = function (cb) {
   this._createSocket(cb)
 }
 
-Assembly.prototype.stopStatusFetching = function () {
-  this._pollingDisabled = true
-  clearTimeout(this._pollTimer)
-}
-
-Assembly.prototype.fetchStatus = function (query, cb) {
-  this._poll(query, cb)
-}
-
 Assembly.prototype.cancel = function (cb) {
   cb = cb || function() {}
   var self = this
 
-  this._poll('?method=delete', function () {
+  this._assemblyRequest('?method=delete', function () {
     self.stopStatusFetching()
     self._end()
     cb()
   })
 }
 
-Assembly.prototype._poll = function (query, cb) {
-  if (this._pollingDisabled) {
-    return
+Assembly.prototype._fetchStatus = function (query, cb) {
+  if (this._ended) {
+    return cb()
   }
+  this._assemblyRequest(query, cb)
+  this._ended = true
+}
 
+Assembly.prototype._assemblyRequest = function (query, cb) {
   query = query || null
   cb = cb || function() {}
 
@@ -79,44 +64,22 @@ Assembly.prototype._poll = function (query, cb) {
     url += query
   }
 
-  this._pollStarted = +new Date()
-
+  console.log(">>> fetch")
   var self = this
   $.jsonp({
     url: url,
-    timeout: self._pollTimeout,
+    timeout: 8000,
     callbackParameter: 'callback',
     success: function (assembly) {
-      if (self._pollingDisabled) {
-        return cb()
-      }
-
-      var continuePolling = self._handleSuccessfulPoll(assembly)
-      if (continuePolling) {
-        self._pollTimer = setTimeout(function () {
-          self._poll()
-        }, self._pollInterval)
-      }
+      self._handleSuccessfulPoll(assembly)
       cb()
     },
     error: function (xhr, status, jsonpErr) {
-      if (self._pollingDisabled) {
-        return cb()
-      }
-
-      var continuePolling = true
       // If this is a server problem and not a client connection problem, check if we should
       // continue polling or if we should abort.
       if (self._internetConnectionChecker.isOnline()) {
-        continuePolling = self._handleErroneousPoll(url, xhr, status, jsonpErr)
+        self._handleErroneousPoll(url, xhr, status, jsonpErr)
       }
-
-      if (continuePolling) {
-        setTimeout(function () {
-          self._poll()
-        }, self._pollTimeout)
-      }
-
       cb()
     }
   })
@@ -124,16 +87,6 @@ Assembly.prototype._poll = function (query, cb) {
 
 Assembly.prototype._handleSuccessfulPoll = function (assembly) {
   this._assemblyResult = assembly
-
-  if (assembly.error === 'ASSEMBLY_NOT_FOUND') {
-    this._pollRetries++
-
-    if (this._pollRetries > this._poll404Retries) {
-      this._onError(assembly)
-      return false
-    }
-    return true
-  }
 
   if (assembly.error || assembly.ok === 'REQUEST_ABORTED') {
     if (assembly.ok === 'REQUEST_ABORTED') {
@@ -151,62 +104,29 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
     this._onStart(assembly)
   }
 
-  this._pollRetries = 0
-
   var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
   var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
   var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
-  var uploadMetaDataExtracted = assembly.upload_meta_data_extracted
 
   this._mergeUploads(assembly)
   this._mergeResults(assembly)
 
+  assembly.uploads = this._uploads
+  assembly.results = this._results
+  this._end()
+
   if (isCanceled) {
-    this._pollingDisabled = true
-    this._end()
     this._onCancel(assembly)
-    return false
-  }
-
-  var isEnded = false
-  console.log('ended false1', isComplete, assembly.ok)
-
-  if (isComplete) {
-    isEnded = true
-    console.log('ended true1')
-  }
-
-  if (isExecuting && !this._wait) {
-    isEnded = true
-    console.log('ended true2')
-
-    if (this._requireUploadMetaData && !uploadMetaDataExtracted) {
-      console.log('ended false2')
-      isEnded = false
-    }
-  }
-
-  if (isEnded) {
-    this._pollingDisabled = true
-    assembly.uploads = this._uploads
-    assembly.results = this._results
-    this._end()
+  } else {
     this._onSuccess(assembly)
-    return false
   }
 
   if (isExecuting) {
     this._onExecuting(assembly)
   }
-  return true
 }
 
 Assembly.prototype._handleErroneousPoll = function (url, xhr, status, jsonpErr) {
-  this._pollRetries++
-  if (this._pollRetries <= this._pollConnectionRetries) {
-    return true
-  }
-
   var reason = 'JSONP status poll request status: ' + status
   reason += ', err: ' + jsonpErr
 
@@ -250,14 +170,24 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on("assembly_uploading_finished", function () {
+    if (!self._wait && !self._requireUploadMetaData) {
+      self._fetchStatus()
+    }
     console.log("upload finished")
   })
 
   socket.on("assembly_upload_meta_data_extracted", function () {
+    if (!self._wait && self._requireUploadMetaData) {
+      self._fetchStatus()
+    }
     console.log("upload meta data extracted")
   })
 
   socket.on("assembly_finished", function () {
+    if (self._wait) {
+      self._fetchStatus()
+    }
+
     console.log("assembly finished")
   })
 
