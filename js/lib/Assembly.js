@@ -25,6 +25,9 @@ function Assembly(opts) {
 
   this._started = false
   this._socket = null
+
+  this._statusFetchRetries = 3
+  this._timeBetweenStatusFetchRetries = 8000
 }
 
 Assembly.prototype.init = function (cb) {
@@ -61,24 +64,50 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
     url += query
   }
 
+  console.log(">> fetching", url)
   var self = this
-  $.jsonp({
-    url: url,
-    timeout: 8000,
-    callbackParameter: 'callback',
-    success: function (assembly) {
-      self._handleSuccessfulPoll(assembly)
-      cb()
-    },
-    error: function (xhr, status, jsonpErr) {
-      // If this is a server problem and not a client connection problem, check if we should
-      // continue polling or if we should abort.
-      if (self._internetConnectionChecker.isOnline()) {
-        self._handleErroneousPoll(url, xhr, status, jsonpErr)
+  var attemptCount = 0
+
+  attempt = =>
+    $.jsonp({
+      url: url,
+      timeout: 8000,
+      callbackParameter: 'callback',
+      success: function (assembly) {
+        console.log('Success')
+        self._handleSuccessfulPoll(assembly)
+        cb()
+      },
+      error: function (xhr, status, jsonpErr) {
+        var retriesExhausted = attemptCount >= self._statusFetchRetries
+        console.log('error')
+
+        errMsg = 'errors.SERVER_CONNECTION_ERROR'
+        if (retriesExhausted) {
+          errMsg = 'errors.SERVER_CONNECTION_ERROR.retries_exhausted'
+        }
+
+        var err = {
+          error: 'SERVER_CONNECTION_ERROR',
+          message: self._i18n.translate(errMsg),
+          reason: reason,
+          url: self._service
+        }
+
+        self._onError(err, retriesExhausted)
+
+        if (retriesExhausted) {
+          return cb(err, true)
+        }
+
+        setTimeout(function() {
+          attemptCount++
+          attempt()
+        }, self._timeBetweenStatusFetchRetries)
       }
-      cb()
-    }
-  })
+    })
+
+  attempt()
 }
 
 Assembly.prototype._handleSuccessfulPoll = function (assembly) {
@@ -117,20 +146,6 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
   if (isExecuting) {
     this._onExecuting(assembly)
   }
-}
-
-Assembly.prototype._handleErroneousPoll = function (url, xhr, status, jsonpErr) {
-  var reason = 'JSONP status poll request status: ' + status
-  reason += ', err: ' + jsonpErr
-
-  var err = {
-    error: 'SERVER_CONNECTION_ERROR',
-    message: this._i18n.translate('errors.SERVER_CONNECTION_ERROR'),
-    reason: reason,
-    url: url
-  }
-  this._onError(err)
-  return false
 }
 
 Assembly.prototype._end = function () {

@@ -15,6 +15,7 @@ InstanceFetcher.prototype.fetch = function (cb) {
   var attemptCount = 0
 
   function _fetch () {
+    console.log(">>> fetch from", self._service, self._timeout)
     $.jsonp({
       url: self._service,
       timeout: self._timeout,
@@ -40,9 +41,8 @@ InstanceFetcher.prototype.fetch = function (cb) {
           url: self._service
         }
 
-        self._onError(err, retriesExhausted)
-
         if (retriesExhausted) {
+          self._onError(err)
           return cb(err, true)
         }
 
