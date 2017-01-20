@@ -3,13 +3,18 @@ require('../dep/jquery.jsonp')
 function InstanceFetcher(opts) {
   this._service = opts.service
   this._timeout = opts.timeout || 2500
+  this._retries = opts.retries || 3
+  this._timeBetweenRetries = opts.timeBetweenRetries || 10000
+
+  this._onError = opts.onError || function() {}
   this._i18n = opts.i18n
-  this._internetConnectionChecker = opts.internetConnectionChecker
 }
 
 InstanceFetcher.prototype.fetch = function (cb) {
   var self = this
-  function attempt () {
+  var attemptCount = 0
+
+  function _fetch () {
     $.jsonp({
       url: self._service,
       timeout: self._timeout,
@@ -18,25 +23,38 @@ InstanceFetcher.prototype.fetch = function (cb) {
         cb(result.error, result.hostname, result.websocket_path)
       },
       error: function (xhr, status, jsonpErr) {
-        if (!self._internetConnectionChecker.isOnline()) {
-          return attempt()
-        }
-
         var reason = 'JSONP assembly_id request status: ' + status
         reason += ', err: ' + jsonpErr
 
+        var retriesExhausted = attemptCount >= self._retries
+
+        errMsg = 'errors.SERVER_CONNECTION_ERROR'
+        if (retriesExhausted) {
+          errMsg = 'errors.SERVER_CONNECTION_ERROR.retries_exhausted'
+        }
+
         var err = {
           error: 'SERVER_CONNECTION_ERROR',
-          message: self._i18n.translate('errors.SERVER_CONNECTION_ERROR'),
+          message: self._i18n.translate(errMsg),
           reason: reason,
           url: self._service
         }
-        cb(err)
+
+        self._onError(err, retriesExhausted)
+
+        if (retriesExhausted) {
+          return cb(err, true)
+        }
+
+        setTimeout(function() {
+          attemptCount++
+          _fetch()
+        }, self._timeBetweenRetries)
       }
     })
   }
 
-  attempt()
+  _fetch()
 }
 
 module.exports = InstanceFetcher

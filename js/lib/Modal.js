@@ -95,21 +95,20 @@ Modal.prototype.renderError = function (err) {
   this._toggleErrorTexts(true)
   this._toggleProgressTexts(false)
 
-  var errorMsg =  err.message + '<br /><br />'
-  var detailedErrMsg = errorMsg
-  detailedErrMsg += (err.reason || '')
+  if (!err.message) {
+    err.message = this._i18n.translate('errors.unknown') + ' ' + this._i18n.translate('errors.tryAgain')
+  }
+
+  this._$modal.$error.html(err.message).show()
 
   var errorsRequiringDetails = [
     'SERVER_CONNECTION_ERROR',
     'ASSEMBLY_NOT_FOUND'
   ]
-  if ($.inArray(err.error, errorsRequiringDetails) === -1) {
-    this._$modal.$error.html(errorMsg).show()
+  if (errorsRequiringDetails.indexOf(err.error) === -1) {
     return
   }
 
-  var text = this._i18n.translate('errors.unknown') + '<br/>' + this._i18n.translate('errors.tryAgain')
-  this._$modal.$error.html(text).show()
   var self = this
   var ip = null
 
@@ -124,7 +123,7 @@ Modal.prototype.renderError = function (err) {
       ip: ip,
       time: helpers.getUTCDatetime(),
       agent: navigator.userAgent,
-      error: detailedErrMsg
+      error: err.message + (err.reason || '')
     }
     $.post('https://status.transloadit.com/client_error', details)
 
@@ -133,7 +132,7 @@ Modal.prototype.renderError = function (err) {
       detailsArr.push(key + ': ' + details[key])
     }
 
-    var detailsTxt = this._i18n.translate('errors.troubleshootDetails') + '<br /><br />'
+    var detailsTxt = self._i18n.translate('errors.troubleshootDetails') + '<br /><br />'
     self._$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
 
     self._$modal.$errorDetailsToggle.show().find('a')

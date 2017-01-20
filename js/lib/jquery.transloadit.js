@@ -193,7 +193,9 @@ var tus = require('tus-js-client')
     instanceFetcher = new InstanceFetcher({
       service: this._options.service,
       i18n: this._i18n,
-      internetConnectionChecker: this._internetConnectionChecker
+      onError: function(err) {
+        self._renderError(err)
+      }
     })
     instanceFetcher.fetch(function (err, instance, websocketPath) {
       if (err) {
@@ -658,9 +660,9 @@ var tus = require('tus-js-client')
 
     if (this._assembly) {
       err.assemblyId = this._assembly.getId()
+      err.instance = this._assembly.getInstance()
     }
 
-    err.instance = this._assembly.getInstance()
     this._modal.renderError(err)
   }
 
