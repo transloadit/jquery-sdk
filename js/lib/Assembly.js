@@ -6,7 +6,6 @@ function Assembly(opts) {
   this._service = opts.service
   this._websocketPath = opts.websocketPath
   this._protocol = opts.protocol
-  this._internetConnectionChecker = opts.internetConnectionChecker
   this._wait = opts.wait
   this._requireUploadMetaData = opts.requireUploadMetaData
 

@@ -123,7 +123,7 @@ Modal.prototype.renderError = function (err) {
       ip: ip,
       time: helpers.getUTCDatetime(),
       agent: navigator.userAgent,
-      error: err.message + (err.reason || '')
+      error: err.message + ' ' + (err.reason || '')
     }
     $.post('https://status.transloadit.com/client_error', details)
 

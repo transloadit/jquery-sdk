@@ -209,7 +209,6 @@ var tus = require('tus-js-client')
         websocketPath: websocketPath,
         service: self._options.service,
         protocol: self._options.protocol,
-        internetConnectionChecker: self._internetConnectionChecker,
 
         wait: self._options['wait'],
         requireUploadMetaData: self._options['requireUploadMetaData'],
