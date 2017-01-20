@@ -4,7 +4,7 @@ function InstanceFetcher(opts) {
   this._service = opts.service
   this._timeout = opts.timeout || 2500
   this._retries = opts.retries || 3
-  this._timeBetweenRetries = opts.timeBetweenRetries || 10000
+  this._timeBetweenRetries = opts.timeBetweenRetries || 8000
 
   this._onError = opts.onError || function() {}
   this._i18n = opts.i18n
