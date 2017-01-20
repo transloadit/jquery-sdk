@@ -46,6 +46,15 @@
         onSuccess: function (assembly) {
           console.log('Assembly finished successfully with', assembly.ok);
         },
+        onExecuting: function (assembly) {
+          console.log('Assembly started executing', assembly.ok);
+        },
+        onUpload: function (file) {
+          console.log('Upload added', file);
+        },
+        onResult: function (stepName, result) {
+          console.log('Result added', stepName, result);
+        },
         onError: function (assembly) {
           console.log('Assembly got an error:', assembly.error);
         },

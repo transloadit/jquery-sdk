@@ -233,11 +233,11 @@ var tus = require('tus-js-client')
         onError: function (assemblyObjContainingError) {
           self._errorOut(assemblyObjContainingError)
         },
-        onUpload: function (upload, assemblyResult) {
-          self._options.onUpload(upload, assemblyResult)
+        onUpload: function (upload) {
+          self._options.onUpload(upload)
         },
-        onResult: function (step, result, assemblyResult) {
-          self._options.onResult(step, result, assemblyResult)
+        onResult: function (step, result) {
+          self._options.onResult(step, result)
         }
       })
 

@@ -18,11 +18,6 @@ function Assembly(opts) {
   this._onUpload = opts.onUpload || function() {}
   this._onResult = opts.onResult || function() {}
 
-  this._uploads = []
-  this._results = {}
-  this._uploadFileIds = []
-  this._resultFileIds = []
-
   this._id = uuid.v4().replace(/\-/g, "")
   this._url = this._protocol + this._instance + '/assemblies/' + this._id
 
@@ -107,11 +102,6 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
   var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
   var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
 
-  this._mergeUploads(assembly)
-  this._mergeResults(assembly)
-
-  assembly.uploads = this._uploads
-  assembly.results = this._results
   this._end()
 
   if (isCanceled) {
@@ -188,43 +178,21 @@ Assembly.prototype._createSocket = function (cb) {
     if (self._wait) {
       self._fetchStatus()
     }
-
     console.log("assembly finished")
+  })
+
+  socket.on("assembly_upload", function (file) {
+    self._onUpload(file)
+  })
+
+  socket.on("assembly_result", function (stepName, result) {
+    self._onResult(stepName, result)
   })
 
   socket.on("disconnect", function (event) {
     console.log("Disconnected", event)
     console.log('Disconnected from WebSocket.')
   })
-}
-
-Assembly.prototype._mergeUploads = function (assembly) {
-  for (var i = 0; i < assembly.uploads.length; i++) {
-    var upload = assembly.uploads[i]
-
-    if ($.inArray(upload.id, this._uploadFileIds) === -1) {
-      this._onUpload(upload, assembly)
-      this._uploads.push(upload)
-      this._uploadFileIds.push(upload.id)
-    }
-  }
-}
-
-Assembly.prototype._mergeResults = function (assembly) {
-  for (var step in assembly.results) {
-    this._results[step] = this._results[step] || []
-
-    for (var j = 0; j < assembly.results[step].length; j++) {
-      var result = assembly.results[step][j]
-      var resultId = step + '_' + result.id
-
-      if ($.inArray(resultId, this._resultFileIds) === -1) {
-        this._onResult(step, result, assembly)
-        this._results[step].push(result)
-        this._resultFileIds.push(resultId)
-      }
-    }
-  }
 }
 
 Assembly.prototype.getRequestTargetUrl = function (withId) {
