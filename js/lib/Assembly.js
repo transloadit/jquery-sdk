@@ -23,6 +23,8 @@ function Assembly(opts) {
   this._url = this._protocol + this._instance + '/assemblies/' + this._id
 
   this._started = false
+  this._ended = false
+  this._finished = false
   this._socket = null
 
   this._statusFetchRetries = 3
@@ -67,7 +69,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
   var self = this
   var attemptCount = 0
 
-  attempt = =>
+  function attempt() {
     $.jsonp({
       url: url,
       timeout: 8000,
@@ -79,19 +81,9 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
       },
       error: function (xhr, status, jsonpErr) {
         var retriesExhausted = attemptCount >= self._statusFetchRetries
-        console.log('error')
-
-        errMsg = 'errors.SERVER_CONNECTION_ERROR'
-        if (retriesExhausted) {
-          errMsg = 'errors.SERVER_CONNECTION_ERROR.retries_exhausted'
-        }
-
-        var err = {
-          error: 'SERVER_CONNECTION_ERROR',
-          message: self._i18n.translate(errMsg),
-          reason: reason,
-          url: self._service
-        }
+        var err = self._connectionError(retriesExhausted)
+        err.reason = 'Could not fetch assembly status.'
+        err.reason += ' Return code: ' + status + ', Error: ' + jsonpErr
 
         self._onError(err, retriesExhausted)
 
@@ -105,6 +97,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
         }, self._timeBetweenStatusFetchRetries)
       }
     })
+  }
 
   attempt()
 }
@@ -190,6 +183,7 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on("assembly_finished", function () {
+    self._finished = true
     if (self._wait) {
       self._fetchStatus()
     }
@@ -205,8 +199,20 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on("disconnect", function (event) {
+    // If the assembly is complete, or it is complete in our eyes based on the wait and
+    // requireUploadMetaData parameters, then we do not mind the socket disconnection.
+    // The final status fetching has its own connection error handling.
     console.log("Disconnected", event)
-    console.log('Disconnected from WebSocket.')
+    if (self._finished || self._ended) {
+      console.log("Do not care about disconnect")
+      return
+    }
+
+    console.log("Caring about disconnect")
+
+    var err = self._connectionError(true)
+    err.reason = 'The Websocket disconnected.'
+    self._onError(err)
   })
 }
 
@@ -218,6 +224,21 @@ Assembly.prototype.getRequestTargetUrl = function (withId) {
   }
 
   return result
+}
+
+Assembly.prototype._connectionError = function (retriesExhausted) {
+  errMsg = 'errors.SERVER_CONNECTION_ERROR'
+  if (retriesExhausted) {
+    errMsg = 'errors.SERVER_CONNECTION_ERROR.retries_exhausted'
+  }
+
+  var err = {
+    error: 'SERVER_CONNECTION_ERROR',
+    message: this._i18n.translate(errMsg),
+    url: this._service
+  }
+
+  return err
 }
 
 Assembly.prototype.getInstance = function () {
