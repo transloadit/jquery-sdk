@@ -203,6 +203,8 @@ var tus = require('tus-js-client')
       }
 
       self._assembly = new Assembly({
+        i18n: self._i18n,
+
         instance: instance,
         websocketPath: websocketPath,
         service: self._options.service,

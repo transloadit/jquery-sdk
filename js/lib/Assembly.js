@@ -18,6 +18,8 @@ function Assembly(opts) {
   this._onUpload = opts.onUpload || function() {}
   this._onResult = opts.onResult || function() {}
 
+  this._i18n = opts.i18n
+
   this._id = uuid.v4().replace(/\-/g, "")
   this._url = this._protocol + this._instance + '/assemblies/' + this._id
 
@@ -153,7 +155,6 @@ Assembly.prototype._createSocket = function (cb) {
 
   socket.on("connect", function (event) {
     if (!cbCalled) {
-      console.log("Connected", "assembly_" + self._id)
       socket.send("connect_assembly_" + self._id)
       cbCalled = true
       cb()
