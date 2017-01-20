@@ -2,18 +2,16 @@
 
 # Transloadit jQuery SDK
 
-The official docs for our jQuery plugin / SDK are on the
-[transloadit website](https://transloadit.com/docs/#jquery-plugin).
-
 ## Version 3
 
 Changes from version 2 to version 3:
 
-- Performance for uploading and result fetching has been improved tremendously.
+- Performance has been improved tremendously in all areas of the plugin.
 - Drag and Drop support has been added.
 - Support for file preview lists has been added.
 - All options related to polling have been removed.
-- The onStart() callback no longer receives the assembly object as a parameter, and is also called much sooner in the process.
+- The onStart(), onUpload() and onResult() callbacks no longer receive the assembly object as a parameter, and is also called much sooner in the process.
+- **Important**: The default value for the wait parameter is now <code>false</code> to encourage usage of notify_urls.
 
 ### Basics
 
@@ -21,12 +19,12 @@ The Transloadit jQuery plugin allows you to
 
 - show file upload progress,
 - get uploaded results directly without further API queries, and
-- wait for upload processing to complete before redirecting to the result page.
+- wait for upload processing to complete before redirecting to the result page or calling a callback function.
 
 Assuming a form with the ID <code>"upload-form"</code> (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
 
 ```markup
-<script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
+<script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
 <script type="text/javascript">
 // We call .transloadit() after the DOM is initialized:
 $(function() {
@@ -39,6 +37,18 @@ By default, this will display an overlay with a progress bar.
 
 <span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
 
+### Releases
+
+We have three *magic* releases:
+
+ - <code>jquery.transloadit-latest.js</code>
+   This is always the latest version of any major release and is **the recommended version to use**. We will make sure not to break backwards compatibility even between major versions. This version is safe to use. [https://assets.transloadit.com/js/jquery.transloadit-latest.js](https://assets.transloadit.com/js/jquery.transloadit-latest.js)
+
+ - <code>jquery.transloadit-v3-latest.js</code>
+   This is always the latest version of the v3 branch: [https://assets.transloadit.com/js/jquery.transloadit-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit-v3-latest.js)
+
+ - <code>jquery.transloadit2-v2-latest.js</code>
+   This is always the latest version of the v2 branch: [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
 
 ### Include drag and drop
 
@@ -156,18 +166,6 @@ $el.transloadit('stop');
 
 Please consult the [plugin's source code](https://github.com/transloadit/jquery-sdk) to see all available methods.
 
-### Available plugin versions
-
-#### Latest
-
-This is always the latest version, and for now points to v2.7.2. This is the **recommended version** to use.<br />
-<https://assets.transloadit.com/js/jquery.transloadit2-latest.js>
-
-#### Version 2 Latest
-
-This is always the latest version of the 2.x.x branch, and for now points to v2.7.2.<br />
-<https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js>
-
 ### Plugin parameters
 
 The plugin supports several parameters.
@@ -182,7 +180,7 @@ The plugin supports several parameters.
   <code>wait</code>
  </td>
  <td markdown="1">
-  Specifies whether the plugin should wait for files to be processed before submitting the form. This is <code>false</code> by default.
+  Specifies whether the plugin should wait for files to be transcoded before submitting the form. This is <code>false</code> by default.
  </td>
 </tr>
 <tr>
@@ -414,7 +412,7 @@ The fields that you send here will be available as <code>${fields.*}</code> vari
   <code>onSuccess(assembly)</code>
  </td>
  <td markdown="1">
-  This is fired when the plugin has completed an upload. If <code>wait</code> is set to <code>false</code>, this is fired after the upload finishes. If <code>wait</code> is <code>true</code>, this is fired once all files have been processed.
+  This is fired when the plugin has completed an upload. If <code>wait</code> is set to <code>false</code>, this is fired after the upload finishes. If <code>wait</code> is <code>true</code>, this is fired once all files have been transcoded.
  </td>
 </tr>
 </table>
@@ -427,59 +425,6 @@ take a look at the [plugin's source code](https://github.com/transloadit/jquery-
 Feel free to fork this project. We will happily merge bug fixes or other small
 improvements. For bigger changes you should probably get in touch with us
 before you start to avoid not seeing them merged.
-
-## Versioning
-
-This project implements the Semantic Versioning guidelines.
-
-Releases will be numbered with the following format:
-
-<code><major>.<minor>.<patch></code>
-
-And constructed with the following guidelines:
-
-* Breaking backward compatibility bumps the major (and resets the minor and patch)
-* New additions without breaking backward compatibility bumps the minor (and resets the patch)
-* Bug fixes and misc changes bumps the patch
-
-For more information on SemVer, please visit http://semver.org/.
-
-<code>latest</code> points to the latest stable of a major version.
-
-Note that the <code>2</code> in <code>jquery.transloadit2-latest.js</code> refers to the Transloadit
-API2 version, not the client SDK version.
-
-## Releases
-
-We have two *magic* releases:
-
- - <code>jquery.transloadit2-latest.js</code>
-   This is always the latest version of any major release and is **the recommended version to use**. If you use this, it may break backwards compatibility for you once we release the next major version. [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
-
- - <code>jquery.transloadit2-v2-latest.js</code>
-   This is always the latest major 2.0 version: [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
-
-Here's an overview of [all our releases](https://github.com/transloadit/jquery-sdk/releases).
-
-## Building
-
-Building your own compressed version requires a *nix operation system and curl.
-We are using the [Google Closure REST API](http://code.google.com/closure/compiler/docs/gettingstarted_api.html)
-for minification.
-
-```bash
-make
-```
-
-The minified output file can be found in: <code>build/jquery.transloadit2.js</code>.
-
-## Tests
-
-To run the tests, install <code>make</code> (via Xcode or build-essentials), [CasperJS](http://casperjs.org/) and [Node.js](http://nodejs.org). Then run
-
-```bash
-make test
-```
 
 ## Dependencies
 
