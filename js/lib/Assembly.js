@@ -162,7 +162,7 @@ Assembly.prototype._createSocket = function (cb) {
 
   socket.on("connect", function (event) {
     if (!cbCalled) {
-      socket.send("connect_assembly_" + self._id)
+      socket.send("assembly_connect_" + self._id)
       cbCalled = true
       cb()
     }
