@@ -32,4 +32,8 @@ InternetConnectionChecker.prototype.isOnline = function () {
   return this._isOnline
 }
 
+InternetConnectionChecker.prototype.isCurrentlyOnline = function (cb) {
+  isOnline(cb)
+}
+
 module.exports = InternetConnectionChecker

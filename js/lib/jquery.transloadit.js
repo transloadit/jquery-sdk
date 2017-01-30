@@ -325,12 +325,11 @@ var tus = require('tus-js-client')
     }
 
     var f = new XMLHttpRequest()
-    var url = this._assembly.getRequestTargetUrl()
+    var url = this._assembly.getRequestTargetUrl(true)
     f.open('POST', url)
     f.onreadystatechange = function () {
       if (f.readyState === 4 && f.status === 200) {
         var resp = JSON.parse(f.responseText)
-        self._assembly.setId(resp.id)
         self._assembly.setUrl(resp.status_endpoint)
         proceed()
         cb()
@@ -379,12 +378,19 @@ var tus = require('tus-js-client')
       },
       onError: function (error) {
         self._xhr = false
-        self._errorOut(error)
+        self._internetConnectionChecker.isCurrentlyOnline(function(online) {
+          // If this is not a connection problem, bubble up the error.
+          // Otherwise if this is a connection problem, we will have our own error handling for it.
+          if (online) {
+            self._errorOut(error)
+          }
+        })
       },
       onSuccess: function() {
         self._xhr = false
       },
       onProgress: function (bytesUploaded, bytesTotal) {
+        console.log(">> onProgress", bytesUploaded, bytesTotal)
         // Calculate the number of uploaded bytes of all uploads by removing
         // the last known value and then adding the new value.
         self._uploadedBytes = self._uploadedBytes - lastBytesUploaded + bytesUploaded
@@ -842,6 +848,7 @@ var tus = require('tus-js-client')
         self._options.onDisconnect()
       },
       onReconnect: function () {
+        console.log(">>> reconnecting ...")
         // If no upload is in progress anyway, then we do not need to do anything here.
         // Polling for the assembly status will auto-continue without us doing anything here.
         if (!self._xhr) {

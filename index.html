@@ -25,13 +25,13 @@
       $('#upload-form').transloadit({
         wait: true,
         autoSubmit: false,
-        service: 'http://vbox.transloadit.com',
+        service: 'http://api2-vbox.transloadit.com',
         assets: 'http://localjquerysdk.com/build/',
         requireUploadMetaData: true,
         triggerUploadOnFileSelection: true,
         pollInterval: 2500,
         fields: '*',
-        resumable: false,
+        resumable: true,
         params: {
           auth: { key: window.YOUR_TRANSLOADIT_AUTH_KEY },
           steps: {
@@ -55,8 +55,8 @@
         onResult: function (stepName, result) {
           console.log('Result added', stepName, result);
         },
-        onError: function (assembly) {
-          console.log('Assembly got an error:', assembly.error);
+        onError: function (error) {
+          console.log('Assembly got an error:', error);
         },
       });
     });

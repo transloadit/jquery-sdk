@@ -26,6 +26,8 @@ function Assembly(opts) {
   this._ended = false
   this._finished = false
   this._socket = null
+  this._socketConnected = false
+  this._socketReconnectInterval = null
 
   this._statusFetchRetries = 3
   this._timeBetweenStatusFetchRetries = 8000
@@ -152,6 +154,7 @@ Assembly.prototype._createSocket = function (cb) {
   var cbCalled = false
   var self = this
 
+  console.log('>>> create socket')
   socket.on("error", function (error) {
     console.log("Websocket Error", error)
     if (!cbCalled) {
@@ -161,40 +164,51 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on("connect", function (event) {
+    self._socketConnected = true
+
+    console.log(">>> CONNECTED")
+    if (self._socketReconnectInterval) {
+      clearInterval(self._socketReconnectInterval)
+      self._socketReconnectInterval = null
+    }
+
     if (!cbCalled) {
-      socket.send("assembly_connect_" + self._id)
+      console.log(">>> SEND CONNECT")
+      socket.emit("assembly_connect", {id: self._id})
       cbCalled = true
       cb()
     }
   })
 
   socket.on("assembly_uploading_finished", function () {
+    console.log("uploading finished")
     if (!self._wait && !self._requireUploadMetaData) {
       self._fetchStatus()
     }
-    console.log("upload finished")
   })
 
   socket.on("assembly_upload_meta_data_extracted", function () {
+    console.log("upload meta data extracted")
     if (!self._wait && self._requireUploadMetaData) {
       self._fetchStatus()
     }
-    console.log("upload meta data extracted")
   })
 
   socket.on("assembly_finished", function () {
+    console.log("assembly finished")
     self._finished = true
     if (self._wait) {
       self._fetchStatus()
     }
-    console.log("assembly finished")
   })
 
-  socket.on("assembly_upload", function (file) {
+  socket.on("assembly_upload_finished", function (file) {
+    console.log("assembly_upload_finished")
     self._onUpload(file)
   })
 
   socket.on("assembly_result", function (stepName, result) {
+    console.log("assembly_result")
     self._onResult(stepName, result)
   })
 
@@ -213,6 +227,12 @@ Assembly.prototype._createSocket = function (cb) {
     var err = self._connectionError(true)
     err.reason = 'The Websocket disconnected.'
     self._onError(err)
+
+    socket.close()
+    self._socketReconnectInterval = setInterval(function() {
+      console.log('>>> try to create socket')
+      self._createSocket()
+    }, 3000)
   })
 }
 
