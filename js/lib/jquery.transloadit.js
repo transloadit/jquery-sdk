@@ -835,7 +835,7 @@ var tus = require('tus-js-client')
       onDisconnect: function () {
         var errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
 
-        if (!this._xhr) {
+        if (!self._xhr) {
           errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_NOT_IN_PROGRESS'
         }
 
@@ -845,17 +845,13 @@ var tus = require('tus-js-client')
         }
         self._renderError(err)
 
+        self._assembly.onDisconnect()
         self._options.onDisconnect()
       },
       onReconnect: function () {
         console.log(">>> reconnecting ...")
-        // If no upload is in progress anyway, then we do not need to do anything here.
-        // Polling for the assembly status will auto-continue without us doing anything here.
-        if (!self._xhr) {
-          return
-        }
 
-        if (!self._options.resumable) {
+        if (self._xhr && !self._options.resumable) {
           // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
           // we have our own resume flag with tus support.
           self._abortUpload()
@@ -868,6 +864,7 @@ var tus = require('tus-js-client')
 
         // Resuming of uploads is done automatically for us in the tus client
 
+        self._assembly.onReconnect()
         self._options.onReconnect()
       }
     })

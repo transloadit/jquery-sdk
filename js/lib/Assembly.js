@@ -31,6 +31,9 @@ function Assembly(opts) {
 
   this._statusFetchRetries = 3
   this._timeBetweenStatusFetchRetries = 8000
+
+  this._uploadingFinished = true
+  this._isOnline = true
 }
 
 Assembly.prototype.init = function (cb) {
@@ -49,6 +52,9 @@ Assembly.prototype.cancel = function (cb) {
 }
 
 Assembly.prototype._fetchStatus = function (query, cb) {
+  query = query || null
+  cb = cb || function() {}
+
   if (this._ended) {
     return cb()
   }
@@ -70,6 +76,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
   console.log(">> fetching", url)
   var self = this
   var attemptCount = 0
+  this._inAssemblyRequest = true
 
   function attempt() {
     $.jsonp({
@@ -79,6 +86,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
       success: function (assembly) {
         console.log('Success')
         self._handleSuccessfulPoll(assembly)
+        self._inAssemblyRequest = false
         cb()
       },
       error: function (xhr, status, jsonpErr) {
@@ -94,8 +102,10 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
         }
 
         setTimeout(function() {
-          attemptCount++
-          attempt()
+          if (self._isOnline) {
+            attemptCount++
+            attempt()
+          }
         }, self._timeBetweenStatusFetchRetries)
       }
     })
@@ -170,6 +180,7 @@ Assembly.prototype._createSocket = function (cb) {
     if (self._socketReconnectInterval) {
       clearInterval(self._socketReconnectInterval)
       self._socketReconnectInterval = null
+      self.onReconnect()
     }
 
     if (!cbCalled) {
@@ -182,6 +193,8 @@ Assembly.prototype._createSocket = function (cb) {
 
   socket.on("assembly_uploading_finished", function () {
     console.log("uploading finished")
+    self._uploadingFinished = true
+
     if (!self._wait && !self._requireUploadMetaData) {
       self._fetchStatus()
     }
@@ -213,27 +226,42 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on("disconnect", function (event) {
-    // If the assembly is complete, or it is complete in our eyes based on the wait and
-    // requireUploadMetaData parameters, then we do not mind the socket disconnection.
-    // The final status fetching has its own connection error handling.
-    console.log("Disconnected", event)
-    if (self._finished || self._ended) {
-      console.log("Do not care about disconnect")
-      return
-    }
-
-    console.log("Caring about disconnect")
-
-    var err = self._connectionError(true)
-    err.reason = 'The Websocket disconnected.'
-    self._onError(err)
-
     socket.close()
-    self._socketReconnectInterval = setInterval(function() {
+    self.onDisconnect()
+  })
+}
+
+Assembly.prototype.onDisconnect = function (fromSocket) {
+  this._isOnline = false
+
+  // If the assembly is complete, or it is complete in our eyes based on the wait and
+  // requireUploadMetaData parameters, then we do not mind the socket disconnection.
+  // The final status fetching has its own connection error handling.
+  console.log("Disconnected", event)
+  if (this._finished || this._ended) {
+    console.log("Do not care about disconnect")
+    return
+  }
+
+  var self = this
+  console.log("Caring about disconnect")
+
+  if (fromSocket) {
+    this._socketReconnectInterval = setInterval(function() {
       console.log('>>> try to create socket')
       self._createSocket()
     }, 3000)
-  })
+  }
+}
+
+Assembly.prototype.onReconnect = function () {
+  this._isOnline = true
+
+  console.log('>> Assembly reconnect')
+  if (this._uploadingFinished && this._inAssemblyRequest) {
+    console.log('Retry fetching status')
+    this._fetchStatus()
+  }
 }
 
 Assembly.prototype.getRequestTargetUrl = function (withId) {
