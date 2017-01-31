@@ -48,6 +48,6 @@
     "jshint": "2.8.0"
   },
   "devDependencies": {
-    "jscs": "2.6.0"
+    "jscs": "2.7.0"
   }
 }
