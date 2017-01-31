@@ -6,12 +6,14 @@
 
 Changes from version 2 to version 3:
 
-- Performance has been improved tremendously in all areas of the plugin.
+- There is now support for resumable file uploads! It works out of the box, you do not need to change anything for it.
+- Performance has been improved in all areas of the plugin.
 - Drag and Drop support has been added.
 - Support for file preview lists has been added.
 - All options related to polling have been removed.
 - The onStart(), onUpload() and onResult() callbacks no longer receive the assembly object as a parameter, and is also called much sooner in the process.
-- **Important**: The default value for the wait parameter is now <code>false</code> to encourage usage of notify_urls.
+- There is now a lot less network traffic for assembly status updates.
+- There is now the ability to not wait for file upload meta data anymore, which is a big speed improvement.
 
 ### Basics
 
