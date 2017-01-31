@@ -23,15 +23,16 @@
     <script type="text/javascript">
     $(function() {
       $('#upload-form').transloadit({
-        wait: true,
+        wait: false,
+        requireUploadMetaData: false,
+        resumable: false,
+
         autoSubmit: false,
         // service: 'http://api2-vbox.transloadit.com',
         assets: 'http://localjquerysdk.com/build/',
-        requireUploadMetaData: true,
         triggerUploadOnFileSelection: true,
         pollInterval: 2500,
         fields: '*',
-        resumable: false,
         params: {
           auth: { key: window.YOUR_TRANSLOADIT_AUTH_KEY },
           steps: {
