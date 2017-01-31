@@ -25,7 +25,7 @@
       $('#upload-form').transloadit({
         wait: true,
         autoSubmit: false,
-        service: 'http://api2-vbox.transloadit.com',
+        // service: 'http://api2-vbox.transloadit.com',
         assets: 'http://localjquerysdk.com/build/',
         requireUploadMetaData: true,
         triggerUploadOnFileSelection: true,
@@ -42,6 +42,9 @@
               height: 75
             }
           }
+        },
+        onProgress: function (bytesIn, totalBytes) {
+          console.log(bytesIn, totalBytes);
         },
         onSuccess: function (assembly) {
           console.log('Assembly finished successfully with', assembly.ok);

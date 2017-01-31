@@ -150,7 +150,7 @@ Assembly.prototype._end = function () {
 }
 
 Assembly.prototype._createSocket = function (cb) {
-  var socket = io.connect(this._service, {path: this._websocketPath})
+  var socket = io.connect(this._protocol + this._instance, {path: this._websocketPath})
   var cbCalled = false
   var self = this
 
