@@ -49,14 +49,16 @@ pushd "${__dir}"
     rm -f ./screen-* 2>/dev/null  || true
 
     tmpfile="/tmp/casper-${basename}"
-    cat "./_pre.js" "${file}" "./_post.js" > "${tmpfile}"
+    echo "${tmpfile}"
+    pushd .. > /dev/null
+      cat "${__dir}/_pre.js" "${__dir}/${file}" "${__dir}/_post.js" | "./node_modules/.bin/babel" --out-file "${tmpfile}" --presets=es2015
+    popd > /dev/null
     casperjs \
       test \
       "${tmpfile}" \
       --ignore-ssl-errors=yes \
       --testhost=${testhost} \
       --failscreen=./screen-fail.png || exitcode=$?
-    rm ${tmpfile}
 
     if [ "${exitcode}" -gt 0 ]; then
       echo "--> Please \`open tests/screen-fail.png\` for the fail screen"

@@ -1,17 +1,14 @@
 // # Setup
 // #########################################################################
 // const utils = require('utils')
-const casper = require('casper').create({
-  verbose: true,
-  logLevel: 'warning',
-  exitOnError: true,
-  safeLogs: true,
-  waitTimeout: 10000,
-  viewportSize: {
-    width: 1600,
-    height: 1600
-  }
-})
+require('babel-polyfill')
+casper.options.exitOnError  = true
+casper.options.safeLogs     = true
+casper.options.waitTimeout  = 10000
+casper.options.viewportSize = {
+  width : 1600,
+  height: 1600,
+}
 
 const testhost = casper.cli.get('testhost')
 const screenshot = casper.cli.get('failscreen')
