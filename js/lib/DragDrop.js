@@ -1,57 +1,59 @@
-function DragDrop(opts) {
-  if (!opts) {
-    opts = {}
+class DragDrop {
+  constructor (opts) {
+    if (!opts) {
+      opts = {}
+    }
+
+    this._$el = opts.$el
+    this._onFileAdd = opts.onFileAdd || (() => {})
+    this._onDrop = opts.onDrop || (() => {})
+
+    this._bindEvents()
   }
 
-  this._$el = opts.$el
-  this._onFileAdd = opts.onFileAdd || function() {}
-  this._onDrop = opts.onDrop || function() {}
+  _bindEvents () {
+    this._$el.on('dragenter', this.dragEnterCb.bind(this))
+    this._$el.on('dragexit', this.dragExitCb.bind(this))
+    this._$el.on('dragover', this.dragOverCb.bind(this))
+    this._$el.on('dragleave', this.dragExitCb.bind(this))
+    this._$el.on('drop', this.dropCb.bind(this))
+  }
 
-  this._bindEvents()
-}
+  dragEnterCb (e) {
+    e.stopPropagation()
+    e.preventDefault()
+  }
 
-DragDrop.prototype._bindEvents = function() {
-  this._$el.on('dragenter', this.dragEnterCb.bind(this))
-  this._$el.on('dragexit', this.dragExitCb.bind(this))
-  this._$el.on('dragover', this.dragOverCb.bind(this))
-  this._$el.on('dragleave', this.dragExitCb.bind(this))
-  this._$el.on('drop', this.dropCb.bind(this))
-}
+  dragExitCb (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    this._$el.removeClass('hover')
+  }
 
-DragDrop.prototype.dragEnterCb = function(e) {
-  e.stopPropagation()
-  e.preventDefault()
-};
+  dragOverCb (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    this._$el.addClass('hover')
+  }
 
-DragDrop.prototype.dragExitCb = function(e) {
-  e.stopPropagation()
-  e.preventDefault()
-  this._$el.removeClass('hover')
-};
+  dropCb (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    this._$el.removeClass('hover')
 
-DragDrop.prototype.dragOverCb = function(e) {
-  e.stopPropagation()
-  e.preventDefault()
-  this._$el.addClass('hover')
-};
-
-DragDrop.prototype.dropCb = function(e) {
-  e.stopPropagation()
-  e.preventDefault()
-  this._$el.removeClass('hover')
-
-  if (e.originalEvent && e.originalEvent.dataTransfer) {
-    var files = e.originalEvent.dataTransfer.files
-    for (var i in files) {
-      if (typeof files[i] === 'object') {
-        this._onFileAdd(files[i])
+    if (e.originalEvent && e.originalEvent.dataTransfer) {
+      const files = e.originalEvent.dataTransfer.files
+      for (const i in files) {
+        if (typeof files[i] === 'object') {
+          this._onFileAdd(files[i])
+        }
       }
     }
+
+    this._onDrop(e)
+
+    return false
   }
-
-  this._onDrop(e)
-
-  return false
 }
 
 module.exports = DragDrop

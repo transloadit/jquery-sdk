@@ -1,7 +1,7 @@
-var http = require('http')
-var querystring = require('querystring')
-var fs = require('fs')
-var path = require('path')
+const http = require('http')
+const querystring = require('querystring')
+const fs = require('fs')
+const path = require('path')
 // var debug = require('debug')('tlj:testserver')
 // var util = require('util')
 
@@ -11,7 +11,7 @@ if (!process.env.TRANSLOADIT_ACCESS_KEY) {
 }
 
 function escapeHtml (string) {
-  var entityMap = {
+  const entityMap = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -20,62 +20,60 @@ function escapeHtml (string) {
     '/': '&#x2F;'
   }
 
-  return String(string).replace(/[&<>"'\/]/g, function (s) {
-    return entityMap[s]
-  })
+  return String(string).replace(/[&<>"'\/]/g, s => entityMap[s])
 }
 
 function processPost (request, response, cb) {
-  var queryData = ''
+  let queryData = ''
 
   if (request.method === 'POST') {
-    request.on('data', function (data) {
+    request.on('data', data => {
       queryData += data
       if (queryData.length > 1e6) {
         queryData = ''
-        response.writeHead(413, {'Content-Type': 'text/plain'}).end()
+        response.writeHead(413, { 'Content-Type': 'text/plain' }).end()
         request.connection.destroy()
       }
     })
 
-    request.on('end', function () {
+    request.on('end', () => {
       request.post = querystring.parse(queryData)
       cb()
     })
   } else {
-    response.writeHead(405, {'Content-Type': 'text/plain'})
+    response.writeHead(405, { 'Content-Type': 'text/plain' })
     response.end()
   }
 }
 
 function respondHtml (res, content) {
-  var headerFile = path.join(__dirname, 'fixtures', 'header.html')
-  fs.readFile(headerFile, function (err, header) {
+  const headerFile = path.join(__dirname, 'fixtures', 'header.html')
+  fs.readFile(headerFile, (err, header) => {
     if (err) {
       throw err
     }
 
-    var footerFile = path.join(__dirname, 'fixtures', 'footer.html')
-    fs.readFile(footerFile, function (err, footer) {
+    const footerFile = path.join(__dirname, 'fixtures', 'footer.html')
+    fs.readFile(footerFile, (err, footer) => {
       if (err) {
         throw err
       }
-      var body = header + content + footer
-      res.writeHead(200, 'OK', {'Content-Type': 'text/html'})
+      const body = header + content + footer
+      res.writeHead(200, 'OK', { 'Content-Type': 'text/html' })
       res.end(body)
     })
   })
 }
 
 function addFixturePath (content) {
-  var toReplace = '<span id="fixture_path">' + path.join(__dirname, 'fixtures</span>')
+  const toReplace = `<span id="fixture_path">${path.join(__dirname, 'fixtures</span>')}`
   return content.replace(/<span id="fixture_path"><\/span>/, toReplace)
 }
 
 function serveHtmlFile (res, filename) {
-  var fileName = path.join(__dirname, 'fixtures', filename)
+  const fileName = path.join(__dirname, 'fixtures', filename)
 
-  fs.readFile(fileName, function (err, content) {
+  fs.readFile(fileName, (err, content) => {
     if (err) {
       throw err
     }
@@ -83,22 +81,25 @@ function serveHtmlFile (res, filename) {
     content = content.toString()
     content = addFixturePath(content)
 
-    content = content.replace(/{TRANSLOADIT_ACCESS_KEY}/g, (process.env.TRANSLOADIT_ACCESS_KEY + '').trim())
+    content = content.replace(
+      /{TRANSLOADIT_ACCESS_KEY}/g,
+      `${process.env.TRANSLOADIT_ACCESS_KEY}`.trim()
+    )
     respondHtml(res, content)
   })
 }
 
 function serveBuildJs (res) {
-  var fileName = path.join(__dirname, '../build/jquery.transloadit2-latest.js')
+  const fileName = path.join(__dirname, '../build/jquery.transloadit2-latest.js')
 
-  fs.readFile(fileName, function (err, content) {
+  fs.readFile(fileName, (err, content) => {
     if (err) {
       throw err
     }
 
     content = content.toString()
 
-    res.writeHead(200, 'OK', {'Content-Type': 'text/javascript'})
+    res.writeHead(200, 'OK', { 'Content-Type': 'text/javascript' })
     res.end(content)
   })
 }
@@ -108,31 +109,33 @@ if (!process.env.TRANSLOADIT_ACCESS_KEY) {
   process.exit(1)
 }
 
-http.createServer(function (req, res) {
-  if (req.method === 'POST') {
-    processPost(req, res, function () {
-      var stringified = JSON.stringify(req.post)
-      var escaped = escapeHtml(stringified)
-      respondHtml(res, '<body>' + escaped + '</body>')
-    })
-    return
-  }
+http
+  .createServer((req, res) => {
+    if (req.method === 'POST') {
+      processPost(req, res, () => {
+        const stringified = JSON.stringify(req.post)
+        const escaped = escapeHtml(stringified)
+        respondHtml(res, `<body>${escaped}</body>`)
+      })
+      return
+    }
 
-  if (req.url === '/build.js') {
-    return serveBuildJs(res)
-  }
+    if (req.url === '/build.js') {
+      return serveBuildJs(res)
+    }
 
-  if (req.url === '/shutdown') {
-    res.writeHead(200, 'OK', {'Content-Type': 'text/javascript'})
-    res.end('{"status":"OK"}')
-    process.exit(0)
-  }
+    if (req.url === '/shutdown') {
+      res.writeHead(200, 'OK', { 'Content-Type': 'text/javascript' })
+      res.end('{"status":"OK"}')
+      process.exit(0)
+    }
 
-  if (req.url === '/trigger-on-file-select') {
-    return serveHtmlFile(res, 'trigger_on_file_select.html')
-  }
+    if (req.url === '/trigger-on-file-select') {
+      return serveHtmlFile(res, 'trigger_on_file_select.html')
+    }
 
-  serveHtmlFile(res, 'standard_resize.html')
-}).listen(3000, '127.0.0.1')
+    serveHtmlFile(res, 'standard_resize.html')
+  })
+  .listen(3000, '127.0.0.1')
 
 console.log('Server running at http://127.0.0.1:3000/')

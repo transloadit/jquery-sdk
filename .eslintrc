@@ -5,6 +5,10 @@
     "node": true
   },
   "globals": {
-    "window": true
+    "window": true,
+    "jQuery": true,
+    "$": true,
+    "casper": true,
+    "testhost": true
   }
 }

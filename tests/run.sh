@@ -2,7 +2,7 @@
 # Transloadit jQuery SDK. Copyright (c) 2014, Transloadit Ltd.
 #
 # This file
-#  - runs coffeescript test scenarios
+#  - runs js test scenarios
 #  - concatenating a pre & post script
 #
 # Also, since casper's --include arguments are just one big mess, but
@@ -27,7 +27,7 @@ set -o nounset
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(dirname "${__dir}")"
 
-pattern="${1:-system/test-*.coffee}"
+pattern="${1:-system/test-*.js}"
 testhost="${2:-127.0.0.1:3000}"
 
 # Start server
@@ -39,17 +39,17 @@ pushd "${__dir}"
   for file in `find ./ -type f -wholename \*${pattern}\*`; do
     basename="$(basename "${file}")"
 
-    if [ "${basename}" = "_pre.coffee" ]; then
+    if [ "${basename}" = "_pre.js" ]; then
       continue;
     fi
-    if [ "${basename}" = "_post.coffee" ]; then
+    if [ "${basename}" = "_post.js" ]; then
       continue;
     fi
 
     rm -f ./screen-* 2>/dev/null  || true
 
     tmpfile="/tmp/casper-${basename}"
-    cat "./_pre.coffee" "${file}" "./_post.coffee" > "${tmpfile}"
+    cat "./_pre.js" "${file}" "./_post.js" > "${tmpfile}"
     casperjs \
       test \
       "${tmpfile}" \

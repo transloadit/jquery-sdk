@@ -1,5 +1,5 @@
-var helpers = require('./helpers')
-var I18nDict = {
+const helpers = require('./helpers')
+const I18nDict = {
   en: {
     'errors.SERVER_CONNECTION_ERROR': 'Your internet connection seems to be down. Retrying ...',
     'errors.SERVER_CONNECTION_ERROR.retries_exhausted': 'Your internet connection seems to be down. Once it is up and running again please reload your browser window and try again.',
@@ -9,8 +9,9 @@ var I18nDict = {
     'errors.MAX_FILES_EXCEEDED': 'Please select at most %s files.',
     'errors.unknown': 'There was an unknown error.',
     'errors.tryAgain': 'Please reload your browser page and try again.',
-    'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
-        'please email us this information:',
+    'errors.troubleshootDetails': (
+      'If you would like our help to troubleshoot this, ' + 'please email us this information:'
+    ),
     cancel: 'Cancel',
     cancelling: 'Cancelling ...',
     details: 'Details',
@@ -23,8 +24,7 @@ var I18nDict = {
     'errors.SERVER_CONNECTION_ERROR.retries_exhausted': 'サーバー接続に問題があります',
     'errors.unknown': '通信環境に問題があります',
     'errors.tryAgain': 'しばらくしてから再度投稿してください',
-    'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
-        '下記の情報をメールでお送りください:',
+    'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' + '下記の情報をメールでお送りください:',
     cancel: 'キャンセル',
     cancelling: 'キャンセル ...',
     details: '詳細',
@@ -34,25 +34,27 @@ var I18nDict = {
   }
 }
 
-function I18n(locale) {
-  this._dict = I18nDict
-  this._locale = locale
-}
-
-I18n.getDictionary = function () {
-  return this._dict
-}
-
-I18n.prototype.translate = function () {
-  var args = Array.prototype.slice.call(arguments)
-  var key = args.shift()
-  var locale = this._locale
-  var translated = this._dict[locale] && this._dict[locale][key] || this._dict.en[key]
-  if (!translated) {
-    throw new Error('Unknown i18n key: ' + key)
+class I18n {
+  constructor (locale) {
+    this._dict = I18nDict
+    this._locale = locale
   }
 
-  return helpers.sprintf(translated, args)
+  static getDictionary () {
+    return this._dict
+  }
+
+  translate () {
+    const args = Array.prototype.slice.call(arguments)
+    const key = args.shift()
+    const locale = this._locale
+    const translated = this._dict[locale] && this._dict[locale][key] || this._dict.en[key]
+    if (!translated) {
+      throw new Error(`Unknown i18n key: ${key}`)
+    }
+
+    return helpers.sprintf(translated, args)
+  }
 }
 
 module.exports = I18n

@@ -1,7 +1,7 @@
 var uuid = require('uuid')
 var io = require('../dep/socket.io.min')
 
-function Assembly(opts) {
+function Assembly (opts) {
   this._instance = opts.instance
   this._service = opts.service
   this._websocketPath = opts.websocketPath
@@ -9,17 +9,17 @@ function Assembly(opts) {
   this._wait = opts.wait
   this._requireUploadMetaData = opts.requireUploadMetaData
 
-  this._onStart = opts.onStart || function() {}
-  this._onExecuting = opts.onExecuting || function() {}
-  this._onSuccess = opts.onSuccess || function() {}
-  this._onCancel = opts.onCancel || function() {}
-  this._onError = opts.onError || function() {}
-  this._onUpload = opts.onUpload || function() {}
-  this._onResult = opts.onResult || function() {}
+  this._onStart = opts.onStart || function () {}
+  this._onExecuting = opts.onExecuting || function () {}
+  this._onSuccess = opts.onSuccess || function () {}
+  this._onCancel = opts.onCancel || function () {}
+  this._onError = opts.onError || function () {}
+  this._onUpload = opts.onUpload || function () {}
+  this._onResult = opts.onResult || function () {}
 
   this._i18n = opts.i18n
 
-  this._id = uuid.v4().replace(/\-/g, "")
+  this._id = uuid.v4().replace(/\-/g, '')
   this._url = this._protocol + this._instance + '/assemblies/' + this._id
 
   this._started = false
@@ -41,7 +41,7 @@ Assembly.prototype.init = function (cb) {
 }
 
 Assembly.prototype.cancel = function (cb) {
-  cb = cb || function() {}
+  cb = cb || function () {}
   var self = this
 
   this._assemblyRequest('?method=delete', function () {
@@ -53,7 +53,7 @@ Assembly.prototype.cancel = function (cb) {
 
 Assembly.prototype._fetchStatus = function (query, cb) {
   query = query || null
-  cb = cb || function() {}
+  cb = cb || function () {}
 
   if (this._ended) {
     return cb()
@@ -64,7 +64,7 @@ Assembly.prototype._fetchStatus = function (query, cb) {
 
 Assembly.prototype._assemblyRequest = function (query, cb) {
   query = query || null
-  cb = cb || function() {}
+  cb = cb || function () {}
 
   var instance = 'status-' + this._instance
   var url = this._url
@@ -73,12 +73,12 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
     url += query
   }
 
-  console.log(">> fetching", url)
+  console.log('>> fetching', url)
   var self = this
   var attemptCount = 0
   this._inAssemblyRequest = true
 
-  function attempt() {
+  function attempt () {
     $.jsonp({
       url: url,
       timeout: 8000,
@@ -101,7 +101,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
           return cb(err, true)
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
           if (self._isOnline) {
             attemptCount++
             attempt()
@@ -119,8 +119,8 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
 
   if (assembly.error || assembly.ok === 'REQUEST_ABORTED') {
     if (assembly.ok === 'REQUEST_ABORTED') {
-      assembly.error = 'REQUEST_ABORTED';
-      assembly.msg   = 'Your internet connection is flaky and was offline for at least a moment. Please try again.';
+      assembly.error = 'REQUEST_ABORTED'
+      assembly.msg = 'Your internet connection is flaky and was offline for at least a moment. Please try again.'
     }
 
     this._end()
@@ -165,18 +165,18 @@ Assembly.prototype._createSocket = function (cb) {
   var self = this
 
   console.log('>>> create socket')
-  socket.on("error", function (error) {
-    console.log("Websocket Error", error)
+  socket.on('error', function (error) {
+    console.log('Websocket Error', error)
     if (!cbCalled) {
       cbCalled = true
       cb(error)
     }
   })
 
-  socket.on("connect", function (event) {
+  socket.on('connect', function (event) {
     self._socketConnected = true
 
-    console.log(">>> CONNECTED")
+    console.log('>>> CONNECTED')
     if (self._socketReconnectInterval) {
       clearInterval(self._socketReconnectInterval)
       self._socketReconnectInterval = null
@@ -184,15 +184,15 @@ Assembly.prototype._createSocket = function (cb) {
     }
 
     if (!cbCalled) {
-      console.log(">>> SEND CONNECT")
-      socket.emit("assembly_connect", {id: self._id})
+      console.log('>>> SEND CONNECT')
+      socket.emit('assembly_connect', {id: self._id})
       cbCalled = true
       cb()
     }
   })
 
-  socket.on("assembly_uploading_finished", function () {
-    console.log("uploading finished")
+  socket.on('assembly_uploading_finished', function () {
+    console.log('uploading finished')
     self._uploadingFinished = true
 
     if (!self._wait && !self._requireUploadMetaData) {
@@ -200,32 +200,32 @@ Assembly.prototype._createSocket = function (cb) {
     }
   })
 
-  socket.on("assembly_upload_meta_data_extracted", function () {
-    console.log("upload meta data extracted")
+  socket.on('assembly_upload_meta_data_extracted', function () {
+    console.log('upload meta data extracted')
     if (!self._wait && self._requireUploadMetaData) {
       self._fetchStatus()
     }
   })
 
-  socket.on("assembly_finished", function () {
-    console.log("assembly finished")
+  socket.on('assembly_finished', function () {
+    console.log('assembly finished')
     self._finished = true
     if (self._wait) {
       self._fetchStatus()
     }
   })
 
-  socket.on("assembly_upload_finished", function (file) {
-    console.log("assembly_upload_finished")
+  socket.on('assembly_upload_finished', function (file) {
+    console.log('assembly_upload_finished')
     self._onUpload(file)
   })
 
-  socket.on("assembly_result", function (stepName, result) {
-    console.log("assembly_result")
+  socket.on('assembly_result', function (stepName, result) {
+    console.log('assembly_result')
     self._onResult(stepName, result)
   })
 
-  socket.on("disconnect", function (event) {
+  socket.on('disconnect', function (event) {
     socket.close()
     self.onDisconnect()
   })
@@ -237,17 +237,17 @@ Assembly.prototype.onDisconnect = function (fromSocket) {
   // If the assembly is complete, or it is complete in our eyes based on the wait and
   // requireUploadMetaData parameters, then we do not mind the socket disconnection.
   // The final status fetching has its own connection error handling.
-  console.log("Disconnected", event)
+  console.log('Disconnected', event)
   if (this._finished || this._ended) {
-    console.log("Do not care about disconnect")
+    console.log('Do not care about disconnect')
     return
   }
 
   var self = this
-  console.log("Caring about disconnect")
+  console.log('Caring about disconnect')
 
   if (fromSocket) {
-    this._socketReconnectInterval = setInterval(function() {
+    this._socketReconnectInterval = setInterval(function () {
       console.log('>>> try to create socket')
       self._createSocket()
     }, 3000)
