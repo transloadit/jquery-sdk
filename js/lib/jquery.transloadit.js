@@ -1,5 +1,3 @@
-/* global tus:false */
-
 /** @license jquery.transloadit2.js: Copyright (c) 2013 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
  *
  * Fork this on Github: http://github.com/transloadit/jquery-sdk
@@ -17,7 +15,7 @@ const DragDrop = require('./DragDrop')
 const FilePreview = require('./FilePreview')
 const InternetConnectionChecker = require('./InternetConnectionChecker')
 const I18n = require('./I18n')
-const helpers = require('./helpers')
+// const helpers = require('./helpers')
 const tus = require('tus-js-client')
 
 !($ => {
@@ -203,7 +201,7 @@ const tus = require('tus-js-client')
 
       const self = this
 
-      instanceFetcher = new InstanceFetcher({
+      const instanceFetcher = new InstanceFetcher({
         service: this._options.service,
         i18n: this._i18n,
         onError (err) {
@@ -458,7 +456,7 @@ const tus = require('tus-js-client')
       // Remove old selection from preview areas if possible
       if (name in this._files) {
         const oldFiles = this._files[name]
-        for (var i = 0; i < oldFiles.length; i++) {
+        for (let i = 0; i < oldFiles.length; i++) {
           this._removeFileFromPreviewAreas(oldFiles[i])
         }
       }
@@ -471,8 +469,8 @@ const tus = require('tus-js-client')
         }
 
         // Add new selection to preview areas
-        for (var i = 0; i < files.length; i++) {
-          const file = files[i]
+        for (let j = 0; j < files.length; j++) {
+          const file = files[j]
           this._files[name].push(file)
           this._addFileToPreviewAreas(file)
         }
@@ -509,7 +507,7 @@ const tus = require('tus-js-client')
     }
 
     _checkFileCountExceeded () {
-      if (this._options.maxNumberOfUploadedFiles == -1) {
+      if (this._options.maxNumberOfUploadedFiles === -1) {
         return true
       }
 
@@ -794,7 +792,7 @@ const tus = require('tus-js-client')
       const self = this
       let i = 0
       $previewAreas.each(function () {
-        const name = $(this).data('name') || 'files'
+        // const name = $(this).data('name') || 'files'
 
         self._previewAreaObjects[i] = new FilePreview({
           onFileRemove (file) {
@@ -820,13 +818,13 @@ const tus = require('tus-js-client')
     }
 
     _removeFileFromFormData (file) {
-      for (var i = 0; i < this._previewAreaObjects.length; i++) {
+      for (let i = 0; i < this._previewAreaObjects.length; i++) {
         this._previewAreaObjects[i].removeFile(file)
       }
 
       for (const key in this._files) {
-        for (var i = 0; i < this._files[key].length; i++) {
-          const myFile = this._files[key][i]
+        for (let j = 0; j < this._files[key].length; j++) {
+          const myFile = this._files[key][j]
           if (myFile.size !== file.size || myFile.name !== file.name) {
             continue
           }
@@ -835,7 +833,7 @@ const tus = require('tus-js-client')
             continue
           }
 
-          this._files[key].splice(i, 1)
+          this._files[key].splice(j, 1)
         }
       }
     }

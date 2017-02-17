@@ -20,7 +20,7 @@ function escapeHtml (string) {
     '/': '&#x2F;'
   }
 
-  return String(string).replace(/[&<>"'\/]/g, s => entityMap[s])
+  return String(string).replace(/[&<>"'/]/g, s => entityMap[s])
 }
 
 function processPost (request, response, cb) {
@@ -105,7 +105,7 @@ function serveBuildJs (res) {
 }
 
 if (!process.env.TRANSLOADIT_ACCESS_KEY) {
-  console.err('Found no TRANSLOADIT_ACCESS_KEY in env')
+  console.error('Found no TRANSLOADIT_ACCESS_KEY in env')
   process.exit(1)
 }
 

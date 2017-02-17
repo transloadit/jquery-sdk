@@ -1,6 +1,6 @@
 // # Setup
 // #########################################################################
-const utils = require('utils')
+// const utils = require('utils')
 const casper = require('casper').create({
   verbose: true,
   logLevel: 'warning',
