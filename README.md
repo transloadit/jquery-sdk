@@ -2,6 +2,9 @@
 
 # Transloadit jQuery SDK
 
+The official docs for our jQuery plugin / SDK are on the
+[Transloadit website](https://transloadit.com/docs/#jquery-plugin).
+
 ## Version 3
 
 Changes from version 2 to version 3:
@@ -176,6 +179,15 @@ The plugin supports several parameters.
 <tr>
  <th>Parameter</th>
  <th>Description</th>
+</tr>
+<tr>
+ <td markdown="1">
+  <code>service</code>
+ </td>
+ <td markdown="1">
+  The service URL to use. By default this is `document.location.protocol + "//api2.transloadit.com/"`, which makes use of our entire api.
+  If you want to temporarily switch regions, because we are down in one region, you can switch this to `document.location.protocol + "//api2-us-east-1.transloadit.com/"` or `document.location.protocol + "//api2-eu-west-1.transloadit.com/"`.
+ </td>
 </tr>
 <tr>
  <td markdown="1">
@@ -373,7 +385,7 @@ The fields that you send here will be available as <code>${fields.*}</code> vari
   <code>onUpload(upload)</code>
  </td>
  <td markdown="1">
-  This is fired once for each file uploaded. This is useful for custom renderings of multiple file uploads.
+  This is fired once for each uploaded file. This is useful for custom renderings of multiple file uploads.
 
   Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
 
