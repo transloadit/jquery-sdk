@@ -5,7 +5,7 @@
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",
     "css": "mkdir -p build/css/img && cp css/transloadit.css build/css/transloadit3-latest.css && cp -v css/img/* build/css/img/",
-    "browserify": "browserify js/lib/*.js -o build/jquery.transloadit3-latest.js",
+    "browserify": "browserify js/lib/*.js -t [ babelify ] -o build/jquery.transloadit3-latest.js",
     "dev": "npm run clean && npm run css && npm run browserify && npm run inject",
     "fix": "eslint . --fix",
     "gzip": "gzip --force --best < build/jquery.transloadit3-latest.js > build/jquery.transloadit3-latest.js.gz",
@@ -32,13 +32,14 @@
     "uuid": "2.0.2"
   },
   "devDependencies": {
-    "eslint": "2.7.0",
-    "fakefile": "0.0.8",
+    "babelify": "^7.3.0",
+    "browserify": "13.0.0",
     "debug": "2.2.0",
-    "uglify-js": "2.6.2",
+    "eslint": "2.7.0",
     "eslint-config-standard": "5.1.0",
     "eslint-plugin-promise": "1.1.0",
     "eslint-plugin-standard": "1.3.2",
-    "browserify": "13.0.0"
+    "fakefile": "0.0.8",
+    "uglify-js": "2.6.2"
   }
 }
