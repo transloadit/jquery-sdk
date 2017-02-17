@@ -17,10 +17,10 @@ InstanceFetcher.prototype.fetch = function (cb) {
   function _fetch () {
     console.log('>>> fetch from', self._service, self._timeout)
     $.jsonp({
-      url: self._service,
-      timeout: self._timeout,
+      url              : self._service,
+      timeout          : self._timeout,
       callbackParameter: 'callback',
-      success: function (result) {
+      success          : function (result) {
         cb(result.error, result.hostname, result.websocket_path)
       },
       error: function (xhr, status, jsonpErr) {
@@ -33,10 +33,10 @@ InstanceFetcher.prototype.fetch = function (cb) {
         }
 
         var err = {
-          error: 'SERVER_CONNECTION_ERROR',
+          error  : 'SERVER_CONNECTION_ERROR',
           message: self._i18n.translate(errMsg),
-          reason: reason,
-          url: self._service
+          reason : reason,
+          url    : self._service,
         }
 
         if (retriesExhausted) {
@@ -48,7 +48,7 @@ InstanceFetcher.prototype.fetch = function (cb) {
           attemptCount++
           _fetch()
         }, self._timeBetweenRetries)
-      }
+      },
     })
   }
 

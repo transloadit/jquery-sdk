@@ -21,8 +21,8 @@ const tus = require('tus-js-client')
 !($ => {
   const OPTIONS = {
     protocol: 'https://',
-    service: 'https://api2.transloadit.com/',
-    assets: 'https://assets.transloadit.com/',
+    service : 'https://api2.transloadit.com/',
+    assets  : 'https://assets.transloadit.com/',
     beforeStart () {
       return true
     },
@@ -46,22 +46,22 @@ const tus = require('tus-js-client')
     },
     onReconnect () {
     },
-    resumable: false,
-    wait: false,
-    processZeroFiles: true,
+    resumable                   : false,
+    wait                        : false,
+    processZeroFiles            : true,
     triggerUploadOnFileSelection: false,
-    requireUploadMetaData: false,
-    autoSubmit: true,
-    modal: true,
-    exclude: '',
-    fields: false,
-    params: null,
-    signature: null,
-    region: 'us-east-1',
-    locale: 'en',
-    maxNumberOfUploadedFiles: -1,
-    connectionCheckInterval: 3000,
-    debug: true
+    requireUploadMetaData       : false,
+    autoSubmit                  : true,
+    modal                       : true,
+    exclude                     : '',
+    fields                      : false,
+    params                      : null,
+    signature                   : null,
+    region                      : 'us-east-1',
+    locale                      : 'en',
+    maxNumberOfUploadedFiles    : -1,
+    connectionCheckInterval     : 3000,
+    debug                       : true,
   }
 
   let CSS_LOADED = false
@@ -203,10 +203,10 @@ const tus = require('tus-js-client')
 
       const instanceFetcher = new InstanceFetcher({
         service: this._options.service,
-        i18n: this._i18n,
+        i18n   : this._i18n,
         onError (err) {
           self._renderError(err)
-        }
+        },
       })
       instanceFetcher.fetch((err, instance, websocketPath) => {
         if (err) {
@@ -218,10 +218,10 @@ const tus = require('tus-js-client')
 
           instance,
           websocketPath,
-          service: self._options.service,
+          service : self._options.service,
           protocol: self._options.protocol,
 
-          wait: self._options['wait'],
+          wait                 : self._options['wait'],
           requireUploadMetaData: self._options['requireUploadMetaData'],
 
           onExecuting (assemblyResult) {
@@ -252,7 +252,7 @@ const tus = require('tus-js-client')
           },
           onResult (step, result) {
             self._options.onResult(step, result)
-          }
+          },
         })
 
         self._assembly.init(err => {
@@ -372,11 +372,11 @@ const tus = require('tus-js-client')
         //    the Uploader object gets destroyed (for example, if the page is
         //    reloaded) so we do not know to which assembly a file belongs and
         //    more.
-        resume: false,
+        resume  : false,
         metadata: {
-          fieldname: nameAttr,
-          filename: file.name,
-          assembly_url: this._assembly.getUrl()
+          fieldname   : nameAttr,
+          filename    : file.name,
+          assembly_url: this._assembly.getUrl(),
         },
         fingerprint (file) {
           // Fingerprinting is not necessary any more since we have disabled
@@ -405,7 +405,7 @@ const tus = require('tus-js-client')
 
           self._renderProgress(self._uploadedBytes, self._fileSizes)
           self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assemblyResult)
-        }
+        },
       })
 
       this._resumableUploads.push(upload)
@@ -514,8 +514,8 @@ const tus = require('tus-js-client')
       if (this._fileCount > this._options.maxNumberOfUploadedFiles) {
         const max = this._options.maxNumberOfUploadedFiles
         const err = {
-          error: 'MAX_FILES_EXCEEDED',
-          message: this._i18n.translate('errors.MAX_FILES_EXCEEDED', max)
+          error  : 'MAX_FILES_EXCEEDED',
+          message: this._i18n.translate('errors.MAX_FILES_EXCEEDED', max),
         }
         this._errorOut(err)
         return false
@@ -746,7 +746,7 @@ const tus = require('tus-js-client')
         onClose () {
           self.cancel()
         },
-        i18n: this._i18n
+        i18n: this._i18n,
       })
     }
 
@@ -777,7 +777,7 @@ const tus = require('tus-js-client')
               self._$form.trigger('submit.transloadit')
             }
           },
-          $el: $(this)
+          $el: $(this),
         })
         i++
       })
@@ -799,7 +799,7 @@ const tus = require('tus-js-client')
             self._removeFileFromFormData(file)
             self._removeFileFromPreviewAreas(file)
           },
-          $el: $(this)
+          $el: $(this),
         })
         i++
       })
@@ -851,8 +851,8 @@ const tus = require('tus-js-client')
           }
 
           const err = {
-            error: errorType,
-            message: self._i18n.translate(`errors.${errorType}`)
+            error  : errorType,
+            message: self._i18n.translate(`errors.${errorType}`),
           }
           self._renderError(err)
 
@@ -877,7 +877,7 @@ const tus = require('tus-js-client')
 
           self._assembly.onReconnect()
           self._options.onReconnect()
-        }
+        },
       })
       this._internetConnectionChecker.start()
     }

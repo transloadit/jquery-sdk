@@ -20,9 +20,9 @@ class FilePreview {
 
       const $li = $(this).parent()
       const file = {
-        size: $li.data('size'),
-        name: $li.data('name'),
-        lastModified: $li.data('lastModified')
+        size        : $li.data('size'),
+        name        : $li.data('name'),
+        lastModified: $li.data('lastModified'),
       }
       self.onFileRemove(file)
     })

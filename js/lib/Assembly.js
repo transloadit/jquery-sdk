@@ -80,10 +80,10 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
 
   function attempt () {
     $.jsonp({
-      url: url,
-      timeout: 8000,
+      url              : url,
+      timeout          : 8000,
       callbackParameter: 'callback',
-      success: function (assembly) {
+      success          : function (assembly) {
         console.log('Success')
         self._handleSuccessfulPoll(assembly)
         self._inAssemblyRequest = false
@@ -107,7 +107,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
             attempt()
           }
         }, self._timeBetweenStatusFetchRetries)
-      }
+      },
     })
   }
 
@@ -281,9 +281,9 @@ Assembly.prototype._connectionError = function (retriesExhausted) {
   }
 
   var err = {
-    error: 'SERVER_CONNECTION_ERROR',
+    error  : 'SERVER_CONNECTION_ERROR',
     message: this._i18n.translate(errMsg),
-    url: this._service
+    url    : this._service,
   }
 
   return err

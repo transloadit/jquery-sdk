@@ -65,7 +65,7 @@ const helpers = {
       }
       return `${arg}`
     })
-  }
+  },
 }
 
 module.exports = helpers

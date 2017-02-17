@@ -49,15 +49,15 @@ class Modal {
     ).appendTo('body')
 
     $.extend(this._$modal, {
-      $content: this._$modal.find('.content'),
-      $close: this._$modal.find('.close'),
-      $label: this._$modal.find('label'),
-      $progress: this._$modal.find('.progress'),
-      $percent: this._$modal.find('.progress .percent'),
-      $progressBar: this._$modal.find('.progress .bar'),
-      $error: this._$modal.find('.error'),
-      $errorDetails: this._$modal.find('.error-details'),
-      $errorDetailsToggle: this._$modal.find('.error-details-toggle')
+      $content           : this._$modal.find('.content'),
+      $close             : this._$modal.find('.close'),
+      $label             : this._$modal.find('label'),
+      $progress          : this._$modal.find('.progress'),
+      $percent           : this._$modal.find('.progress .percent'),
+      $progressBar       : this._$modal.find('.progress .bar'),
+      $error             : this._$modal.find('.error'),
+      $errorDetails      : this._$modal.find('.error-details'),
+      $errorDetailsToggle: this._$modal.find('.error-details-toggle'),
     })
 
     this._$modal.$error.hide()
@@ -65,12 +65,12 @@ class Modal {
     this._$modal.$errorDetailsToggle.hide()
 
     this._$modal.expose({
-      api: true,
-      maskId: 'transloadit_expose',
-      opacity: 0.9,
-      loadSpeed: 250,
-      closeOnEsc: false,
-      closeOnClick: false
+      api         : true,
+      maskId      : 'transloadit_expose',
+      opacity     : 0.9,
+      loadSpeed   : 250,
+      closeOnEsc  : false,
+      closeOnClick: false,
     })
 
     const self = this
@@ -110,13 +110,13 @@ class Modal {
       })
       .always(() => {
         const details = {
-          endpoint: err.url,
-          instance: err.instance,
+          endpoint   : err.url,
+          instance   : err.instance,
           assembly_id: err.assemblyId,
           ip,
-          time: helpers.getUTCDatetime(),
-          agent: navigator.userAgent,
-          error: `${err.message} ${err.reason || ''}`
+          time       : helpers.getUTCDatetime(),
+          agent      : navigator.userAgent,
+          error      : `${err.message} ${err.reason || ''}`,
         }
         $.post('https://status.transloadit.com/client_error', details)
 

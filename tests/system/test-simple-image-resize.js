@@ -4,9 +4,9 @@ casper.start(`http://${testhost}`, function () {
   const fixturePath = this.fetchText('#fixture_path')
 
   this.fill('#entryForm', {
-    my_file: `${fixturePath}/1.jpg`,
-    width_field: '400',
-    height_field: '400'
+    my_file     : `${fixturePath}/1.jpg`,
+    width_field : '400',
+    height_field: '400',
   })
 
   this.evaluate(() => $('#entryForm').submit())
