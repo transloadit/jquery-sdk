@@ -50,7 +50,7 @@ pushd "${__dir}"
 
     tmpfile="/tmp/casper-${basename}"
     echo "${tmpfile}"
-    pushd .. > /dev/null
+    pushd "${__root}" > /dev/null
       cat "${__dir}/_pre.js" "${__dir}/${file}" "${__dir}/_post.js" | "./node_modules/.bin/babel" --out-file "${tmpfile}" --presets=es2015
     popd > /dev/null
     casperjs \

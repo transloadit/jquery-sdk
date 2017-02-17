@@ -19,7 +19,7 @@ function Assembly (opts) {
 
   this._i18n = opts.i18n
 
-  this._id = uuid.v4().replace(/\-/g, '')
+  this._id = uuid.v4().replace(/-/g, '')
   this._url = this._protocol + this._instance + '/assemblies/' + this._id
 
   this._started = false
@@ -66,7 +66,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
   query = query || null
   cb = cb || function () {}
 
-  var instance = 'status-' + this._instance
+  // var instance = 'status-' + this._instance
   var url = this._url
 
   if (query) {
@@ -135,7 +135,7 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
 
   var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
   var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
-  var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
+  // var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
 
   this._end()
 
@@ -275,7 +275,7 @@ Assembly.prototype.getRequestTargetUrl = function (withId) {
 }
 
 Assembly.prototype._connectionError = function (retriesExhausted) {
-  errMsg = 'errors.SERVER_CONNECTION_ERROR'
+  let errMsg = 'errors.SERVER_CONNECTION_ERROR'
   if (retriesExhausted) {
     errMsg = 'errors.SERVER_CONNECTION_ERROR.retries_exhausted'
   }

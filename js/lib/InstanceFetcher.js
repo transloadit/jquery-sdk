@@ -27,7 +27,7 @@ InstanceFetcher.prototype.fetch = function (cb) {
         var reason = 'Could not fetch an instance. Return code: ' + status + ', Error: ' + jsonpErr
         var retriesExhausted = attemptCount >= self._retries
 
-        errMsg = 'errors.SERVER_CONNECTION_ERROR'
+        let errMsg = 'errors.SERVER_CONNECTION_ERROR'
         if (retriesExhausted) {
           errMsg = 'errors.SERVER_CONNECTION_ERROR.retries_exhausted'
         }

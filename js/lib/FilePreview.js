@@ -46,7 +46,7 @@ class FilePreview {
       const size = $(this).data('size')
       const lastModified = $(this).data('lastModified')
 
-      if (name == file.name && size == file.size && lastModified == file.lastModified) {
+      if (name === file.name && size === file.size && lastModified === file.lastModified) {
         $(this).remove()
       }
     })

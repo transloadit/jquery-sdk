@@ -162,7 +162,7 @@ class Modal {
     }
 
     // For some reason we sometimes get several events for 100%. Make sure to only use the first.
-    if (progress == 100 && this._animatedTo100) {
+    if (progress === 100 && this._animatedTo100) {
       return
     }
 
@@ -182,7 +182,7 @@ class Modal {
     // We want to make sure we display "0s left" when the upload is done
     updateSpeed = updateSpeed || progress === 100
 
-    const goingBackwards = this._bytesReceivedBefore && received < this._bytesReceivedBefore
+    // const goingBackwards = this._bytesReceivedBefore && received < this._bytesReceivedBefore
 
     if (!this._animatedTo100 && updateSpeed) {
       const bytesReceived = received - this._bytesReceivedBefore
@@ -232,7 +232,7 @@ class Modal {
     this._setProgressbarPercent(progressInt)
     const self = this
 
-    if (progressInt == 100 && !this._animatedTo100) {
+    if (progressInt === 100 && !this._animatedTo100) {
       this._animatedTo100 = true
       setTimeout(
         () => {
