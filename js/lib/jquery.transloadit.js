@@ -20,32 +20,20 @@ const tus = require('tus-js-client')
 
 !($ => {
   const OPTIONS = {
-    protocol: 'https://',
-    service : 'https://api2.transloadit.com/',
-    assets  : 'https://assets.transloadit.com/',
-    beforeStart () {
-      return true
-    },
-    onFileSelect () {
-    },
-    onStart () {
-    },
-    onProgress () {
-    },
-    onUpload () {
-    },
-    onResult () {
-    },
-    onCancel () {
-    },
-    onError () {
-    },
-    onSuccess () {
-    },
-    onDisconnect () {
-    },
-    onReconnect () {
-    },
+    protocol                    : 'https://',
+    service                     : 'https://api2.transloadit.com/',
+    assets                      : 'https://assets.transloadit.com/',
+    beforeStart                 : function () { return true },
+    onFileSelect                : function () { },
+    onStart                     : function () { },
+    onProgress                  : function () { },
+    onUpload                    : function () { },
+    onResult                    : function () { },
+    onCancel                    : function () { },
+    onError                     : function () { },
+    onSuccess                   : function () { },
+    onDisconnect                : function () { },
+    onReconnect                 : function () { },
     resumable                   : false,
     wait                        : false,
     processZeroFiles            : true,
