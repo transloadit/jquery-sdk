@@ -45,7 +45,6 @@ Assembly.prototype.cancel = function (cb) {
   var self = this
 
   this._assemblyRequest('?method=delete', function () {
-    self.stopStatusFetching()
     self._end()
     cb()
   })

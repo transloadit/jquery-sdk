@@ -197,6 +197,10 @@ const tus = require('tus-js-client')
         },
       })
       instanceFetcher.fetch((err, instance, websocketPath) => {
+        // tusd demands that we start with api2
+        if (instance.indexOf('api2-') !== 0) {
+          instance = 'api2-' + instance
+        }
         if (err) {
           return self._errorOut(err)
         }
@@ -319,13 +323,14 @@ const tus = require('tus-js-client')
         }
       }
 
+      console.log(self._files)
+
       const f = new XMLHttpRequest()
       const url = this._assembly.getRequestTargetUrl(true)
       f.open('POST', url)
       f.onreadystatechange = () => {
         if (f.readyState === 4 && f.status === 200) {
           const resp = JSON.parse(f.responseText)
-          self._assembly.setUrl(resp.status_endpoint)
           proceed()
           cb()
         }
