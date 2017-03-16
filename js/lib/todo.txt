@@ -25,4 +25,15 @@
 
 KNOWN ISSUES:
 
-- I cannot start tusd locally for some reason which naturally results in "XMLHttpRequest cannot load http://vbox.transloadit.com/resumable/" errors in the browser.
+- [x] on reconnect when resumable is false and uploading was not finished, the old assembly object should be cleaned up and removed and a new one created.
+- [ ] Do not show tus error message on disconnect; just show the disconnect error
+- [x] Test uploaded bytes in resumable files (Marius' work) // resumable: true fires upload meta data extracted too early
+- [ ] resumable:true with requireUploadMetaData:false does not upload to test, because it ends too soon (onSuccess and therefore reset are called too soon)
+- [ ] add socket.io via npm
+- [ ] tus assemblies and require meta data issue -> event emitted too early
+
+For later:
+- [ ] If we go offline when upload is at 100% and then reconnect, make sure to show progress bar again at 100%
+  - Generally the progress bar starts somewhere else after a reconnect, because we rely on client side progress events, not on server side ones
+- [ ] Problem with reconnects when resumable: true - we are missing out on progress events sometimes
+- [ ] I cannot start tusd locally for some reason which naturally results in "XMLHttpRequest cannot load http://vbox.transloadit.com/resumable/" errors in the browser.
