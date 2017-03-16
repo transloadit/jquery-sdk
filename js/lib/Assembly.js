@@ -1,5 +1,5 @@
 var uuid = require('uuid')
-var io = require('../dep/socket.io.min')
+var io = require('socket.io-client')
 
 function Assembly (opts) {
   this._instance = opts.instance
