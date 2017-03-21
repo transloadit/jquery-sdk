@@ -18,7 +18,7 @@ class InternetConnectionChecker {
     const self = this
     this._interval = setInterval(
       () => {
-        isOnline(online => {
+        isOnline().then(online => {
           if (self._isOnline && !online) {
             self._onDisconnect()
           }

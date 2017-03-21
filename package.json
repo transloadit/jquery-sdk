@@ -5,7 +5,7 @@
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",
     "css": "mkdir -p build/css/img && cp css/transloadit.css build/css/transloadit3-latest.css && cp -v css/img/* build/css/img/",
-    "browserify": "browserify js/lib/*.js node_modules/socket.io-client/dist/socket.io.min.js -o build/jquery.transloadit3-latest.js",
+    "browserify": "browserify js/lib/*.js -o build/jquery.transloadit3-latest.js",
     "dev": "npm run clean && npm run css && npm run browserify && npm run inject",
     "fix": "eslint . --fix",
     "gzip": "gzip --force --best < build/jquery.transloadit3-latest.js > build/jquery.transloadit3-latest.js.gz",
@@ -27,7 +27,7 @@
     "css"
   ],
   "dependencies": {
-    "is-online": "git://github.com/tim-kos/is-online",
+    "is-online": "7.0.0",
     "tus-js-client": "1.4.2",
     "uuid": "2.0.2",
     "socket.io-client": "1.7.2"

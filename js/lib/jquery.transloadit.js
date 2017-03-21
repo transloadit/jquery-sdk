@@ -118,6 +118,7 @@ const tus = require('tus-js-client')
 
       this._websocketPath = null
       this._internetConnectionChecker = null
+      this._isOnline = true
     }
 
     init ($form, options) {
@@ -691,6 +692,10 @@ const tus = require('tus-js-client')
       if (!this._options.modal) {
         return
       }
+      if (!this._isOnline) {
+        return
+      }
+
       this._modal.renderProgress(received, expected)
     }
 
@@ -847,6 +852,7 @@ const tus = require('tus-js-client')
       this._internetConnectionChecker = new InternetConnectionChecker({
         intervalLength: this._options.connectionCheckInterval,
         onDisconnect () {
+          self._isOnline = false
           let errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
 
           if (!self._xhr) {
@@ -857,13 +863,14 @@ const tus = require('tus-js-client')
             error  : errorType,
             message: self._i18n.translate(`errors.${errorType}`),
           }
-          console.log(">> Disconnect error", err)
           self._renderError(err)
 
           self._assembly.onDisconnect()
           self._options.onDisconnect()
         },
         onReconnect () {
+          self._isOnline = true
+
           if (self._xhr && !self._options.resumable) {
             // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
             // we have our own resume flag with tus support.
