@@ -72,7 +72,6 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
     url += query
   }
 
-  console.log('>> fetching', url)
   var self = this
   var attemptCount = 0
   this._inAssemblyRequest = true
@@ -83,7 +82,6 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
       timeout          : 8000,
       callbackParameter: 'callback',
       success          : function (assembly) {
-        console.log('Success')
         self._handleSuccessfulPoll(assembly)
         self._inAssemblyRequest = false
         cb()
@@ -163,9 +161,7 @@ Assembly.prototype._createSocket = function (cb) {
   var cbCalled = false
   var self = this
 
-  console.log('>>> create socket')
   socket.on('error', function (error) {
-    console.log('Websocket Error', error)
     if (!cbCalled) {
       cbCalled = true
       cb(error)
@@ -175,7 +171,6 @@ Assembly.prototype._createSocket = function (cb) {
   socket.on('connect', function (event) {
     self._socketConnected = true
 
-    console.log('>>> CONNECTED')
     if (self._socketReconnectInterval) {
       clearInterval(self._socketReconnectInterval)
       self._socketReconnectInterval = null
@@ -183,7 +178,6 @@ Assembly.prototype._createSocket = function (cb) {
     }
 
     if (!cbCalled) {
-      console.log('>>> SEND CONNECT')
       socket.emit('assembly_connect', {id: self._id})
       cbCalled = true
       cb()
@@ -191,7 +185,6 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on('assembly_uploading_finished', function () {
-    console.log('uploading finished')
     self._uploadingFinished = true
 
     if (!self._wait && !self._requireUploadMetaData) {
@@ -200,14 +193,12 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on('assembly_upload_meta_data_extracted', function () {
-    console.log('upload meta data extracted')
     if (!self._wait && self._requireUploadMetaData) {
       self._fetchStatus()
     }
   })
 
   socket.on('assembly_finished', function () {
-    console.log('assembly finished')
     self._finished = true
     if (self._wait) {
       self._fetchStatus()
@@ -215,12 +206,10 @@ Assembly.prototype._createSocket = function (cb) {
   })
 
   socket.on('assembly_upload_finished', function (file) {
-    console.log('assembly_upload_finished')
     self._onUpload(file)
   })
 
   socket.on('assembly_result', function (stepName, result) {
-    console.log('assembly_result')
     self._onResult(stepName, result)
   })
 
@@ -236,18 +225,14 @@ Assembly.prototype.onDisconnect = function (fromSocket) {
   // If the assembly is complete, or it is complete in our eyes based on the wait and
   // requireUploadMetaData parameters, then we do not mind the socket disconnection.
   // The final status fetching has its own connection error handling.
-  console.log('Disconnected', event)
   if (this._finished || this._ended) {
-    console.log('Do not care about disconnect')
     return
   }
 
   var self = this
-  console.log('Caring about disconnect')
 
   if (fromSocket) {
     this._socketReconnectInterval = setInterval(function () {
-      console.log('>>> try to create socket')
       self._createSocket()
     }, 3000)
   }
@@ -256,9 +241,7 @@ Assembly.prototype.onDisconnect = function (fromSocket) {
 Assembly.prototype.onReconnect = function () {
   this._isOnline = true
 
-  console.log('>> Assembly reconnect')
   if (this._uploadingFinished && this._inAssemblyRequest) {
-    console.log('Retry fetching status')
     this._fetchStatus()
   }
 }

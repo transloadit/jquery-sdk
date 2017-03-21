@@ -323,8 +323,6 @@ const tus = require('tus-js-client')
         }
       }
 
-      console.log(self._files)
-
       const f = new XMLHttpRequest()
       const url = this._assembly.getRequestTargetUrl(true)
       f.open('POST', url)
@@ -390,7 +388,6 @@ const tus = require('tus-js-client')
           self._xhr = false
         },
         onProgress (bytesUploaded, bytesTotal) {
-          console.log('>> onProgress', bytesUploaded, bytesTotal)
           // Calculate the number of uploaded bytes of all uploads by removing
           // the last known value and then adding the new value.
           self._uploadedBytes = self._uploadedBytes - lastBytesUploaded + bytesUploaded
@@ -853,8 +850,6 @@ const tus = require('tus-js-client')
           self._options.onDisconnect()
         },
         onReconnect () {
-          console.log('>>> reconnecting ...')
-
           if (self._xhr && !self._options.resumable) {
             // Note: Google Chrome can resume xhr requests. However, we ignore this here, because
             // we have our own resume flag with tus support.
