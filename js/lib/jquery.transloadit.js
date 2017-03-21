@@ -398,7 +398,7 @@ const tus = require('tus-js-client')
 
           self._renderProgress(self._uploadedBytes, self._fileSizes)
           self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assemblyResult)
-        },
+        }
       })
 
       this._resumableUploads.push(upload)
