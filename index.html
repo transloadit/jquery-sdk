@@ -44,17 +44,20 @@
             }
           }
         },
+        onStart: function (assembly) {
+          console.log(">>> onStart", assembly);
+        },
         onProgress: function (bytesIn, totalBytes) {
           console.log(bytesIn, totalBytes);
         },
         onSuccess: function (assembly) {
           console.log('Assembly finished successfully with', assembly.ok);
         },
-        onExecuting: function (assembly) {
-          console.log('Assembly started executing', assembly.ok);
+        onExecuting: function () {
+          console.log('Uploading finished!');
         },
-        onUpload: function (file) {
-          console.log('Upload added', file);
+        onUpload: function (uploadedFile) {
+          console.log('Upload added', uploadedFile);
         },
         onResult: function (stepName, result) {
           console.log('Result added', stepName, result);

@@ -197,10 +197,6 @@ const tus = require('tus-js-client')
         },
       })
       instanceFetcher.fetch((err, instance, websocketPath) => {
-        // tusd demands that we start with api2
-        if (instance.indexOf('api2-') !== 0) {
-          instance = 'api2-' + instance
-        }
         if (err) {
           return self._errorOut(err)
         }
@@ -216,11 +212,14 @@ const tus = require('tus-js-client')
           wait                 : self._options['wait'],
           requireUploadMetaData: self._options['requireUploadMetaData'],
 
-          onExecuting (assemblyResult) {
+          onExecuting () {
             // If the assembly is executing meaning all uploads are done, we will not get more progress
             // events from XHR. But if there was a connection interruption in the meantime, we want to
             // make sure all components (like the modal) now know that the error is gone.
             self._renderProgress()
+
+            let assemblyObj = self._buildAssemblyObj('ASSEMBLY_EXECUTING')
+            self._options.onExecuting(assemblyObj)
           },
           onSuccess (assemblyResult) {
             self._ended = true
@@ -252,7 +251,8 @@ const tus = require('tus-js-client')
             self._errorOut(err)
           }
 
-          self._options.onStart()
+          let assemblyObj = self._buildAssemblyObj('ASSEMBLY_UPLOADING')
+          self._options.onStart(assemblyObj)
 
           if (self._options.resumable && tus.isSupported) {
             self._startWithResumabilitySupport()
@@ -323,8 +323,9 @@ const tus = require('tus-js-client')
         }
       }
 
-      const f = new XMLHttpRequest()
+      const f   = new XMLHttpRequest()
       const url = this._assembly.getRequestTargetUrl(true)
+
       f.open('POST', url)
       f.onreadystatechange = () => {
         if (f.readyState === 4 && f.status === 200) {
@@ -828,6 +829,18 @@ const tus = require('tus-js-client')
       }
     }
 
+    _buildAssemblyObj (ok) {
+      const assemblyObj = {
+        ok: ok,
+        assembly_id: this._assembly.getId(),
+        instance: this._assembly.getInstance(),
+        assembly_url: this._assembly.getHttpUrl(),
+        assembly_ssl_url: this._assembly.getHttpsUrl()
+      }
+
+      return assemblyObj
+    }
+
     _initInternetConnectionChecker () {
       const self = this
 
@@ -844,6 +857,7 @@ const tus = require('tus-js-client')
             error  : errorType,
             message: self._i18n.translate(`errors.${errorType}`),
           }
+          console.log(">> Disconnect error", err)
           self._renderError(err)
 
           self._assembly.onDisconnect()

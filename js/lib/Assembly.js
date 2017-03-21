@@ -20,7 +20,11 @@ function Assembly (opts) {
   this._i18n = opts.i18n
 
   this._id = uuid.v4().replace(/-/g, '')
-  this._url = this._protocol + this._instance + '/assemblies/' + this._id
+
+  this._url = this._protocol + "api2-" + this._instance + '/assemblies/' + this._id
+  this._websocketUrl = this._protocol + "api2-" + this._instance
+  this._httpUrl = "http://api2." + this._instance + '/assemblies/' + this._id
+  this._httpsUrl = "https://api2-" + this._instance + '/assemblies/' + this._id
 
   this._started = false
   this._ended = false
@@ -130,22 +134,14 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
     this._onStart(assembly)
   }
 
-  var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING'
-  var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED'
-  // var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED'
-
   this._end()
 
-  if (isCanceled) {
+  if (assembly.ok === 'ASSEMBLY_CANCELED') {
     this._onCancel(assembly)
   } else {
-    // We only call this when uploading is finished and based on our wait parameter and
+    // We only call _handleSuccessfulPoll when uploading is finished and based on our wait parameter and
     // the requireUploadMetaData parameter. Hence, we can safely call onSuccess here.
     this._onSuccess(assembly)
-  }
-
-  if (isExecuting) {
-    this._onExecuting(assembly)
   }
 }
 
@@ -157,7 +153,7 @@ Assembly.prototype._end = function () {
 }
 
 Assembly.prototype._createSocket = function (cb) {
-  var socket = io.connect(this._protocol + this._instance, {path: this._websocketPath})
+  var socket = io.connect(this._websocketUrl, {path: this._websocketPath})
   var cbCalled = false
   var self = this
 
@@ -186,6 +182,8 @@ Assembly.prototype._createSocket = function (cb) {
 
   socket.on('assembly_uploading_finished', function () {
     self._uploadingFinished = true
+
+    self._onExecuting()
 
     if (!self._wait && !self._requireUploadMetaData) {
       self._fetchStatus()
@@ -289,6 +287,14 @@ Assembly.prototype.setUrl = function (url) {
 
 Assembly.prototype.getUrl = function () {
   return this._url
+}
+
+Assembly.prototype.getHttpUrl = function () {
+  return this._httpUrl
+}
+
+Assembly.prototype.getHttpsUrl = function () {
+  return this._httpsUrl
 }
 
 module.exports = Assembly

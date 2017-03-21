@@ -9,14 +9,18 @@ The official docs for our jQuery plugin / SDK are on the
 
 Changes from version 2 to version 3:
 
+BC Breaking changes:
+- The onStart() and onExecuting() callbacks receive a stripped down version of the assembly object parameter.
+- The onUpload() and onResult() callbacks no longer receive the assembly object as a parameter.
+
+Non-BC Breaking Changes and new features:
 - There is now support for resumable file uploads! It works out of the box, you do not need to change anything for it.
 - Performance has been improved in all areas of the plugin.
 - Drag and Drop support has been added.
 - Support for file preview lists has been added.
 - All options related to polling have been removed.
-- The onStart(), onUpload() and onResult() callbacks no longer receive the assembly object as a parameter, and is also called much sooner in the process.
 - There is now a lot less network traffic for assembly status updates.
-- There is now the ability to not wait for file upload meta data anymore, which is a big speed improvement.
+- There is now the ability to not wait for file upload meta data anymore, which is a big speed improvement. This change was also backported to the last version in the 2.x series.
 
 ### Basics
 
