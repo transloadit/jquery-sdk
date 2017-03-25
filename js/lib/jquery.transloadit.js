@@ -21,7 +21,8 @@ const tus = require('tus-js-client')
 !($ => {
   const OPTIONS = {
     protocol                    : 'https://',
-    service                     : 'https://api2.transloadit.com/',
+    service                     : null,
+    region                      : null,
     assets                      : 'https://assets.transloadit.com/',
     beforeStart                 : function () { return true },
     onFileSelect                : function () { },
@@ -45,7 +46,6 @@ const tus = require('tus-js-client')
     fields                      : false,
     params                      : null,
     signature                   : null,
-    region                      : 'us-east-1',
     locale                      : 'en',
     maxNumberOfUploadedFiles    : -1,
     connectionCheckInterval     : 3000,
@@ -96,6 +96,8 @@ const tus = require('tus-js-client')
 
   class Uploader {
     constructor () {
+      this._service = null
+
       this._assembly = null
       this._options = {}
       this._ended = null
@@ -160,7 +162,8 @@ const tus = require('tus-js-client')
       this._fileCount = 0
       this._fileSizes = 0
       this._uploadedBytes = 0
-
+      this._service = this._getService()
+      
       // Remove textareas with encoding results from previous uploads to not send them
       // as form fields.
       this._$form.find('textarea[name=transloadit]').remove()
@@ -191,7 +194,7 @@ const tus = require('tus-js-client')
       const self = this
 
       const instanceFetcher = new InstanceFetcher({
-        service: this._options.service,
+        service: this._service,
         i18n   : this._i18n,
         onError (err) {
           self._renderError(err)
@@ -207,7 +210,7 @@ const tus = require('tus-js-client')
 
           instance,
           websocketPath,
-          service : self._options.service,
+          service : self._service,
           protocol: self._options.protocol,
 
           wait                 : self._options['wait'],
@@ -653,7 +656,7 @@ const tus = require('tus-js-client')
         this._$form.attr('action', this._params.redirect_url)
       } else if (
         this._options.autoSubmit &&
-        this._$form.attr('action') === `${this._options.service}assemblies`
+        this._$form.attr('action') === `${this._service}assemblies`
       ) {
         alert('Error: input[name=params] does not include a redirect_url')
         return
@@ -865,7 +868,9 @@ const tus = require('tus-js-client')
           }
           self._renderError(err)
 
-          self._assembly.onDisconnect()
+          if (self._assembly) {
+            self._assembly.onDisconnect()
+          }
           self._options.onDisconnect()
         },
         onReconnect () {
@@ -883,12 +888,25 @@ const tus = require('tus-js-client')
           }
 
           // Resuming of uploads is done automatically for us in the tus client
-
-          self._assembly.onReconnect()
+          if (self._assembly) {
+            self._assembly.onReconnect()
+          }
           self._options.onReconnect()
         },
       })
       this._internetConnectionChecker.start()
+    }
+
+    _getService () {
+      if (this._options.service) {
+        return this._options.service
+      }
+
+      let result = 'https://api2.transloadit.com/'
+      if (this._options.region) {
+        result = this._options.protocol + "api2-" + this._options.region + ".transloadit.com/"
+      }
+      return result
     }
 
     options (options) {
