@@ -111,7 +111,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onStart(assemblyObj)</code>
+   onStart(assemblyObj)
   </td>
   <td markdown="1">
    This is fired whenever uploading begins. The assemblyObj contains useful data like the assembly's id.
@@ -119,7 +119,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onExecuting(assemblyObj)</code>
+   onExecuting(assemblyObj)
   </td>
   <td markdown="1">
    This is fired whenever uploading is fully finished and transcoding begins. The assemblyObj contains useful data like the assembly's id.
@@ -127,7 +127,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onFileSelect(fileName, $fileInputField)</code>
+   onFileSelect(fileName, $fileInputField)
   </td>
   <td markdown="1">
    This is fired whenever a user selects a file in file input field.
@@ -135,7 +135,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onProgress(<br />bytesReceived, bytesExpected<br />)</code>
+   onProgress(<br />bytesReceived, bytesExpected<br />)
   </td>
   <td markdown="1">
    This is fired whenever the upload progress is updated, allowing you to render your own upload progress bar.
@@ -143,7 +143,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onUpload(upload)</code>
+   onUpload(upload)
   </td>
   <td markdown="1">
    This is fired once for each uploaded file. This is useful for custom renderings of multiple file uploads.
@@ -155,7 +155,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onResult(step, result)</code>
+   onResult(step, result)
   </td>
   <td markdown="1">
    This is fired each time a result becomes available for a given Step, and is only available when <code>wait</code> is set to <code>true</code>. This can be used
@@ -166,7 +166,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onCancel()</code>
+   onCancel()
   </td>
   <td markdown="1">
    This is fired after an upload has been canceled by the user.
@@ -174,7 +174,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onError(assembly)</code>
+   onError(assembly)
   </td>
   <td markdown="1">
    This is fired when upload errors occur.
@@ -182,7 +182,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onSuccess(assembly)</code>
+   onSuccess(assembly)
   </td>
   <td markdown="1">
    This is fired when the plugin has completed an upload. If <code>wait</code> is set to <code>false</code>, this is fired after the upload finishes. If <code>wait</code> is <code>true</code>, this is fired once all files have been transcoded.
@@ -190,7 +190,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onDisconnect()</code>
+   onDisconnect()
   </td>
   <td markdown="1">
    This is called whenever the internet connection goes down. Useful in the context of resumable uploads. Transloadit will display a default error message in this case, though, asking the user to keep their browser tab open and wait for the resume.
@@ -198,7 +198,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>onReconnect()</code>
+   onReconnect()
   </td>
   <td markdown="1">
    This is called whenever the internet connection becomes available again after it had been down previously.
@@ -229,7 +229,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>service</code>
+   service
   </td>
   <td markdown="1">
    The service URL to use. By default this is <code>"https://api2.transloadit.com/"</code>, which makes use of our entire api and route traffic based on the geolocation of your users.
@@ -238,7 +238,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>region</code>
+   region
   </td>
   <td markdown="1">
    If you want to temporarily switch to a particular region only, because we are down in the other region, you can set this parameter to either <code>"us-east-1"</code> or <code>"eu-west-1"</code>. The SDK will then build the proper service endpoint for you. Make sure to not set a custom service endpoint yourself in this case, as this would overrule the region parameter.
@@ -246,7 +246,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>wait</code>
+   wait
   </td>
   <td markdown="1">
    Specifies whether the plugin should wait for files to be transcoded before submitting the form. This is <code>false</code> by default.
@@ -254,7 +254,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>requireUploadMetaData</code>
+   requireUploadMetaData
   </td>
   <td markdown="1">
    Specifies whether the plugin should wait for meta data of uploaded files to first be extracted before it calls the <code>onSuccess</code> callback.
@@ -267,7 +267,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>params</code>
+   params
   </td>
   <td markdown="1">
 
@@ -297,7 +297,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>signature</code>
+   signature
   </td>
   <td markdown="1">
    Specifies the signature string, which is required if signature authentication is enabled in your account. This is <code>null</code> by default. The old way of providing this in a hidden input field named <code>signature</code> is still valid and will not be deprecated.
@@ -307,7 +307,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>modal</code>
+   modal
   </td>
   <td markdown="1">
    Specifies whether to render the Transloadit overlay and progress bar automatically. This is <code>true</code> by default.
@@ -323,7 +323,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>processZeroFiles</code>
+   processZeroFiles
   </td>
   <td markdown="1">
    Specifies whether to perform processing when the form is submitted with no files selected using the form inputs. This is <code>true</code> by default.
@@ -331,7 +331,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>triggerUploadOnFileSelection</code>
+   triggerUploadOnFileSelection
   </td>
   <td markdown="1">
    When set to <code>true</code> this triggers the upload to Transloadit as soon as the user has selected a file in any of the form's file input fields. This is <code>false</code> by default.
@@ -339,7 +339,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>exclude</code>
+   exclude
   </td>
   <td markdown="1">
    Specifies a selector for which any matching <code>input[type=file]</code> elements in the current form will <em>not</em> be uploaded through Transloadit. This is <code>""</code> by default.
@@ -347,7 +347,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>fields</code>
+   fields
   </td>
   <td markdown="1">
 
@@ -395,7 +395,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   <code>debug</code>
+   debug
   </td>
   <td markdown="1">
    Specifies whether Transloadit errors are displayed to end users. If this is set to <code>false</code>, no Transloadit errors will be displayed. Use the <code>onError</code> callback to perform your own logging or presentation. This is <code>true</code> by default.
