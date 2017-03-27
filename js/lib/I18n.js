@@ -9,9 +9,7 @@ const I18nDict = {
     'errors.MAX_FILES_EXCEEDED'                              : 'Please select at most %s files.',
     'errors.unknown'                                         : 'There was an unknown error.',
     'errors.tryAgain'                                        : 'Please reload your browser page and try again.',
-    'errors.troubleshootDetails'                             : (
-      'If you would like our help to troubleshoot this, ' + 'please email us this information:'
-    ),
+    'errors.troubleshootDetails'                             : 'If you would like our help to troubleshoot this, ' + 'please email us this information:',
     cancel         : 'Cancel',
     cancelling     : 'Cancelling ...',
     details        : 'Details',
