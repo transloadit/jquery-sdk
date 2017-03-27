@@ -127,7 +127,7 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
-   onFileSelect(<br />fileName, $fileInputField<br />)
+   onFileSelect(<br />fileName,<br />$fileInputField<br />)
   </td>
   <td markdown="1">
    This is fired whenever a user selects a file in file input field.
