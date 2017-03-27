@@ -86,6 +86,24 @@ We have three *magic* releases:
 
 ## Callbacks
 
+These can be added as parameters to the `.transloadit()` call like so:
+
+```markup
+<script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
+<script type="text/javascript">
+// We call .transloadit() after the DOM is initialized:
+$(function() {
+  $('#upload-form').transloadit({
+    onStart: function(assembly) {
+      console.log('>> Uploading has started!');
+    },
+    onExecuting: function(assembly) {
+      console.log('>> Transcoding has started!');
+    },
+  });
+});
+```
+
 <table class="table table-striped table-bordered">
 <tr>
   <th>Parameter</th>
@@ -188,7 +206,19 @@ We have three *magic* releases:
 </tr>
 </table>
 
-## Other Parameters
+## Parameters
+
+```markup
+<script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
+<script type="text/javascript">
+// We call .transloadit() after the DOM is initialized:
+$(function() {
+  $('#upload-form').transloadit({
+    wait  : true,
+    region: 'eu-west-1'
+  });
+});
+```
 
 <table class="table table-striped table-bordered">
 <tr>
