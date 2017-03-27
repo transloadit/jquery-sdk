@@ -2,19 +2,18 @@
 
 # Transloadit jQuery SDK
 
-The official docs for our jQuery plugin / SDK are on the
-[Transloadit website](https://transloadit.com/docs/#jquery-plugin).
-
 ## Version 3
 
 Changes from version 2 to version 3:
 
-BC Breaking changes:
+### BC Breaking changes:
+
 - The onStart() and onExecuting() callbacks receive a stripped down version of the assembly object parameter.
 - The onUpload() and onResult() callbacks no longer receive the assembly object as a parameter.
 - The formData parameter has been removed, because all uploads use XHR now. This will only break BC for you if you used formData: customFormDataObj. In that case you should add the contents of your custom form data as hidden input fields to the form now.
 
-Non-BC Breaking Changes and new features:
+### Non-BC Breaking Changes and new features:
+
 - There is now support for resumable file uploads! It works out of the box, you do not need to change anything for it.
 - Performance has been improved in all areas of the plugin.
 - Drag and Drop support has been added.
