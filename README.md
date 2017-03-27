@@ -26,7 +26,7 @@ Changes from version 2 to version 3:
 
 Version 2 of the plugin is deprecated and will cease to exist on September 30, 2017. Please upgrade to version 3 as soon as possible.
 
-### Basics
+## Basics
 
 The Transloadit jQuery plugin allows you to
 
@@ -68,7 +68,7 @@ By default, this will display an overlay with a progress bar.
 
 <span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
 
-### Releases
+## Releases
 
 We have three *magic* releases:
 
@@ -83,9 +83,111 @@ We have three *magic* releases:
 - <code>jquery.transloadit2-v2-latest.js</code>
   This is always the latest version of the v2 branch: [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
 
-### Plugin parameters
+## Callbacks
 
-The plugin supports several parameters.
+<table class="table table-striped table-bordered">
+<tr>
+  <th>Parameter</th>
+  <th>Description</th>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onStart(assemblyObj)</code>
+  </td>
+  <td markdown="1">
+   This is fired whenever uploading begins. The assemblyObj contains useful data like the assembly's id.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onExecuting(assemblyObj)</code>
+  </td>
+  <td markdown="1">
+   This is fired whenever uploading is fully finished and transcoding begins. The assemblyObj contains useful data like the assembly's id.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onFileSelect(fileName, $fileInputField)</code>
+  </td>
+  <td markdown="1">
+   This is fired whenever a user selects a file in file input field.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onProgress(<br />bytesReceived, bytesExpected<br />)</code>
+  </td>
+  <td markdown="1">
+   This is fired whenever the upload progress is updated, allowing you to render your own upload progress bar.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onUpload(upload)</code>
+  </td>
+  <td markdown="1">
+   This is fired once for each uploaded file. This is useful for custom renderings of multiple file uploads.
+
+   Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
+
+   Please set <code>requireUploadMetaData</code> to true if you use this callback.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onResult(step, result)</code>
+  </td>
+  <td markdown="1">
+   This is fired each time a result becomes available for a given Step, and is only available when <code>wait</code> is set to <code>true</code>. This can be used
+   to show thumbnails for videos or images once they are uploaded.
+
+   Results here contain a key <code>original_id</code>, which maps them back to the ID of the originally uploaded file's ID.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onCancel()</code>
+  </td>
+  <td markdown="1">
+   This is fired after an upload has been canceled by the user.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onError(assembly)</code>
+  </td>
+  <td markdown="1">
+   This is fired when upload errors occur.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onSuccess(assembly)</code>
+  </td>
+  <td markdown="1">
+   This is fired when the plugin has completed an upload. If <code>wait</code> is set to <code>false</code>, this is fired after the upload finishes. If <code>wait</code> is <code>true</code>, this is fired once all files have been transcoded.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onDisconnect()</code>
+  </td>
+  <td markdown="1">
+   This is called whenever the internet connection goes down. Useful in the context of resumable uploads. Transloadit will display a default error message in this case, though, asking the user to keep their browser tab open and wait for the resume.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   <code>onReconnect()</code>
+  </td>
+  <td markdown="1">
+   This is called whenever the internet connection becomes available again after it had been down previously.
+  </td>
+</tr>
+</table>
+
+## Other Parameters
 
 <table class="table table-striped table-bordered">
 <tr>
@@ -266,107 +368,12 @@ The plugin supports several parameters.
    Specifies whether Transloadit errors are displayed to end users. If this is set to <code>false</code>, no Transloadit errors will be displayed. Use the <code>onError</code> callback to perform your own logging or presentation. This is <code>true</code> by default.
   </td>
 </tr>
-<tr>
-  <td markdown="1">
-   <code>onStart(assemblyObj)</code>
-  </td>
-  <td markdown="1">
-   This is fired whenever uploading begins. The assemblyObj contains useful data like the assembly's id.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onExecuting(assemblyObj)</code>
-  </td>
-  <td markdown="1">
-   This is fired whenever uploading is fully finished and transcoding begins. The assemblyObj contains useful data like the assembly's id.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onFileSelect(fileName, $fileInputField)</code>
-  </td>
-  <td markdown="1">
-   This is fired whenever a user selects a file in file input field.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onProgress(<br />bytesReceived, bytesExpected<br />)</code>
-  </td>
-  <td markdown="1">
-   This is fired whenever the upload progress is updated, allowing you to render your own upload progress bar.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onUpload(upload)</code>
-  </td>
-  <td markdown="1">
-   This is fired once for each uploaded file. This is useful for custom renderings of multiple file uploads.
-
-   Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
-
-   Please set <code>requireUploadMetaData</code> to true if you use this callback.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onResult(step, result)</code>
-  </td>
-  <td markdown="1">
-   This is fired each time a result becomes available for a given Step, and is only available when <code>wait</code> is set to <code>true</code>. This can be used
-   to show thumbnails for videos or images once they are uploaded.
-
-   Results here contain a key <code>original_id</code>, which maps them back to the ID of the originally uploaded file's ID.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onCancel()</code>
-  </td>
-  <td markdown="1">
-   This is fired after an upload has been canceled by the user.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onError(assembly)</code>
-  </td>
-  <td markdown="1">
-   This is fired when upload errors occur.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onSuccess(assembly)</code>
-  </td>
-  <td markdown="1">
-   This is fired when the plugin has completed an upload. If <code>wait</code> is set to <code>false</code>, this is fired after the upload finishes. If <code>wait</code> is <code>true</code>, this is fired once all files have been transcoded.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onDisconnect()</code>
-  </td>
-  <td markdown="1">
-   This is called whenever the internet connection goes down. Useful in the context of resumable uploads. Transloadit will display a default error message in this case, though, asking the user to keep their browser tab open and wait for the resume.
-  </td>
-</tr>
-<tr>
-  <td markdown="1">
-   <code>onReconnect()</code>
-  </td>
-  <td markdown="1">
-   This is called whenever the internet connection becomes available again after it had been down previously.
-  </td>
-</tr>
 </table>
 
 <span class="label label-danger">Important</span> For very specific use-cases it may help to
  take a look at the [plugin's source code](https://github.com/transloadit/jquery-sdk). You can also always [ask us](/support) to clarify something or help you with integration.
 
-### Enabling drag and drop
+## Drag and drop
 
 To enable drag and drop please add a div to your form like as follows:
 
@@ -390,7 +397,7 @@ This will create a drag and drop area with some default CSS in your form. This i
 }
 ```
 
-### Enabling file preview areas
+## File preview areas
 
 File preview areas are lists that are automatically populated with the files that will be part of the upload.
 The user can then review the list prior to the upload and remove some files again if he or she so wishes.
@@ -430,7 +437,7 @@ This will create a file preview area with some default CSS in your form. This is
 }
 ```
 
-### Customize the progress bar
+## Customizing the Progress Bar
 
 If you don't like the Transloadit progress bar, you can render your own, like this:
 
@@ -458,7 +465,7 @@ You can unbind the plugin by calling
 $('#upload-form').unbind('submit.transloadit');
 ```
 
-### How to add your own localization / other language strings
+## How to add your own localization / other language strings
 
 You can add your own language strings like so:
 
@@ -485,7 +492,7 @@ $el.transloadit.i18n.my_locale = {
 
 Then just replace the English strings with your custom language strings.
 
-### How to access the internal Transloadit object
+## How to access the internal plugin object
 
 You can access the internal uploader object to call methods directly on it like so:
 
