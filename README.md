@@ -208,6 +208,8 @@ $(function() {
 
 ## Parameters
 
+These can be added as parameters to the `.transloadit()` call like so:
+
 ```markup
 <script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
 <script type="text/javascript">
