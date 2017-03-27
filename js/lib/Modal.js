@@ -38,14 +38,28 @@ class Modal {
       return
     }
 
+    const cancelTxt = this._i18n.translate('cancel')
+    const startingUploadTxt = this._i18n.translate('startingUpload')
+    const detailsTxt = this._i18n.translate('details')
+
     this._$modal = $(
-      `<div id="transloadit"><div class="content"><a href="#close" class="close">${this._i18n.translate(
-        'cancel'
-      )}</a><p class="status"></p><div class="progress progress-striped"><div class="bar"><span class="percent"></span></div></div><label>${this._i18n.translate(
-        'startingUpload'
-      )}</label><p class="error"></p><div class="error-details-toggle"><a href="#">${this._i18n.translate(
-        'details'
-      )}</a></div><p class="error-details"></p></div></div>`
+      `<div id="transloadit">
+        <div class="content">
+          <a href="#close" class="close">${cancelTxt}</a>
+          <p class="status"></p>
+          <div class="progress progress-striped">
+            <div class="bar">
+              <span class="percent"></span>
+            </div>
+          </div>
+          <label>${startingUploadTxt}</label>
+          <p class="error"></p>
+          <div class="error-details-toggle">
+            <a href="#">${detailsTxt}</a>
+          </div>
+          <p class="error-details"></p>
+        </div>
+      </div>`
     ).appendTo('body')
 
     $.extend(this._$modal, {
@@ -140,9 +154,17 @@ class Modal {
   }
 
   renderProgress (received, expected) {
-    // this._$modal can actually be gone if cancel was hit in the meantime
+    // this._$modal can actually be gone if cancel was hit in the meantime.
     if (!this._$modal) {
       return
+    }
+
+    // If no file was selected make sure that we set the progressbar to 100%.
+    let jumpTo100 = false
+    if (!received && !expected && !this._bytesReceivedBefore) {
+      expected = 1
+      received = 1
+      jumpTo100 = true
     }
 
     this._toggleErrorTexts(false)
@@ -204,14 +226,16 @@ class Modal {
       this._bytesReceivedBefore = received
     }
 
-    const txt = this._i18n.translate(
-      'uploadProgress',
-      mbReceived,
-      mbExpected,
-      this._uploadRate,
-      this._durationLeft
-    )
-    this._$modal.$label.text(txt)
+    if (!jumpTo100) {
+      const txt = this._i18n.translate(
+        'uploadProgress',
+        mbReceived,
+        mbExpected,
+        this._uploadRate,
+        this._durationLeft
+      )
+      this._$modal.$label.text(txt)
+    }
 
     const currPercent = this._$modal.$progressBar.data('percent')
 

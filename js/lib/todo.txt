@@ -14,14 +14,8 @@
 - You can do "npm run dev" after changes that you want to test. That will build the project and move the built files into the crm repo. Just refresh that demo page then
   and it should run on the newest version. :)
 
-- we need to test locally if the resuming works at all
-  -> check for the resumable case in this._onReconnect()
+---------
 
-- it would be nice to have little preview images for images or videos in the file preview areas
-- and otherwise icons for the file types
-- we need some automated tests
-- let's double-check if the latest jQuery versions are supported
-- [ ] when there is no file upload the jQuery plugin should not say "uploading files"
 
 KNOWN ISSUES:
 
@@ -31,11 +25,14 @@ KNOWN ISSUES:
 - [x] resumable:true with requireUploadMetaData:false does not upload to test, because it ends too soon (onSuccess and therefore reset are called too soon)
 - [x] add socket.io via npm
 - [x] Do not show tus error message on disconnect; just show the disconnect error
-- [ ] Uploading 100MB file over tus consistently stops/breaks at 50% upload
-- [ ] Figure out how we can do i18n better so that people can add their own translations without having to be stuck on a custom build
+- [x] Uploading 100MB file over tus consistently stops/breaks at 50% upload
+- [x] Figure out how we can do i18n better so that people can add their own translations without having to be stuck on a custom build
 
 For later:
+- [x] we need some automated tests
+- [ ] when there is no file upload the jQuery plugin should not say "uploading files"
 - [ ] If we go offline when upload is at 100% and then reconnect, make sure to show progress bar again at 100%
   - Generally the progress bar starts somewhere else after a reconnect, because we rely on client side progress events, not on server side ones
-- [ ] Problem with reconnects when resumable: true - we are missing out on progress events sometimes
-- [ ] I cannot start tusd locally for some reason which naturally results in "XMLHttpRequest cannot load http://vbox.transloadit.com/resumable/" errors in the browser.
+- [x] Problem with reconnects when resumable: true - we are missing out on progress events sometimes -> Marius says this cannot be bypassed
+- [x] I cannot start tusd locally for some reason which naturally results in "XMLHttpRequest cannot load http://vbox.transloadit.com/resumable/" errors in the browser.
+- [ ] it would be nice to have little preview images for images or videos in the file preview areas and otherwise icons for the file types
