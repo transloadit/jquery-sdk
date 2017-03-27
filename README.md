@@ -518,12 +518,12 @@ $el.transloadit.i18n.my_locale = {
   'errors.unknown'                                         : 'There was an unknown error.',
   'errors.tryAgain'                                        : 'Please reload your browser page and try again.',
   'errors.troubleshootDetails'                             : 'If you would like our help to troubleshoot this, ' + 'please email us this information:',
-  cancel         : 'Cancel',
-  cancelling     : 'Cancelling ...',
-  details        : 'Details',
-  startingUpload : 'Starting upload ...',
-  processingFiles: 'Upload done, now processing files ...',
-  uploadProgress : '%s / %s MB at %s kB/s | %s left'
+  'cancel'                                                 : 'Cancel',
+  'cancelling'                                             : 'Cancelling ...',
+  'details'                                                : 'Details',
+  'startingUpload'                                         : 'Starting upload ...',
+  'processingFiles'                                        : 'Upload done, now processing files ...',
+  'uploadProgress'                                         : '%s / %s MB at %s kB/s | %s left',
 }
 ```
 

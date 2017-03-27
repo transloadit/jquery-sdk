@@ -21,10 +21,10 @@ function Assembly (opts) {
 
   this._id = uuid.v4().replace(/-/g, '')
 
-  this._url = this._protocol + "api2-" + this._instance + '/assemblies/' + this._id
-  this._websocketUrl = this._protocol + "api2-" + this._instance
-  this._httpUrl = "http://api2." + this._instance + '/assemblies/' + this._id
-  this._httpsUrl = "https://api2-" + this._instance + '/assemblies/' + this._id
+  this._url = this._protocol + 'api2-' + this._instance + '/assemblies/' + this._id
+  this._websocketUrl = this._protocol + 'api2-' + this._instance
+  this._httpUrl = 'http://api2.' + this._instance + '/assemblies/' + this._id
+  this._httpsUrl = 'https://api2-' + this._instance + '/assemblies/' + this._id
 
   this._started = false
   this._ended = false

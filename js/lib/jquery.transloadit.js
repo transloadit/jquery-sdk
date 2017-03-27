@@ -122,6 +122,8 @@ const tus = require('tus-js-client')
       this._websocketPath = null
       this._internetConnectionChecker = null
       this._isOnline = true
+
+      this._error = null
     }
 
     init ($form, options) {
@@ -280,12 +282,15 @@ const tus = require('tus-js-client')
 
       this._xhr.addEventListener('error', err => {
         self._xhr = null
+        self._error = err
       })
       this._xhr.addEventListener('abort', err => {
         self._xhr = null
+        self._error = err
       })
       this._xhr.addEventListener('timeout', err => {
         self._xhr = null
+        self._error = err
       })
       this._xhr.addEventListener('load', () => {
         self._xhr = null
@@ -334,7 +339,6 @@ const tus = require('tus-js-client')
       f.open('POST', url)
       f.onreadystatechange = () => {
         if (f.readyState === 4 && f.status === 200) {
-          const resp = JSON.parse(f.responseText)
           proceed()
           cb()
         }
@@ -401,7 +405,7 @@ const tus = require('tus-js-client')
 
           self._renderProgress(self._uploadedBytes, self._fileSizes)
           self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assemblyResult)
-        }
+        },
       })
 
       this._resumableUploads.push(upload)
@@ -840,11 +844,11 @@ const tus = require('tus-js-client')
 
     _buildAssemblyObj (ok) {
       const assemblyObj = {
-        ok: ok,
-        assembly_id: this._assembly.getId(),
-        instance: this._assembly.getInstance(),
-        assembly_url: this._assembly.getHttpUrl(),
-        assembly_ssl_url: this._assembly.getHttpsUrl()
+        ok              : ok,
+        assembly_id     : this._assembly.getId(),
+        instance        : this._assembly.getInstance(),
+        assembly_url    : this._assembly.getHttpUrl(),
+        assembly_ssl_url: this._assembly.getHttpsUrl(),
       }
 
       return assemblyObj
@@ -905,7 +909,7 @@ const tus = require('tus-js-client')
 
       let result = 'https://api2.transloadit.com/'
       if (this._options.region) {
-        result = this._options.protocol + "api2-" + this._options.region + ".transloadit.com/"
+        result = this._options.protocol + 'api2-' + this._options.region + '.transloadit.com/'
       }
       return result
     }
