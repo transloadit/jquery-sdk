@@ -104,7 +104,7 @@ The plugin supports several parameters.
 </tr>
 <tr>
   <td markdown="1">
-   <code>service</code>
+   <code>region</code>
   </td>
   <td markdown="1">
    If you want to temporarily switch to a particular region only, because we are down in the other region, you can set this parameter to either `us-east-1` or `eu-west-1`. The SDK will then build the proper service endpoint for you. Make sure to not set a custom service endpoint yourself in this case, as this would overrule the region parameter.
