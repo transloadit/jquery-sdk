@@ -232,7 +232,7 @@ $(function() {
    <code>service</code>
   </td>
   <td markdown="1">
-   The service URL to use. By default this is `https://api2.transloadit.com/"`, which makes use of our entire api and route traffic based on the geolocation of your users.
+   The service URL to use. By default this is `"https://api2.transloadit.com/"`, which makes use of our entire api and route traffic based on the geolocation of your users.
    Setting this parameter overrules the `region` parameter, which you should also check out.
   </td>
 </tr>
