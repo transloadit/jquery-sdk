@@ -27,6 +27,7 @@ const tus = require('tus-js-client')
     beforeStart                 : function () { return true },
     onFileSelect                : function () { },
     onStart                     : function () { },
+    onExecuting                 : function () { },
     onProgress                  : function () { },
     onUpload                    : function () { },
     onResult                    : function () { },
@@ -163,7 +164,7 @@ const tus = require('tus-js-client')
       this._fileSizes = 0
       this._uploadedBytes = 0
       this._service = this._getService()
-      
+
       // Remove textareas with encoding results from previous uploads to not send them
       // as form fields.
       this._$form.find('textarea[name=transloadit]').remove()

@@ -276,6 +276,14 @@ The plugin supports several parameters.
 </tr>
 <tr>
   <td markdown="1">
+   <code>onExecuting(assemblyObj)</code>
+  </td>
+  <td markdown="1">
+   This is fired whenever uploading is fully finished and transcoding begins. The assemblyObj contains useful data like the assembly's id.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
    <code>onFileSelect(fileName, $fileInputField)</code>
   </td>
   <td markdown="1">
