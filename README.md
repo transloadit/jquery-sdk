@@ -22,7 +22,7 @@ Changes from version 2 to version 3:
 - All options related to polling have been removed.
 - There is now a lot less network traffic for assembly status updates.
 - There is now the ability to not wait for file upload meta data anymore, which is a big speed improvement. This change was also backported to the last version in the 2.x series.
-
+- There is now a new parameter "maxNumberOfUploadedFiles", with which you can set a limit to the number of uploaded files.
 - There are two new callbacks implemented: onDisconnect() and onReconnect()
 
 Version 2 of the plugin is deprecated and will cease to exist on September 30, 2017. Please upgrade to version 3 as soon as possible.
@@ -335,6 +335,22 @@ $(function() {
   </td>
   <td markdown="1">
    When set to <code>true</code> this triggers the upload to Transloadit as soon as the user has selected a file in any of the form's file input fields. This is <code>false</code> by default.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   maxNumberOfUploadedFiles
+  </td>
+  <td markdown="1">
+   When set to an integer value, this is the maximum number of files users can upload. If they exceed this number, then an error will occur. By default this is <code>null</code>, which means no limit.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
+   locale
+  </td>
+  <td markdown="1">
+   The locale to use. The default value is <code>"en"</code>. If you use a custom locale, please provide your own localized strings. Please check the bottom of this page for further instructions.
   </td>
 </tr>
 <tr>
