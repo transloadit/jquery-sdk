@@ -104,6 +104,21 @@ function serveBuildJs (res) {
   })
 }
 
+function serveSourceMap (res) {
+  const fileName = path.join(__dirname, '../build/jquery.transloadit2-latest.js.map')
+
+  fs.readFile(fileName, (err, content) => {
+    if (err) {
+      throw err
+    }
+
+    content = content.toString()
+
+    res.writeHead(200, 'OK', { 'Content-Type': 'text/javascript' })
+    res.end(content)
+  })
+}
+
 if (!process.env.TRANSLOADIT_ACCESS_KEY) {
   console.error('Found no TRANSLOADIT_ACCESS_KEY in env')
   process.exit(1)
@@ -120,8 +135,12 @@ http
       return
     }
 
-    if (req.url === '/build.js') {
+    if (req.url === '/build.js' || req.url === '/build/jquery.transloadit2-latest.js') {
       return serveBuildJs(res)
+    }
+
+    if (req.url === '/build/jquery.transloadit2-latest.js.map') {
+      return serveSourceMap(res)
     }
 
     if (req.url === '/shutdown') {
