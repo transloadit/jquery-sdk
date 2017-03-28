@@ -1,0 +1,36 @@
+{
+  "extends": "standard",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "window": true,
+    "jQuery": true,
+    "$": true,
+    "casper": true,
+    "testhost": true
+  },
+  "rules": {
+    "no-multi-spaces": 0,
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "key-spacing": [
+      "error",
+      {
+        "multiLine": {
+          "beforeColon": false,
+          "afterColon": true
+        },
+        "align": {
+          "beforeColon": false,
+          "afterColon": true,
+          "on": "colon",
+          "mode": "strict"
+        }
+      }
+    ]
+  }
+}

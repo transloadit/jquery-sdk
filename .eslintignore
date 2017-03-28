@@ -1,0 +1,6 @@
+build/**
+flow/**
+js/dep/**
+node_modules/**
+n1k0-casperjs-*/**
+phantomjs-*/**
