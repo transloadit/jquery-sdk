@@ -4,7 +4,7 @@
   "scripts": {
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",
-    "css": "mkdir -p build/css/img && cp css/transloadit.css build/css/transloadit3-latest.css && cp -v css/img/* build/css/img/",
+    "css": "mkdir -p build/css/img && cp css/transloadit.css build/css/transloadit2-latest.css && cp -v css/img/* build/css/img/",
     "browserify": "browserify  -t [ babelify --presets [ es2015 ] ] js/lib/*.js -o build/jquery.transloadit2-latest.js",
     "dev": "npm run clean && npm run css && npm run browserify && npm run inject",
     "fix": "eslint . --fix",
