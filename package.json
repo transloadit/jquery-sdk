@@ -6,11 +6,11 @@
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",
     "css": "mkdir -p build/css/img && cp css/transloadit2.css build/css/transloadit2-latest.css && cp -v css/img/* build/css/img/",
-    "browserify": "browserify js/dep/*.js js/lib/*.js -o build/jquery.transloadit2-latest.js",
+    "browserify": "browserify -t [ babelify --presets [ es2015 ] ] js/dep/*.js js/lib/*.js -o build/jquery.transloadit2-latest.js",
     "dev": "npm run clean && npm run css && npm run browserify && npm run inject",
     "fix": "eslint . --fix",
     "gzip": "gzip --force --best < build/jquery.transloadit2-latest.js > build/jquery.transloadit2-latest.js.gz",
-    "inject": "cp -v build/*.css ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/css/ && cp -v css/img/* ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/css/img/ && cp -v build/*.js* ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/js",
+    "inject": "cp -v build/css/*.css ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/css/ && cp -v css/img/* ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/css/img/ && cp -v build/*.js* ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/js",
     "link": "ln -nfs $(pwd) ${WEBSITEDIR:-../content}/jquery-sdk",
     "lint": "eslint .",
     "release:major": "env SEMANTIC=major npm run release",
@@ -48,6 +48,8 @@
     "jshint": "2.8.0"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.24.0",
+    "babelify": "^7.3.0",
     "jscs": "2.6.0"
   }
 }
