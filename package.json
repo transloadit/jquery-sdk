@@ -18,7 +18,7 @@
     "release:patch": "env SEMANTIC=patch npm run release",
     "release": "npm version ${SEMANTIC:-patch} -m \"Release %s\" && git push --tags && git push && npm publish",
     "start:test:server": "node tests/server.js",
-    "test": "tests/run.sh",
+    "test": "npm run build && tests/run.sh",
     "uglify": "uglifyjs --comments --stats --output=build/jquery.transloadit2-latest.js --source-map=build/jquery.transloadit2-latest.js.map -- build/jquery.transloadit2-latest.js",
     "versionify": "cd build && for file in *.*; do cp -v ${file} $(echo ${file} |sed \"s/latest/v$(npm run --silent version)/g\" ); done",
     "version": "node -e 'console.log(require(\"./package.json\").version)'"
