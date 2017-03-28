@@ -4,7 +4,6 @@ var fs          = require('fs');
 var debug       = require('debug')('tlj:testserver');
 var util        = require('util');
 
-
 function escapeHtml(string) {
   var entityMap = {
      "&" : "&amp;",
