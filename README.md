@@ -76,10 +76,10 @@ We have three *magic* releases:
 - <code>jquery.transloadit-latest.js</code>
   This is usually the latest version and is **the recommended version to use**. We will make sure not to break backwards compatibility even between major versions. This version is safe to use.
   Since between version 2 and 3 there are a few minor BC breaking changes, this version still points to **version 2** for now, until **September 30, 2017**. We will then make this point to **version 3**.
-  [https://assets.transloadit.com/js/jquery.transloadit-latest.js](https://assets.transloadit.com/js/jquery.transloadit-latest.js)
+  [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
 - <code>jquery.transloadit-v3-latest.js</code>
-  This is always the latest version of the v3 branch: [https://assets.transloadit.com/js/jquery.transloadit-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit-v3-latest.js)
+  This is always the latest version of the v3 branch: [https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js)
 
 - <code>jquery.transloadit2-v2-latest.js</code>
   This is always the latest version of the v2 branch: [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)

@@ -90,7 +90,7 @@ function serveHtmlFile (res, filename) {
 }
 
 function serveBuildJs (res) {
-  const fileName = path.join(__dirname, '../build/jquery.transloadit3-latest.js')
+  const fileName = path.join(__dirname, '../build/jquery.transloadit2-latest.js')
 
   fs.readFile(fileName, (err, content) => {
     if (err) {
