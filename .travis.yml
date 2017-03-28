@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - 6
 before_install:
-- npm install -g npm@1.4
+- npm install -g npm@latest
 - wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/phantomjs/phantomjs-1.8.0-linux-x86_64.tar.bz2 || wget http://packages.transloadit.com.s3.amazonaws.com/phantomjs-1.8.0-linux-x86_64.tar.bz2
 - tar jxf phantomjs-1.8.0-linux-x86_64.tar.bz2
 - sudo cp -Raf phantomjs-*/* /usr/local/
