@@ -9,7 +9,6 @@ before_install:
 - wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.0.3
 - tar zvxf 1.0.3
 - sudo cp -Raf casperjs-casperjs-*/* /usr/local/
-- npm install
 notifications:
   email: false
   slack:
