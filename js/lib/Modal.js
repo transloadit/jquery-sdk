@@ -153,7 +153,7 @@ class Modal {
     this._$modal.$label.text(this._i18n.translate('cancelling'))
   }
 
-  renderProgress (received, expected) {  
+  renderProgress (received, expected) {
     // this._$modal can actually be gone if cancel was hit in the meantime.
     if (!this._$modal) {
       return

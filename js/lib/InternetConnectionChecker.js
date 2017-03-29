@@ -31,12 +31,9 @@ class InternetConnectionChecker {
   }
 
   onlineCheck (cb) {
-    const v4 = '(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])){3}'
-    let regex = new RegExp(v4, 'g')
-
     let urls = [
       'https://api2.transloadit.com/',
-      'https://ipv4.icanhazip.com/'
+      'https://ipv4.icanhazip.com/',
     ]
     let cbCalled = false
     let numResultsGathered = 0
@@ -54,7 +51,7 @@ class InternetConnectionChecker {
           cb(true)
         }
 
-        if (numResultsGathered === urls.length ) {
+        if (numResultsGathered === urls.length) {
           cbCalled = true
           cb(false)
         }
@@ -73,13 +70,12 @@ class InternetConnectionChecker {
     })
   }
 
-
   isOnline () {
     return this._isOnline
   }
 
   isCurrentlyOnline (cb) {
-    isOnline(cb)
+    this.onlineCheck(cb)
   }
 }
 
