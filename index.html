@@ -13,8 +13,8 @@
     </form>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <!-- <script src="http://localjquerysdk.com/build/jquery.transloadit2-latest.js"></script> -->
-    <script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
+    <script src="http://localjquerysdk.com/build/jquery.transloadit2-latest.js"></script>
+    <!-- <script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script> -->
 
 
     <script type="text/javascript">
@@ -32,7 +32,7 @@
         autoSubmit: false,
         // service: 'http://api2-vbox.transloadit.com',
         region: 'eu-west-1',
-        // assets: 'http://localjquerysdk.com/build/',
+        assets: 'http://localjquerysdk.com/build/',
         triggerUploadOnFileSelection: true,
         pollInterval: 2500,
         fields: '*',
@@ -68,6 +68,12 @@
         onError: function (error) {
           console.log('Assembly got an error:', error);
         },
+        onDisconnect: function () {
+          console.log('Disconnected!');
+        },
+        onReconnect: function (error) {
+          console.log('Reconnected!');
+        }
       });
     });
     </script>

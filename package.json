@@ -6,7 +6,7 @@
     "clean": "rm -rf build/*",
     "css": "mkdir -p build/css/img && cp css/transloadit.css build/css/transloadit2-latest.css && cp -v css/img/* build/css/img/",
     "browserify": "browserify -t [ babelify --presets [ es2015 ] ] js/lib/*.js -o build/jquery.transloadit2-latest.js",
-    "dev": "npm run clean && npm run css && npm run browserify && npm run inject",
+    "dev": "npm run clean && npm run css && npm run browserify",
     "fix": "eslint . --fix",
     "gzip": "gzip --force --best < build/jquery.transloadit2-latest.js > build/jquery.transloadit2-latest.js.gz",
     "inject": "cp -v build/css/transloadit2-latest.css ${WEBSITEDIR:-~/code/content}/css/transloadit2-v3-latest.css && cp -v build/css/img/* ${WEBSITEDIR:-~/code/content}/css/img/ && cp -v build/jquery.transloadit2-v3*.js* ${WEBSITEDIR:-~/code/content}/js",

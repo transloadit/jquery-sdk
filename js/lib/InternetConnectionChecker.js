@@ -34,16 +34,46 @@ class InternetConnectionChecker {
     const v4 = '(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])){3}'
     let regex = new RegExp(v4, 'g')
 
+    let urls = [
+      'https://api2.transloadit.com/',
+      'https://ipv4.icanhazip.com/'
+    ]
+    let cbCalled = false
+    let numResultsGathered = 0
+
+    for (var i = 0; i < urls.length; i++) {
+      this._onlineCheck(urls[i], (online) => {
+        numResultsGathered++
+
+        if (cbCalled) {
+          return
+        }
+
+        if (online) {
+          cbCalled = true
+          cb(true)
+        }
+
+        if (numResultsGathered === urls.length ) {
+          cbCalled = true
+          cb(false)
+        }
+      })
+    }
+  }
+
+  _onlineCheck (url, cb) {
     $.ajax({
-      url: 'https://ipv4.icanhazip.com/',
+      url: url,
     }).done(data => {
-      let isOnline = regex.test(data)
-      cb(isOnline)
+      cb(true)
     })
     .fail(() => {
       cb(false)
     })
   }
+
+
   isOnline () {
     return this._isOnline
   }
