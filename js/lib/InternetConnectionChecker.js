@@ -1,5 +1,3 @@
-const isOnline = require('is-online')
-
 class InternetConnectionChecker {
   constructor ({ onDisconnect, onReconnect, intervalLength }) {
     this._onDisconnect = onDisconnect || (() => {})
@@ -18,7 +16,7 @@ class InternetConnectionChecker {
     const self = this
     this._interval = setInterval(
       () => {
-        isOnline().then(online => {
+        self.onlineCheck(online => {
           if (self._isOnline && !online) {
             self._onDisconnect()
           }
@@ -32,6 +30,20 @@ class InternetConnectionChecker {
     )
   }
 
+  onlineCheck (cb) {
+    const v4 = '(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])){3}'
+    let regex = new RegExp(v4, 'g')
+
+    $.ajax({
+      url: 'https://ipv4.icanhazip.com/',
+    }).done(data => {
+      let isOnline = regex.test(data)
+      cb(isOnline)
+    })
+    .fail(() => {
+      cb(false)
+    })
+  }
   isOnline () {
     return this._isOnline
   }

@@ -27,7 +27,6 @@
     "css"
   ],
   "dependencies": {
-    "is-online": "7.0.0",
     "tus-js-client": "1.4.2",
     "uuid": "2.0.2",
     "socket.io-client": "1.7.2"
