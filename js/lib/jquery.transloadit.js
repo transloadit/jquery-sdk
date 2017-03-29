@@ -723,6 +723,14 @@ const tus = require('tus-js-client')
         err.message = this._i18n.translate(`errors.${err.error}`)
       }
 
+      if (err.reason) {
+        err.message += '<br />' + err.reason
+      }
+
+      if (err.stderr) {
+        err.message += '<br />' + err.stderr.substr(0, 100) + ' ...'
+      }
+
       this._ended = true
       this._renderError(err)
       this._options.onError(err)

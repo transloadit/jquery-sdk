@@ -196,6 +196,11 @@ Assembly.prototype._createSocket = function (cb) {
     }
   })
 
+  socket.on('assembly_error', function () {
+    self._finished = true
+    self._fetchStatus()
+  })
+
   socket.on('assembly_finished', function () {
     self._finished = true
     if (self._wait) {
