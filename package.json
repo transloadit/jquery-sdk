@@ -9,7 +9,7 @@
     "dev": "npm run clean && npm run css && npm run browserify && npm run inject",
     "fix": "eslint . --fix",
     "gzip": "gzip --force --best < build/jquery.transloadit2-latest.js > build/jquery.transloadit2-latest.js.gz",
-    "inject": "cp -v build/css/*.css ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/css/ && cp -v build/css/img/* ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/css/img/ && cp -v build/*.js* ${WEBSITEDIR:-~/code/crm}/app/webroot/jquery-sdk/js",
+    "inject": "cp -v build/css/transloadit2-latest.css ${WEBSITEDIR:-~/code/content}/css/transloadit2-v3-latest.css && cp -v build/css/img/* ${WEBSITEDIR:-~/code/content}/css/img/ && cp -v build/jquery.transloadit2-v3*.js* ${WEBSITEDIR:-~/code/content}/js",
     "link": "ln -nfs $(pwd) ${WEBSITEDIR:-../content}/jquery-sdk",
     "lint": "eslint .",
     "release:major": "env SEMANTIC=major npm run release",
