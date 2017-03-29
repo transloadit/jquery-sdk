@@ -9,6 +9,7 @@ before_install:
 - wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.0.3
 - tar zvxf 1.0.3
 - sudo cp -Raf casperjs-casperjs-*/* /usr/local/
+- npm install
 notifications:
   email: false
   slack:
@@ -16,5 +17,5 @@ notifications:
 env:
 # travis encrypt TRANSLOADIT_ACCESS_KEY=xxx
 - secure: B+Nha+TarsZCCoOYIyeMEFyiAWY/o7kgmyj9hwCBikOOoM/FLBrldW8E4DYhP2ub0xv/VtQywcMovDkPi+y4b5ooMnWodDYtDwzkOlyrDqNJIzsaT6KQ5Q7qsXVxEMK/RsLLrwRMlGZJiu1nqFsUJNVswmu4o71fb+Rnc6sXxbY=
-before_script: npm install && npm run build
+before_script: npm run build
 script: npm run test
