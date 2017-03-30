@@ -77,18 +77,23 @@ By default, this will display an overlay with a progress bar.
 
 ## Releases
 
-We have three *magic* releases:
-
-- <code>jquery.transloadit-latest.js</code>
-  This is usually the latest version and is **the recommended version to use**. We will make sure not to break backwards compatibility even between major versions. This version is safe to use.
-  Since between version 2 and 3 there are a few minor BC breaking changes, this version still points to **version 2** for now, until **September 30, 2017**. We will then make this point to **version 3**.
-  [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
+We have two *magic* releases:
 
 - <code>jquery.transloadit-v3-latest.js</code>
-  This is always the latest version of the v3 branch: [https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js)
+  This is always the latest version of the v3 branch and is currently in beta. We welcome any feedback! [https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js)
 
 - <code>jquery.transloadit2-v2-latest.js</code>
-  This is always the latest version of the v2 branch: [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
+  This is always the latest version of the v2 branch and is **the recommended version to use** for now. [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
+
+- If you'd like to load a specific version, please follow our Releases. One can load specific versions like so:
+  [https://assets.transloadit.com/js/jquery.transloadit2-v3.0.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v3.0.0.js)
+
+### Legacy
+
+- <code>jquery.transloadit-latest.js</code>
+  This is the latest version and is **not** recommended to use. We do not want to auto-upgrade users between major versions to allow us to make BC breaking changes.
+  On **September 30, 2017** we will remove this version.
+  [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
 
 ## Callbacks
 
