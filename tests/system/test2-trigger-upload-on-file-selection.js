@@ -1,4 +1,4 @@
-casper.options.clientScripts.push("node_modules/babel-polyfill/dist/polyfill.js")
+casper.options.clientScripts.push('node_modules/babel-polyfill/dist/polyfill.js')
 casper.start(`http://${testhost}/trigger-on-file-select`, function () {
   const curr = this.getCurrentUrl()
 
