@@ -212,7 +212,7 @@ Assembly.prototype._createSocket = function (cb) {
     self._onUpload(file)
   })
 
-  socket.on('assembly_result', function (stepName, result) {
+  socket.on('assembly_result_finished', function (stepName, result) {
     self._onResult(stepName, result)
   })
 
