@@ -1,3 +1,4 @@
+casper.options.clientScripts.push("node_modules/babel-polyfill/dist/polyfill.js")
 casper.start(`http://${testhost}`, function () {
   const curr = this.getCurrentUrl()
 
