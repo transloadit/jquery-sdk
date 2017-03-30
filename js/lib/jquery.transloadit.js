@@ -708,7 +708,7 @@ const tus = require('tus-js-client')
     }
 
     includeCss () {
-      if (CSS_LOADED || !this._options.modal) {
+      if (CSS_LOADED) {
         return
       }
 
