@@ -29,7 +29,7 @@ Version 2 of the plugin is deprecated and will cease to exist on September 30, 2
 
 ### Trying out Version 3:
 
-Instead of including  [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js) in your HTML page please include [https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js).
+Please include <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js> instead of your previous version.
 
 We'd be delighted to [receive your feedback](https://github.com/transloadit/jquery-sdk/issues/new) and fix reported issues!
 
@@ -41,7 +41,7 @@ The Transloadit jQuery plugin allows you to
 - get uploaded results directly without further API queries, and
 - wait for upload processing to complete before redirecting to the result page or calling a callback function.
 
-Assuming a form with the ID <code>"upload-form"</code> (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
+Assuming a form with the ID `"upload-form"` (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
 
 ```markup
 <script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
@@ -79,21 +79,21 @@ By default, this will display an overlay with a progress bar.
 
 We have two *magic* releases:
 
-- <code>jquery.transloadit-v3-latest.js</code>
-  This is always the latest version of the v3 branch and is currently in beta. We welcome any feedback! [https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js)
+- `jquery.transloadit-v3-latest.js`
+  This is always the latest version of the v3 branch and is currently in beta. We welcome any feedback! <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js>
 
-- <code>jquery.transloadit2-v2-latest.js</code>
-  This is always the latest version of the v2 branch and is **the recommended version to use** for now. [https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js)
+- `jquery.transloadit2-v2-latest.js`
+  This is always the latest version of the v2 branch and is **the recommended version to use** for now. <https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js>
 
-- If you'd like to load a specific version, please follow our Releases. One can load specific versions like so:
-  [https://assets.transloadit.com/js/jquery.transloadit2-v3.0.0.js](https://assets.transloadit.com/js/jquery.transloadit2-v3.0.0.js)
+- You can also pin specific versions via:
+  <https://assets.transloadit.com/js/jquery.transloadit2-v3.0.0.js>. Remember that it then becomes your responsibility to keep track of security and performance upgrades in our [releases](https://github.com/transloadit/jquery-sdk/releases).
 
 ### Legacy
 
-- <code>jquery.transloadit-latest.js</code>
-  This is the latest version and is **not** recommended to use. We do not want to auto-upgrade users between major versions to allow us to make BC breaking changes.
+- `jquery.transloadit2-latest.js`
+  This is the latest version across majors and is **not** recommended to use. We do not want to auto-upgrade users between major versions to allow us to make BC breaking changes.
   On **September 30, 2017** we will remove this version.
-  [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js)
+  <https://assets.transloadit.com/js/jquery.transloadit2-latest.js>
 
 ## Callbacks
 
