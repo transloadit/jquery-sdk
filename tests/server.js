@@ -90,7 +90,7 @@ function serveHtmlFile (res, filename) {
 }
 
 function serveBuildJs (res) {
-  const fileName = path.join(__dirname, '../build/jquery.transloadit2-latest.js')
+  const fileName = path.join(__dirname, '../build/jquery.transloadit2-v3-latest.js')
 
   fs.readFile(fileName, (err, content) => {
     if (err) {
@@ -105,7 +105,7 @@ function serveBuildJs (res) {
 }
 
 function serveSourceMap (res) {
-  const fileName = path.join(__dirname, '../build/jquery.transloadit2-latest.js.map')
+  const fileName = path.join(__dirname, '../build/jquery.transloadit2-v3-latest.js.map')
 
   fs.readFile(fileName, (err, content) => {
     if (err) {
@@ -135,11 +135,11 @@ http
       return
     }
 
-    if (req.url === '/build.js' || req.url === '/build/jquery.transloadit2-latest.js') {
+    if (req.url === '/build.js' || req.url === '/build/jquery.transloadit2-v3-latest.js') {
       return serveBuildJs(res)
     }
 
-    if (req.url === '/build/jquery.transloadit2-latest.js.map') {
+    if (req.url === '/build/jquery.transloadit2-v3-latest.js.map') {
       return serveSourceMap(res)
     }
 
