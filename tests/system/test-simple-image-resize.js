@@ -26,7 +26,6 @@ casper.test.begin('test-simple-image-resize', numberOfPlannedTests, (test) => {
   })
 
   casper.run(function () {
-    // this.test.renderResults(true)
     this.test.done()
   })
 })
