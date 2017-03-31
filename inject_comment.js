@@ -1,5 +1,11 @@
 const fs = require('fs')
 const version = require('./package.json').version
+
+const errorOut = (err) => {
+  console.error(err)
+  process.exit(1)
+}
+
 let comment = '/*\n'
 comment += '  jQuery Easing v1.3: Copyright (c) 2008 George McGinley Smith | BSD License: http://www.opensource.org/licenses/bsd-license.php\n'
 comment += '  jquery.transloadit2-' + version + '.js: Copyright (c) 2016 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php\n'
@@ -18,8 +24,8 @@ fs.readFile(filePath, 'utf8', (err, content) => {
     errorOut(err)
   }
 
-  if (content.indexOf("/*") === 0) {
-    err = new Error("Comment already added.")
+  if (content.indexOf('/*') === 0) {
+    err = new Error('Comment already added.')
     errorOut(err)
   }
 
@@ -33,8 +39,3 @@ fs.readFile(filePath, 'utf8', (err, content) => {
     process.exit(0)
   })
 })
-
-errorOut = (err) => {
-  console.error(err)
-  process.exit(1)
-}
