@@ -31,7 +31,7 @@ Version 2 of the plugin is deprecated and will cease to exist on September 30, 2
 
 Instead of including  [https://assets.transloadit.com/js/jquery.transloadit2-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-latest.js) in your HTML page please include [https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js](https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js).
 
-We'd be delighted to receive your feedback and fix reported issues!
+We'd be delighted to [receive your feedback](https://github.com/transloadit/jquery-sdk/issues/new) and fix reported issues!
 
 ## Basics
 
