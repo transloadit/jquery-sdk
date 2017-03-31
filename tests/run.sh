@@ -53,7 +53,7 @@ pushd "${__dir}"
     pushd "${__root}" > /dev/null
       cat "${__dir}/_pre.js" "${__dir}/${file}" "${__dir}/_post.js" | "./node_modules/.bin/babel" --out-file "${tmpfile}" --presets=es2015
     popd > /dev/null
-    casperjs \
+    "${__root}/node_modules/casperjs/bin/casperjs" \
       test \
       "${tmpfile}" \
       --ignore-ssl-errors=yes \
