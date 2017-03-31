@@ -7,6 +7,7 @@
  */
 require('../dep/json2')
 require('../dep/jquery.jsonp')
+require('babel-polyfill')
 
 const Assembly = require('./Assembly')
 const InstanceFetcher = require('./InstanceFetcher')

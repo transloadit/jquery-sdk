@@ -1,7 +1,6 @@
 // # Setup
 // #########################################################################
 // const utils = require('utils')
-require('babel-polyfill')
 casper.options.exitOnError  = true
 casper.options.safeLogs     = true
 casper.options.waitTimeout  = 10000
