@@ -1,5 +1,5 @@
-var uuid = require('uuid')
 var io = require('socket.io-client')
+require('../dep/jquery.jsonp')
 
 function Assembly (opts) {
   this._instance = opts.instance
@@ -18,8 +18,6 @@ function Assembly (opts) {
   this._onResult = opts.onResult || function () {}
 
   this._i18n = opts.i18n
-
-  this._id = uuid.v4().replace(/-/g, '')
 
   this._url = this._protocol + 'api2-' + this._instance + '/assemblies/' + this._id
   this._websocketUrl = this._protocol + 'api2-' + this._instance
@@ -247,16 +245,6 @@ Assembly.prototype.onReconnect = function () {
   if (this._uploadingFinished && this._inAssemblyRequest) {
     this._fetchStatus()
   }
-}
-
-Assembly.prototype.getRequestTargetUrl = function (withId) {
-  var result = this._protocol + this._instance + '/assemblies'
-
-  if (withId) {
-    result += '/' + this._id + '?redirect=false'
-  }
-
-  return result
 }
 
 Assembly.prototype._connectionError = function (retriesExhausted) {

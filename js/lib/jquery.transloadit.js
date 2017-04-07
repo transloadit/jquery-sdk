@@ -6,17 +6,14 @@
  * keep this in mind when rolling out fixes.
  */
 require('../dep/json2')
-require('../dep/jquery.jsonp')
 require('babel-polyfill')
 
 const Assembly = require('./Assembly')
-const InstanceFetcher = require('./InstanceFetcher')
 const Modal = require('./Modal')
 const DragDrop = require('./DragDrop')
 const FilePreview = require('./FilePreview')
 const InternetConnectionChecker = require('./InternetConnectionChecker')
 const I18n = require('./I18n')
-// const helpers = require('./helpers')
 const tus = require('tus-js-client')
 
 !($ => {
@@ -37,7 +34,6 @@ const tus = require('tus-js-client')
     onSuccess                   : function () { },
     onDisconnect                : function () { },
     onReconnect                 : function () { },
-    resumable                   : false,
     wait                        : false,
     processZeroFiles            : true,
     triggerUploadOnFileSelection: false,
@@ -120,7 +116,6 @@ const tus = require('tus-js-client')
       this._formData = null
       this._files = {}
 
-      this._websocketPath = null
       this._internetConnectionChecker = null
       this._isOnline = true
 
@@ -195,124 +190,77 @@ const tus = require('tus-js-client')
         this._modal.show()
       }
 
+      this._start()
+    }
+
+    _setupAssembly () {
       const self = this
 
-      const instanceFetcher = new InstanceFetcher({
-        service: this._service,
-        i18n   : this._i18n,
-        onError (err) {
-          self._renderError(err)
+      this._assembly = new Assembly({
+        i18n: this._i18n,
+
+        instance,
+        websocketPath,
+        service : this._service,
+        protocol: this._options.protocol,
+
+        wait                 : this._options['wait'],
+        requireUploadMetaData: this._options['requireUploadMetaData'],
+
+        onExecuting () {
+          // If the assembly is executing meaning all uploads are done, we will not get more progress
+          // events from XHR. But if there was a connection interruption in the meantime, we want to
+          // make sure all components (like the modal) now know that the error is gone.
+          self._renderProgress()
+
+          let assemblyObj = self._buildAssemblyObj('ASSEMBLY_EXECUTING')
+          self._options.onExecuting(assemblyObj)
+        },
+        onSuccess (assemblyResult) {
+          self._ended = true
+          self._options.onSuccess(assemblyResult)
+          self.reset()
+
+          if (self._options.modal) {
+            self._modal.hide()
+          }
+          self.submitForm(assemblyResult)
+        },
+        onCancel (assemblyResult) {
+          self._ended = true
+          self._options.onCancel(assemblyResult)
+        },
+        onError (assemblyObjContainingError) {
+          self._errorOut(assemblyObjContainingError)
+        },
+        onUpload (upload) {
+          self._options.onUpload(upload)
+        },
+        onResult (step, result) {
+          self._options.onResult(step, result)
         },
       })
-      instanceFetcher.fetch((err, instance, websocketPath) => {
+
+      self._assembly.init(err => {
         if (err) {
           return self._errorOut(err)
         }
 
-        self._assembly = new Assembly({
-          i18n: self._i18n,
+        let assemblyObj = self._buildAssemblyObj('ASSEMBLY_UPLOADING')
+        self._options.onStart(assemblyObj)
 
-          instance,
-          websocketPath,
-          service : self._service,
-          protocol: self._options.protocol,
-
-          wait                 : self._options['wait'],
-          requireUploadMetaData: self._options['requireUploadMetaData'],
-
-          onExecuting () {
-            // If the assembly is executing meaning all uploads are done, we will not get more progress
-            // events from XHR. But if there was a connection interruption in the meantime, we want to
-            // make sure all components (like the modal) now know that the error is gone.
-            self._renderProgress()
-
-            let assemblyObj = self._buildAssemblyObj('ASSEMBLY_EXECUTING')
-            self._options.onExecuting(assemblyObj)
-          },
-          onSuccess (assemblyResult) {
-            self._ended = true
-            self._options.onSuccess(assemblyResult)
-            self.reset()
-
-            if (self._options.modal) {
-              self._modal.hide()
-            }
-            self.submitForm(assemblyResult)
-          },
-          onCancel (assemblyResult) {
-            self._ended = true
-            self._options.onCancel(assemblyResult)
-          },
-          onError (assemblyObjContainingError) {
-            self._errorOut(assemblyObjContainingError)
-          },
-          onUpload (upload) {
-            self._options.onUpload(upload)
-          },
-          onResult (step, result) {
-            self._options.onResult(step, result)
-          },
-        })
-
-        self._assembly.init(err => {
-          if (err) {
-            self._errorOut(err)
+        // adding uploads from drag/dropped files and input fields
+        for (const name in self._files) {
+          for (let i = 0; i < self._files[name].length; i++) {
+            const file = self._files[name][i]
+            const upload = self._addResumableUpload(name, file)
+            upload.start()
           }
-
-          let assemblyObj = self._buildAssemblyObj('ASSEMBLY_UPLOADING')
-          self._options.onStart(assemblyObj)
-
-          if (self._options.resumable && tus.isSupported) {
-            self._startWithResumabilitySupport()
-          } else {
-            self._startWithXhr()
-          }
-        })
-      })
-    }
-
-    _startWithXhr (cb = () => {}) {
-      const self = this
-      this._formData = this._prepareFormData()
-
-      this._appendFilteredFormFields()
-      this._appendCustomFormData()
-      this._appendFiles()
-
-      this._xhr = new XMLHttpRequest()
-
-      this._xhr.addEventListener('error', err => {
-        self._xhr = null
-        self._error = err
-      })
-      this._xhr.addEventListener('abort', err => {
-        self._xhr = null
-        self._error = err
-      })
-      this._xhr.addEventListener('timeout', err => {
-        self._xhr = null
-        self._error = err
-      })
-      this._xhr.addEventListener('load', () => {
-        self._xhr = null
-      })
-
-      this._xhr.upload.addEventListener('progress', function progressFunction (evt) {
-        if (!evt.lengthComputable) {
-          return
         }
-
-        self._renderProgress(evt.loaded, evt.total)
-        self._options.onProgress(evt.loaded, evt.total, self._assemblyResult)
       })
-
-      const url = this._assembly.getRequestTargetUrl(true)
-      this._xhr.open('POST', url)
-      this._xhr.send(this._formData)
-      cb()
     }
 
-    _startWithResumabilitySupport (cb = () => {}) {
+    _start (cb = () => {}) {
       const self = this
       this._formData = this._prepareFormData()
       this._formData.append('tus_num_expected_upload_files', this._fileCount)
@@ -323,24 +271,28 @@ const tus = require('tus-js-client')
       // We need this to control retries/resumes
       this._xhr = true
 
-      function proceed () {
-        // adding uploads from drag/dropped files and input fields
-        for (const name in self._files) {
-          for (let i = 0; i < self._files[name].length; i++) {
-            const file = self._files[name][i]
-            const upload = self._addResumableUpload(name, file)
-            upload.start()
-          }
-        }
-      }
-
       const f   = new XMLHttpRequest()
-      const url = this._assembly.getRequestTargetUrl(true)
+      const url = this._service + 'assemblies'
 
+      console.log(">>> url", url)
       f.open('POST', url)
       f.onreadystatechange = () => {
         if (f.readyState === 4 && f.status === 200) {
-          proceed()
+          let parsed = null
+          try {
+            parsed = JSON.parse(f.response)
+          } catch (e) {
+            let errMsg = 'errors.SERVER_CONNECTION_ERROR'
+            var err = {
+              error  : 'SERVER_CONNECTION_ERROR',
+              message: self._i18n.translate(errMsg),
+              reason : reason,
+              url    : self._service,
+            }
+
+            return self._errorOut(err)
+          }
+
           cb()
         }
       }
@@ -435,16 +387,6 @@ const tus = require('tus-js-client')
       }
 
       return result
-    }
-
-    _appendFiles () {
-      for (const key in this._files) {
-        for (let i = 0; i < this._files[key].length; i++) {
-          this._formData.append(key, this._files[key][i])
-          this._fileCount++
-          this._fileSizes += this._files[key][i].size
-        }
-      }
     }
 
     _updateInputFileSelection ($input) {
@@ -913,6 +855,10 @@ const tus = require('tus-js-client')
 
     _getService () {
       if (this._options.service) {
+        const len = this._options.service.length
+        if (this._options.service[len] !== '/') {
+          this._options.service += '/'
+        }
         return this._options.service
       }
 
