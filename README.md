@@ -8,7 +8,7 @@ Changes from version 2 to version 3:
 
 ### BC Breaking changes:
 
-- The onStart() and onExecuting() callbacks now receive only a stripped down version of the assembly object parameter.
+- The onExecuting() callback does not have the array of `uploads` anymore. Please use the `onUpload` callback to track received uploads.
 - The onUpload() and onResult() callbacks no longer receive the assembly object as a parameter.
 - The formData parameter has been removed, because all uploads use XHR now. This will only break BC for you if you used formData: customFormDataObj. In that case you should add the contents of your custom form data as hidden input fields to the form now.
 - Several new translations have been added for which you would need to add a translation in case you run on a custom locale. Please check "How to add your own localization / other language strings" at the bottom of this page for details.

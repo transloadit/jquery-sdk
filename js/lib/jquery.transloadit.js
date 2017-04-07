@@ -21,6 +21,7 @@ const tus = require('tus-js-client')
     service                     : null,
     region                      : null,
     assets                      : 'https://assets.transloadit.com/',
+    protocol                    : 'https://',
     beforeStart                 : function () { return true },
     onFileSelect                : function () { },
     onStart                     : function () { },
@@ -191,8 +192,12 @@ const tus = require('tus-js-client')
 
       const self = this
       this._createAssembly((err, assemblyStatus) => {
+        if (err) {
+          return self._errorOut(err)
+        }
+
         self._setupAssemblyObj(assemblyStatus)
-        self._startUploading()
+        self._startUploading(assemblyStatus)
       })
     }
 
@@ -201,6 +206,7 @@ const tus = require('tus-js-client')
 
       this._assembly = new Assembly({
         i18n             : this._i18n,
+        protocol         : this._options.protocol,
         id               : assemblyStatus.assembly_id,
         httpUrl          : assemblyStatus.assembly_url,
         httpsUrl         : assemblyStatus.assembly_ssl_url,
@@ -218,8 +224,8 @@ const tus = require('tus-js-client')
           // make sure all components (like the modal) now know that the error is gone.
           self._renderProgress()
 
-          let assemblyObj = self._buildAssemblyObj('ASSEMBLY_EXECUTING')
-          self._options.onExecuting(assemblyObj)
+          assemblyStatus.ok = 'ASSEMBLY_EXECUTING'
+          self._options.onExecuting(assemblyStatus)
         },
         onSuccess (assemblyResult) {
           self._ended = true
@@ -247,15 +253,14 @@ const tus = require('tus-js-client')
       })
     }
 
-    _startUploading () {
+    _startUploading (assemblyStatus) {
       const self = this
       this._assembly.init(err => {
         if (err) {
           return self._errorOut(err)
         }
 
-        let assemblyObj = self._buildAssemblyObj('ASSEMBLY_UPLOADING')
-        self._options.onStart(assemblyObj)
+        self._options.onStart(assemblyStatus)
 
         // adding uploads from drag/dropped files and input fields
         for (const name in self._files) {
@@ -282,7 +287,6 @@ const tus = require('tus-js-client')
       const f   = new XMLHttpRequest()
       const url = this._service + 'assemblies'
 
-      console.log(">>> url", url)
       f.open('POST', url)
       f.onreadystatechange = () => {
         if (f.readyState === 4 && f.status === 200) {
@@ -298,7 +302,7 @@ const tus = require('tus-js-client')
               url    : self._service,
             }
 
-            return self._errorOut(err)
+            return cb(err)
           }
 
           cb(null, parsed)
@@ -319,6 +323,10 @@ const tus = require('tus-js-client')
       // for calculating the number of all bytes uploaded accross all uploads
       let lastBytesUploaded = 0
 
+      let assemblyUrl = this._assembly.getHttpsUrl()
+      if (this._options.protocol === 'http://') {
+        assemblyUrl = this._assembly.getHttpUrl()
+      }
       const upload = new tus.Upload(file, {
         endpoint,
         // Setting resume to false, may seem a bit counterproductive but you need
@@ -338,7 +346,7 @@ const tus = require('tus-js-client')
         metadata: {
           fieldname   : nameAttr,
           filename    : file.name,
-          assembly_url: this._assembly.getHttpsUrl(),
+          assembly_url: assemblyUrl,
         },
         fingerprint (file) {
           // Fingerprinting is not necessary any more since we have disabled
@@ -799,18 +807,6 @@ const tus = require('tus-js-client')
           this._files[key].splice(j, 1)
         }
       }
-    }
-
-    _buildAssemblyObj (ok) {
-      const assemblyObj = {
-        ok              : ok,
-        assembly_id     : this._assembly.getId(),
-        instance        : this._assembly.getInstance(),
-        assembly_url    : this._assembly.getHttpUrl(),
-        assembly_ssl_url: this._assembly.getHttpsUrl(),
-      }
-
-      return assemblyObj
     }
 
     _initInternetConnectionChecker () {

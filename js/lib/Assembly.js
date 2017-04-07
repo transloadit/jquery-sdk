@@ -9,6 +9,7 @@ function Assembly (opts) {
   this._tusdEndpoint = opts.tusdEndpoint
   this._wait = opts.wait
   this._requireUploadMetaData = opts.requireUploadMetaData
+  this._protocol = opts.protocol
 
   this._onStart = opts.onStart || function () {}
   this._onExecuting = opts.onExecuting || function () {}
@@ -151,7 +152,8 @@ Assembly.prototype._end = function () {
 
 Assembly.prototype._createSocket = function (cb) {
   let split = this._websocketEndpoint.split('/')
-  var socket = io.connect(split[0] + "//" + split[2], {path: "/" + split[3]})
+  var socket = io.connect(this._protocol + split[2], {path: "/" + split[3]})
+
   var cbCalled = false
   var self = this
 
