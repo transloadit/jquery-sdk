@@ -210,8 +210,8 @@ const tus = require('tus-js-client')
         id               : assemblyStatus.assembly_id,
         httpUrl          : assemblyStatus.assembly_url,
         httpsUrl         : assemblyStatus.assembly_ssl_url,
-        tusdEndpoint     : assemblyStatus.tusd_endpoint,
-        websocketEndpoint: assemblyStatus.websocket_endpoint,
+        tusUrl           : assemblyStatus.tus_url,
+        websocketUrl     : assemblyStatus.websocket_url,
         instance         : assemblyStatus.instance,
         service          : this._service,
 
@@ -317,7 +317,7 @@ const tus = require('tus-js-client')
       // plain HTTP - the response to the CORS preflight request, will contain a
       // redirect to a HTTPS url. However, redirects are not allowed a responses
       // to preflight requests and causes the tus upload creation to fail.
-      const endpoint = this._assembly.getTusdEndpoint()
+      const endpoint = this._assembly.getTusUrl()
 
       // Store the last value of bytesUploaded of the progress event from tus
       // for calculating the number of all bytes uploaded accross all uploads

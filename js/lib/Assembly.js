@@ -6,7 +6,7 @@ function Assembly (opts) {
   this._instance = opts.instance
   this._service = opts.service
   this._websocketEndpoint = opts.websocketEndpoint
-  this._tusdEndpoint = opts.tusdEndpoint
+  this._tusUrl = opts.tusUrl
   this._wait = opts.wait
   this._requireUploadMetaData = opts.requireUploadMetaData
   this._protocol = opts.protocol
@@ -280,8 +280,8 @@ Assembly.prototype.getHttpsUrl = function () {
   return this._httpsUrl
 }
 
-Assembly.prototype.getTusdEndpoint = function () {
-  return this._tusdEndpoint
+Assembly.prototype.getTusUrl = function () {
+  return this._tusUrl
 }
 
 module.exports = Assembly
