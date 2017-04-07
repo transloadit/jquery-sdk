@@ -2,10 +2,11 @@ var io = require('socket.io-client')
 require('../dep/jquery.jsonp')
 
 function Assembly (opts) {
+  this._id = opts.id
   this._instance = opts.instance
   this._service = opts.service
-  this._websocketPath = opts.websocketPath
-  this._protocol = opts.protocol
+  this._websocketEndpoint = opts.websocketEndpoint
+  this._tusdEndpoint = opts.tusdEndpoint
   this._wait = opts.wait
   this._requireUploadMetaData = opts.requireUploadMetaData
 
@@ -19,10 +20,8 @@ function Assembly (opts) {
 
   this._i18n = opts.i18n
 
-  this._url = this._protocol + 'api2-' + this._instance + '/assemblies/' + this._id
-  this._websocketUrl = this._protocol + 'api2-' + this._instance
-  this._httpUrl = 'http://api2.' + this._instance + '/assemblies/' + this._id
-  this._httpsUrl = 'https://api2-' + this._instance + '/assemblies/' + this._id
+  this._httpUrl = opts.httpUrl
+  this._httpsUrl = opts.httpsUrl
 
   this._started = false
   this._ended = false
@@ -68,7 +67,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
   cb = cb || function () {}
 
   // var instance = 'status-' + this._instance
-  var url = this._url
+  var url = this._httpsUrl
 
   if (query) {
     url += query
@@ -151,7 +150,8 @@ Assembly.prototype._end = function () {
 }
 
 Assembly.prototype._createSocket = function (cb) {
-  var socket = io.connect(this._websocketUrl, {path: this._websocketPath})
+  let split = this._websocketEndpoint.split('/')
+  var socket = io.connect(split[0] + "//" + split[2], {path: "/" + split[3]})
   var cbCalled = false
   var self = this
 
@@ -266,20 +266,8 @@ Assembly.prototype.getInstance = function () {
   return this._instance
 }
 
-Assembly.prototype.setId = function (id) {
-  this._id = id
-}
-
 Assembly.prototype.getId = function () {
   return this._id
-}
-
-Assembly.prototype.setUrl = function (url) {
-  this._url = url
-}
-
-Assembly.prototype.getUrl = function () {
-  return this._url
 }
 
 Assembly.prototype.getHttpUrl = function () {
@@ -288,6 +276,10 @@ Assembly.prototype.getHttpUrl = function () {
 
 Assembly.prototype.getHttpsUrl = function () {
   return this._httpsUrl
+}
+
+Assembly.prototype.getTusdEndpoint = function () {
+  return this._tusdEndpoint
 }
 
 module.exports = Assembly

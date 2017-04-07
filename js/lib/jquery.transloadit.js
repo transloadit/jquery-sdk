@@ -18,7 +18,6 @@ const tus = require('tus-js-client')
 
 !($ => {
   const OPTIONS = {
-    protocol                    : 'https://',
     service                     : null,
     region                      : null,
     assets                      : 'https://assets.transloadit.com/',
@@ -190,19 +189,25 @@ const tus = require('tus-js-client')
         this._modal.show()
       }
 
-      this._start()
+      const self = this
+      this._createAssembly((err, assemblyStatus) => {
+        self._setupAssemblyObj(assemblyStatus)
+        self._startUploading()
+      })
     }
 
-    _setupAssembly () {
+    _setupAssemblyObj (assemblyStatus) {
       const self = this
 
       this._assembly = new Assembly({
-        i18n: this._i18n,
-
-        instance,
-        websocketPath,
-        service : this._service,
-        protocol: this._options.protocol,
+        i18n             : this._i18n,
+        id               : assemblyStatus.assembly_id,
+        httpUrl          : assemblyStatus.assembly_url,
+        httpsUrl         : assemblyStatus.assembly_ssl_url,
+        tusdEndpoint     : assemblyStatus.tusd_endpoint,
+        websocketEndpoint: assemblyStatus.websocket_endpoint,
+        instance         : assemblyStatus.instance,
+        service          : this._service,
 
         wait                 : this._options['wait'],
         requireUploadMetaData: this._options['requireUploadMetaData'],
@@ -240,8 +245,11 @@ const tus = require('tus-js-client')
           self._options.onResult(step, result)
         },
       })
+    }
 
-      self._assembly.init(err => {
+    _startUploading () {
+      const self = this
+      this._assembly.init(err => {
         if (err) {
           return self._errorOut(err)
         }
@@ -260,7 +268,7 @@ const tus = require('tus-js-client')
       })
     }
 
-    _start (cb = () => {}) {
+    _createAssembly (cb = () => {}) {
       const self = this
       this._formData = this._prepareFormData()
       this._formData.append('tus_num_expected_upload_files', this._fileCount)
@@ -293,7 +301,7 @@ const tus = require('tus-js-client')
             return self._errorOut(err)
           }
 
-          cb()
+          cb(null, parsed)
         }
       }
       f.send(this._formData)
@@ -305,7 +313,7 @@ const tus = require('tus-js-client')
       // plain HTTP - the response to the CORS preflight request, will contain a
       // redirect to a HTTPS url. However, redirects are not allowed a responses
       // to preflight requests and causes the tus upload creation to fail.
-      const endpoint = `${this._options.protocol + this._assembly.getInstance()}/resumable/files/`
+      const endpoint = this._assembly.getTusdEndpoint()
 
       // Store the last value of bytesUploaded of the progress event from tus
       // for calculating the number of all bytes uploaded accross all uploads
@@ -330,7 +338,7 @@ const tus = require('tus-js-client')
         metadata: {
           fieldname   : nameAttr,
           filename    : file.name,
-          assembly_url: this._assembly.getUrl(),
+          assembly_url: this._assembly.getHttpsUrl(),
         },
         fingerprint (file) {
           // Fingerprinting is not necessary any more since we have disabled
@@ -864,7 +872,7 @@ const tus = require('tus-js-client')
 
       let result = 'https://api2.transloadit.com/'
       if (this._options.region) {
-        result = this._options.protocol + 'api2-' + this._options.region + '.transloadit.com/'
+        result = 'https://api2-' + this._options.region + '.transloadit.com/'
       }
       return result
     }
