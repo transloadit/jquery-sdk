@@ -1,6 +1,6 @@
 {
   "name": "transloadit-jquery-sdk",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "scripts": {
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run inject_comment && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",
@@ -29,8 +29,7 @@
   ],
   "dependencies": {
     "socket.io-client": "1.7.2",
-    "tus-js-client": "1.4.2",
-    "uuid": "2.0.2"
+    "tus-js-client": "1.4.2"
   },
   "devDependencies": {
     "babel-cli": "6.23.0",
