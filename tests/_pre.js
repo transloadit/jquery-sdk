@@ -43,7 +43,7 @@ casper.on('remote.message', function (msg) {
 })
 
 casper.on('page.error', function (msg, trace) {
-  for (let step of trace) {
+  for (let step of Array.from(trace)) {
     console.log(`${step.file}:${step.line} ${step.function || '(anonymous)'}`)
   }
 
