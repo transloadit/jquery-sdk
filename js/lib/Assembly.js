@@ -5,7 +5,7 @@ function Assembly (opts) {
   this._id = opts.id
   this._instance = opts.instance
   this._service = opts.service
-  this._websocketEndpoint = opts.websocketEndpoint
+  this._websocketUrl = opts.websocketUrl
   this._tusUrl = opts.tusUrl
   this._wait = opts.wait
   this._requireUploadMetaData = opts.requireUploadMetaData
@@ -151,7 +151,7 @@ Assembly.prototype._end = function () {
 }
 
 Assembly.prototype._createSocket = function (cb) {
-  let split = this._websocketEndpoint.split('/')
+  let split = this._websocketUrl.split('/')
   var socket = io.connect(this._protocol + split[2], {path: "/" + split[3]})
 
   var cbCalled = false
