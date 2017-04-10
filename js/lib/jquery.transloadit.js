@@ -205,15 +205,15 @@ const tus = require('tus-js-client')
       const self = this
 
       this._assembly = new Assembly({
-        i18n             : this._i18n,
-        protocol         : this._options.protocol,
-        id               : assemblyStatus.assembly_id,
-        httpUrl          : assemblyStatus.assembly_url,
-        httpsUrl         : assemblyStatus.assembly_ssl_url,
-        tusUrl           : assemblyStatus.tus_url,
-        websocketUrl     : assemblyStatus.websocket_url,
-        instance         : assemblyStatus.instance,
-        service          : this._service,
+        i18n        : this._i18n,
+        protocol    : this._options.protocol,
+        id          : assemblyStatus.assembly_id,
+        httpUrl     : assemblyStatus.assembly_url,
+        httpsUrl    : assemblyStatus.assembly_ssl_url,
+        tusUrl      : assemblyStatus.tus_url,
+        websocketUrl: assemblyStatus.websocket_url,
+        instance    : assemblyStatus.instance,
+        service     : this._service,
 
         wait                 : this._options['wait'],
         requireUploadMetaData: this._options['requireUploadMetaData'],
@@ -298,7 +298,6 @@ const tus = require('tus-js-client')
             var err = {
               error  : 'SERVER_CONNECTION_ERROR',
               message: self._i18n.translate(errMsg),
-              reason : reason,
               url    : self._service,
             }
 
