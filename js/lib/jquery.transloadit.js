@@ -298,7 +298,7 @@ const tus = require('tus-js-client')
             var err = {
               error  : 'SERVER_CONNECTION_ERROR',
               message: self._i18n.translate(errMsg),
-              url    : self._service,
+              url    : url,
             }
 
             return cb(err)
