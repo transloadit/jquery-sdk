@@ -6,7 +6,6 @@
  * keep this in mind when rolling out fixes.
  */
 require('../dep/json2')
-require('babel-polyfill')
 
 const Assembly = require('./Assembly')
 const Modal = require('./Modal')
