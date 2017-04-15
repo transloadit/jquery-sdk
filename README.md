@@ -12,6 +12,7 @@ Changes from version 2 to version 3:
 - The onUpload() and onResult() callbacks no longer receive the assembly object as a parameter.
 - The formData parameter has been removed, because all uploads use XHR now. This will only break BC for you if you used formData: customFormDataObj. In that case you should add the contents of your custom form data as hidden input fields to the form now.
 - Several new translations have been added for which you would need to add a translation in case you run on a custom locale. Please check "How to add your own localization / other language strings" at the bottom of this page for details.
+- There is a new `translations` parameter now that must be used to get your custom locale working.
 
 ### Non-BC Breaking Changes and new features:
 
@@ -422,6 +423,14 @@ $(function() {
 </tr>
 <tr>
   <td markdown="1">
+   translations
+  </td>
+  <td markdown="1">
+   An object of i18n translation strings. Please check below to get the list of all available strings to translate.
+  </td>
+</tr>
+<tr>
+  <td markdown="1">
    debug
   </td>
   <td markdown="1">
@@ -532,26 +541,24 @@ You can add your own language strings like so:
 ```
 var $el = $('#upload-form');
 $el.transloadit({
-  locale: "my_locale"
+  translations: {
+    'errors.SERVER_CONNECTION_ERROR'                         : 'Your internet connection seems to be down. Retrying ...',
+    'errors.SERVER_CONNECTION_ERROR.retries_exhausted'       : 'Your internet connection seems to be down. Once it is up and running again please reload your browser window and try again.',
+    'errors.ASSEMBLY_NOT_FOUND'                              : 'There was a server problem finding the proper upload. Please reload your browser window and try again.',
+    'errors.INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'    : 'Your internet connection seems to be offline. We will automatically retry the upload until the connection works again. Please leave the browser window open.',
+    'errors.INTERNET_CONNECTION_ERROR_UPLOAD_NOT_IN_PROGRESS': 'Your internet connection seems to be offline. Please leave the browser window open, so that we can retry fetching the status of your upload.',
+    'errors.MAX_FILES_EXCEEDED'                              : 'Please select at most %s files.',
+    'errors.unknown'                                         : 'There was an unknown error.',
+    'errors.tryAgain'                                        : 'Please reload your browser page and try again.',
+    'errors.troubleshootDetails'                             : 'If you would like our help to troubleshoot this, ' + 'please email us this information:',
+    'cancel'                                                 : 'Cancel',
+    'cancelling'                                             : 'Cancelling ...',
+    'details'                                                : 'Details',
+    'startingUpload'                                         : 'Starting upload ...',
+    'processingFiles'                                        : 'Upload done, now processing files ...',
+    'uploadProgress'                                         : '%s / %s MB at %s kB/s | %s left',
+  }
 });
-
-$el.transloadit.i18n.my_locale = {
-  'errors.SERVER_CONNECTION_ERROR'                         : 'Your internet connection seems to be down. Retrying ...',
-  'errors.SERVER_CONNECTION_ERROR.retries_exhausted'       : 'Your internet connection seems to be down. Once it is up and running again please reload your browser window and try again.',
-  'errors.ASSEMBLY_NOT_FOUND'                              : 'There was a server problem finding the proper upload. Please reload your browser window and try again.',
-  'errors.INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'    : 'Your internet connection seems to be offline. We will automatically retry the upload until the connection works again. Please leave the browser window open.',
-  'errors.INTERNET_CONNECTION_ERROR_UPLOAD_NOT_IN_PROGRESS': 'Your internet connection seems to be offline. Please leave the browser window open, so that we can retry fetching the status of your upload.',
-  'errors.MAX_FILES_EXCEEDED'                              : 'Please select at most %s files.',
-  'errors.unknown'                                         : 'There was an unknown error.',
-  'errors.tryAgain'                                        : 'Please reload your browser page and try again.',
-  'errors.troubleshootDetails'                             : 'If you would like our help to troubleshoot this, ' + 'please email us this information:',
-  'cancel'                                                 : 'Cancel',
-  'cancelling'                                             : 'Cancelling ...',
-  'details'                                                : 'Details',
-  'startingUpload'                                         : 'Starting upload ...',
-  'processingFiles'                                        : 'Upload done, now processing files ...',
-  'uploadProgress'                                         : '%s / %s MB at %s kB/s | %s left',
-}
 ```
 
 Then just replace the English strings with your custom language strings.

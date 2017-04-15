@@ -33,9 +33,14 @@ const I18nDict = {
 }
 
 class I18n {
-  constructor (locale) {
+  constructor (locale, translations) {
     this._dict = I18nDict
     this._locale = locale
+
+    if (translations) {
+      this._locale = 'custom'
+      this._dict[this._locale] = translations
+    }
   }
 
   static getDictionary () {

@@ -44,6 +44,7 @@ const tus = require('tus-js-client')
     params                      : null,
     signature                   : null,
     locale                      : 'en',
+    translations                : null,
     maxNumberOfUploadedFiles    : -1,
     connectionCheckInterval     : 3000,
     debug                       : true,
@@ -88,8 +89,6 @@ const tus = require('tus-js-client')
     r = uploader[method](...args)
     return r === undefined ? this : r
   }
-
-  $.fn.transloadit.i18n = I18n.getDictionary()
 
   class Uploader {
     constructor () {
@@ -706,7 +705,7 @@ const tus = require('tus-js-client')
     }
 
     _initI18n () {
-      this._i18n = new I18n(this._locale)
+      this._i18n = new I18n(this._locale, this._options.translations)
     }
 
     _initModal () {
