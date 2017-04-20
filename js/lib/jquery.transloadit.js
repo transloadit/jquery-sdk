@@ -869,7 +869,7 @@ const tus = require('tus-js-client')
     _getService () {
       if (this._options.service) {
         const len = this._options.service.length
-        if (this._options.service[len] !== '/') {
+        if (this._options.service[len - 1] !== '/') {
           this._options.service += '/'
         }
         return this._options.service
