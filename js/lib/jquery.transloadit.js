@@ -290,7 +290,7 @@ const tus = require('tus-js-client')
 
       f.open('POST', url)
       f.onreadystatechange = () => {
-        if (f.readyState === 4 && f.status === 200) {
+        if (f.readyState === 4) {
           let parsed = null
           try {
             parsed = JSON.parse(f.response)
@@ -305,7 +305,13 @@ const tus = require('tus-js-client')
             return cb(err)
           }
 
-          cb(null, parsed)
+          if (f.status === 200) {
+            return cb(null, parsed)
+          }
+
+          // Parsed is an error object in this case containing an "error" key like
+          // "TEMPLATE_NOT_FOUND" for example
+          cb(parsed)
         }
       }
       f.send(this._formData)
