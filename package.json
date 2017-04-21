@@ -51,6 +51,7 @@
     "eslint-plugin-promise": "3.4.1",
     "eslint-plugin-standard": "2.0.1",
     "fakefile": "0.0.8",
+    "phantomjs-polyfill-array-from": "^1.0.1",
     "uglify-js": "2.8.16"
   }
 }

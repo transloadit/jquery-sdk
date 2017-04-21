@@ -1,3 +1,5 @@
+require('phantomjs-polyfill-array-from')
+
 // # Setup
 // #########################################################################
 // const utils = require('utils')
