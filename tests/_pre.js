@@ -1,4 +1,4 @@
-require('phantomjs-polyfill-array-from')
+// require('phantomjs-polyfill-array-from')
 
 // # Setup
 // #########################################################################
@@ -45,9 +45,9 @@ casper.on('remote.message', function (msg) {
 })
 
 casper.on('page.error', function (msg, trace) {
-  for (let step of Array.from(trace)) {
-    console.log(`${step.file}:${step.line} ${step.function || '(anonymous)'}`)
-  }
+  // for (let step of Array.from(trace)) {
+  //   console.log(`${step.file}:${step.line} ${step.function || '(anonymous)'}`)
+  // }
 
   return this.echo(`A browser error occured: ${msg}`)
 })
