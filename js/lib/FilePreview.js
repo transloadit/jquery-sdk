@@ -34,8 +34,8 @@ class FilePreview {
     const closeLink = '<a href="#" class="remove_file">Remove</a>'
 
     // prevent xss
-    let fileName = file.name.replace(/</g, "&lt;")
-    fileName = fileName.replace(/>/g, "&gt;")
+    let fileName = file.name.replace(/</g, '&lt;')
+    fileName = fileName.replace(/>/g, '&gt;')
 
     const html = `<li>${fileName} - ${size} - ${closeLink}</li>`
     const $li = $(html).appendTo(this._$ul)
