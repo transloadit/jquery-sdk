@@ -32,11 +32,16 @@ class FilePreview {
     const size = this._niceSize(file.size)
 
     const closeLink = '<a href="#" class="remove_file">Remove</a>'
-    const html = `<li>${file.name} - ${size} - ${closeLink}</li>`
+
+    // prevent xss
+    let fileName = file.name.replace(/</g, "&lt;")
+    fileName = fileName.replace(/>/g, "&gt;")
+
+    const html = `<li>${fileName} - ${size} - ${closeLink}</li>`
     const $li = $(html).appendTo(this._$ul)
 
     $li.data('size', file.size)
-    $li.data('name', file.name)
+    $li.data('name', fileName)
     $li.data('lastModified', file.lastModified)
   }
 
