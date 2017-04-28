@@ -568,7 +568,9 @@ const tus = require('tus-js-client')
         this._$params.prependTo(this._$form)
       }
 
-      this._modal.renderCancelling()
+      if (this._options.modal) {
+        this._modal.renderCancelling()
+      }
 
       if (this._assembly) {
         this._assembly.cancel(hideModal)
