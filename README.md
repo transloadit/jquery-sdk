@@ -2,6 +2,30 @@
 
 # Transloadit jQuery SDK
 
+A jQuery Integration for [Transloadit](https://transloadit.com)'s file uploading and encoding service
+
+## Intro
+
+[Transloadit](https://transloadit.com) is a service that helps you handle file uploads, resize, crop and watermark your images, make GIFs, transcode your videos, extract thumbnails, generate audio waveforms, and so much more. In short, [Transloadit](https://transloadit.com) is the Swiss Army Knife for your files.
+
+This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://transloadit.com) REST API.
+
+## Install
+
+Simply link the javascript file to your page like so:
+
+```
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
+```
+
+To install **version 2** of the SDK, use the following script tag instead:
+
+```
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
+```
+
+*Note: This plugin requires jQuery >= 1.9, so be sure to have jQuery loaded on your page before loading this*
+
 ## Version 3
 
 Changes from version 2 to version 3:
@@ -26,7 +50,7 @@ Changes from version 2 to version 3:
 - There is now a new parameter "maxNumberOfUploadedFiles", with which you can set a limit to the number of uploaded files.
 - There are two new callbacks implemented: onDisconnect() and onReconnect()
 
-Version 2 of the plugin is deprecated and will cease to exist on September 30, 2017. Please upgrade to version 3 as soon as possible.
+*Version 2 of the plugin is DEPRECATED and will CEASE TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible.*
 
 ### Trying out Version 3:
 
@@ -34,7 +58,7 @@ Please include <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.
 
 We'd be delighted to [receive your feedback](https://github.com/transloadit/jquery-sdk/issues/new) and fix reported issues!
 
-## Basics
+## Usage
 
 The Transloadit jQuery plugin allows you to
 
@@ -42,10 +66,10 @@ The Transloadit jQuery plugin allows you to
 - get uploaded results directly without further API queries, and
 - wait for upload processing to complete before redirecting to the result page or calling a callback function.
 
-Assuming a form with the ID `"upload-form"` (from the [minimal integration](/docs/#the-minimal-integration)), the jQuery plugin can be used like this:
+Assuming a form with the ID `"upload-form"` (from the [minimal integration](https://transloadit.com/docs/#13-the-minimal-integration)), the jQuery plugin can be used like this:
 
 ```markup
-<script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
 <script type="text/javascript">
 // We call .transloadit() after the DOM is initialized:
 $(function() {
@@ -56,7 +80,7 @@ $(function() {
     triggerUploadOnFileSelection: true,
 
     params : {
-      auth  : { key : 'YOUR_TRANSLOADIT_AUTH_KEY' },
+      auth  : { key : 'YOUR_TRANSLOADIT_KEY' },
       steps : {
         resize_to_75: {
           robot  : '/image/resize',
@@ -76,6 +100,12 @@ By default, this will display an overlay with a progress bar.
 
 <span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
 
+## Example
+
+An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
+
+To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the html file) with your actual transloadit key and load the html file on your browser.
+
 ## Releases
 
 We have two *magic* releases:
@@ -93,6 +123,8 @@ We have two *magic* releases:
 
 - `jquery.transloadit2-latest.js`
   This is the latest version across majors and is **not** recommended to use. We do not want to auto-upgrade users between major versions to allow us to make BC breaking changes.
+  *Note: This version requires jQuery < 1.9 to work.*
+
   On **September 30, 2017** we will remove this version.
   <https://assets.transloadit.com/js/jquery.transloadit2-latest.js>
 
@@ -101,7 +133,7 @@ We have two *magic* releases:
 These can be added as parameters to the `.transloadit()` call like so:
 
 ```markup
-<script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
 <script type="text/javascript">
 // We call .transloadit() after the DOM is initialized:
 $(function() {
@@ -223,7 +255,7 @@ $(function() {
 These can be added as parameters to the `.transloadit()` call like so:
 
 ```markup
-<script src="//assets.transloadit.com/js/jquery.transloadit-v3-latest.js"></script>
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
 <script type="text/javascript">
 // We call .transloadit() after the DOM is initialized:
 $(function() {
@@ -283,7 +315,7 @@ $(function() {
   </td>
   <td markdown="1">
 
- An object of Assembly instructions that should be executed. For examples please check [the minimal integration](#the-minimal-integration). This is <code>null</code> by default, which means the instructions are read from the hidden input field named <code>params</code>.
+ An object of Assembly instructions that should be executed. For examples please check [the minimal integration](https://transloadit.com/docs/#13-the-minimal-integration). This is <code>null</code> by default, which means the instructions are read from the hidden input field named <code>params</code>.
 
  Here is an example:
 
@@ -291,7 +323,7 @@ $(function() {
  $('#upload-form').transloadit({
    wait   : true,
    params : {
-     auth  : { key : 'YOUR_TRANSLOADIT_AUTH_KEY' },
+     auth  : { key : 'YOUR_TRANSLOADIT_KEY' },
      steps : {
        resize_to_75: {
          robot  : '/image/resize',
