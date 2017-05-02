@@ -2,7 +2,7 @@
 
 # Transloadit jQuery SDK
 
-A jQuery Integration for Transloadit's file uploading and encoding service
+A jQuery Integration for [Transloadit](https://transloadit.com)'s file uploading and encoding service
 
 ## Intro
 
@@ -14,13 +14,17 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 
 Simply link the javascript file to your page like so:
 
-`<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>`
+```
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
+```
 
-To install version 2 of the SDK, use the following script tag instead:
+To install **version 2** of the SDK, use the following script tag instead:
 
-`<script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>`
+```
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
+```
 
-*Note: This library requires jQuery >= 1.9, so be sure to have jQuery loaded on your page before loading this*
+*Note: This plugin requires jQuery >= 1.9, so be sure to have jQuery loaded on your page before loading this*
 
 ## Version 3
 
@@ -46,7 +50,7 @@ Changes from version 2 to version 3:
 - There is now a new parameter "maxNumberOfUploadedFiles", with which you can set a limit to the number of uploaded files.
 - There are two new callbacks implemented: onDisconnect() and onReconnect()
 
-Version 2 of the plugin is deprecated and will cease to exist on September 30, 2017. Please upgrade to version 3 as soon as possible.
+*Version 2 of the plugin is DEPRECATED and will CEASE TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible.*
 
 ### Trying out Version 3:
 
@@ -98,7 +102,7 @@ By default, this will display an overlay with a progress bar.
 
 ## Example
 
-An example use of this library can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
+An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
 
 To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the html file) with your actual transloadit key and load the html file on your browser.
 
