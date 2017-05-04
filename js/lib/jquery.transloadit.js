@@ -243,10 +243,14 @@ const tus = require('tus-js-client')
           self._errorOut(assemblyObjContainingError)
         },
         onUpload (upload) {
-          self._options.onUpload(upload)
+          if (!self._ended) {
+            self._options.onUpload(upload)
+          }
         },
         onResult (step, result) {
-          self._options.onResult(step, result)
+          if (!self._ended) {
+            self._options.onResult(step, result)
+          }
         },
       })
     }
@@ -260,7 +264,7 @@ const tus = require('tus-js-client')
 
         self._options.onStart(assemblyStatus)
 
-        if (self._files.length > 0) {
+        if (Object.keys(self._files).length > 0) {
           // adding uploads from drag/dropped files and input fields
           for (const name in self._files) {
             for (let i = 0; i < self._files[name].length; i++) {
@@ -675,6 +679,10 @@ const tus = require('tus-js-client')
         return
       }
       if (!this._isOnline) {
+        return
+      }
+
+      if (this._ended) {
         return
       }
 
