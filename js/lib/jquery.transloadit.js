@@ -260,13 +260,17 @@ const tus = require('tus-js-client')
 
         self._options.onStart(assemblyStatus)
 
-        // adding uploads from drag/dropped files and input fields
-        for (const name in self._files) {
-          for (let i = 0; i < self._files[name].length; i++) {
-            const file = self._files[name][i]
-            const upload = self._addResumableUpload(name, file)
-            upload.start()
+        if (self._files.length > 0) {
+          // adding uploads from drag/dropped files and input fields
+          for (const name in self._files) {
+            for (let i = 0; i < self._files[name].length; i++) {
+              const file = self._files[name][i]
+              const upload = self._addResumableUpload(name, file)
+              upload.start()
+            }
           }
+        } else {
+          self._renderProgress()
         }
       })
     }
@@ -379,7 +383,7 @@ const tus = require('tus-js-client')
           lastBytesUploaded = bytesUploaded
 
           self._renderProgress(self._uploadedBytes, self._fileSizes)
-          self._options.onProgress(self._uploadedBytes, self._fileSizes, self._assemblyResult)
+          self._options.onProgress(self._uploadedBytes, self._fileSizes)
         },
       })
 
