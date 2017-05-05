@@ -43,10 +43,7 @@ casper.on('remote.message', function (msg) {
 })
 
 casper.on('page.error', function (msg, trace) {
-  for (let step of trace) {
-    console.log(`${step.file}:${step.line} ${step.function || '(anonymous)'}`)
-  }
-
+  console.log(trace)
   return this.echo(`A browser error occured: ${msg}`)
 })
 // Uncomment this to make browser errors fatal
