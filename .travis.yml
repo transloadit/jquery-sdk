@@ -2,6 +2,8 @@ language: node_js
 node_js:
 - 6
 before_install:
+# We need the latest phantomjs and casperjs here. The older Travis defaults
+# won't work with our ES5/6 requirements.
 - npm install -g npm@latest
 - wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
 - tar jxf phantomjs-2.1.1-linux-x86_64.tar.bz2
