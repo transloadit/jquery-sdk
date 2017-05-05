@@ -1,6 +1,3 @@
-// This causes a tus "source must be a valid file" error right now, but I do not know why.
-// I have tested for xss manually and it works fine, meaning xss is not possible.
-// @todo Figure this out and re-enable it again.
 const numberOfPlannedTests = 7
 casper.test.begin('test-xss', numberOfPlannedTests, (test) => {
   casper.start(`http://${testhost}`, function () {
