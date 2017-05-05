@@ -143,7 +143,12 @@ const tus = require('tus-js-client')
       this._$inputs.on('change.transloadit', function () {
         const $input = $(this)
         self._updateInputFileSelection($input)
-        self._options.onFileSelect($input.val(), $input)
+
+        const files = $input[0].files
+        for (let j = 0; j < files.length; j++) {
+          const file = files[j]
+          self._options.onFileSelect(file, $input)
+        }
 
         if (self._options.triggerUploadOnFileSelection) {
           self._$form.trigger('submit.transloadit')
