@@ -585,7 +585,7 @@ const tus = require('tus-js-client')
         this._modal.renderCancelling()
       }
 
-      if (this._assembly) {
+      if (this._assembly && this._isOnline) {
         this._assembly.cancel(hideModal)
       }
     }
