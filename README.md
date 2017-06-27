@@ -642,3 +642,9 @@ A big thanks goes to the authors of these fantastic projects!
 
 The Transloadit jQuery SDK is licensed under the MIT license. The dependencies
 have their own licenses (MIT, BSD, PUBLIC DOMAIN).
+
+
+
+## Documentation
+
+See <a href="https://github.com/transloadit/jquery-sdk/blob/master/README.md">GitHub</a> for the full documentation.
