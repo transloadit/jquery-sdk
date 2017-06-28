@@ -12,19 +12,23 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 
 ## Install
 
-Simply link the javascript file to page like so:
+Simply include the JavaScript asset in your HTML page like so:
 
-```
+```html
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
 ```
 
-To install **the old and deprecated version 2** of the SDK, use the following script tag instead:
+To install **the deprecated version 2** of the SDK, use the following script tag instead:
 
-```
+```html
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
 ```
 
-*Note: This plugin requires jQuery >= 1.9, so be sure to have jQuery loaded on your page before loading this*
+This plugin requires jQuery >= 1.9, so be sure to have jQuery loaded on your page before loading this:
+
+```html
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+```
 
 ## Version 3
 
@@ -60,7 +64,8 @@ The Transloadit jQuery plugin allows you to
 - get uploaded results directly without further API queries, and
 - wait for upload processing to complete before redirecting to the result page or calling a callback function.
 
-Assuming a form with the ID `"upload-form"` (from the [minimal integration](https://transloadit.com/docs/#13-the-minimal-integration)), the jQuery plugin can be used like this:
+Assuming a form with the ID `"upload-form"` (from the [minimal integration](https://transloadit.com/docs/#minimal-integration)), 
+the jQuery plugin can be used like this:
 
 ```markup
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
@@ -74,7 +79,7 @@ $(function() {
     triggerUploadOnFileSelection: true,
 
     params : {
-      auth  : { key : 'YOUR_TRANSLOADIT_KEY' },
+      auth  : { key : 'YOUR_TRANSLOADIT_AUTH_KEY' },
       steps : {
         resize_to_75: {
           robot  : '/image/resize',
@@ -98,7 +103,7 @@ By default, this will display an overlay with a progress bar.
 
 An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
 
-To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the html file) with your actual transloadit key and load the html file on your browser.
+To run it, simply replace `YOUR_TRANSLOADIT_AUTH_KEY` (on the HTML file) with your actual Transloadit key and load the html file on your browser.
 
 ## Releases
 
