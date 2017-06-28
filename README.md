@@ -12,13 +12,13 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 
 ## Install
 
-Simply link the javascript file to your page like so:
+Simply link the javascript file to page like so:
 
 ```
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
 ```
 
-To install **version 2** of the SDK, use the following script tag instead:
+To install **the old and deprecated version 2** of the SDK, use the following script tag instead:
 
 ```
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
@@ -51,12 +51,6 @@ Changes from version 2 to version 3:
 - There are two new callbacks implemented: onDisconnect() and onReconnect()
 
 *Version 2 of the plugin is DEPRECATED and will CEASE TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible.*
-
-### Trying out Version 3:
-
-Please include <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js> instead of your previous version.
-
-We'd be delighted to [receive your feedback](https://github.com/transloadit/jquery-sdk/issues/new) and fix reported issues!
 
 ## Usage
 
@@ -111,10 +105,10 @@ To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the html file) with your ac
 We have two *magic* releases:
 
 - `jquery.transloadit-v3-latest.js`
-  This is always the latest version of the v3 branch and is currently in beta. We welcome any feedback! <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js>
+  This is always the latest version of the v3 branch and is **the recommended version to use**. <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js>
 
 - `jquery.transloadit2-v2-latest.js`
-  This is always the latest version of the v2 branch and is **the recommended version to use** for now. <https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js>
+  This is always the latest version of the deprecated v2 branch. <https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js>
 
 - You can also pin specific versions via:
   <https://assets.transloadit.com/js/jquery.transloadit2-v3.0.0.js>. Remember that it then becomes your responsibility to keep track of security and performance upgrades in our [releases](https://github.com/transloadit/jquery-sdk/releases).
