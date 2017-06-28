@@ -636,3 +636,69 @@ A big thanks goes to the authors of these fantastic projects!
 
 The Transloadit jQuery SDK is licensed under the MIT license. The dependencies
 have their own licenses (MIT, BSD, PUBLIC DOMAIN).
+
+
+
+## Install
+
+Simply link the javascript file to page like so:
+
+```
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
+```
+
+To install **the old and deprecated version 2** of the SDK, use the following script tag instead:
+
+```
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
+```
+
+*Note: This plugin requires jQuery >= 1.9, so be sure to have jQuery loaded on your page before loading this*
+
+## Usage
+
+The Transloadit jQuery plugin allows you to
+
+- show file upload progress,
+- get uploaded results directly without further API queries, and
+- wait for upload processing to complete before redirecting to the result page or calling a callback function.
+
+Assuming a form with the ID `"upload-form"` (from the [minimal integration](https://transloadit.com/docs/#13-the-minimal-integration)), the jQuery plugin can be used like this:
+
+```markup
+<script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
+<script type="text/javascript">
+// We call .transloadit() after the DOM is initialized:
+$(function() {
+  $('#upload-form').transloadit({
+    wait  : true,
+    fields: true,
+
+    triggerUploadOnFileSelection: true,
+
+    params : {
+      auth  : { key : 'YOUR_TRANSLOADIT_KEY' },
+      steps : {
+        resize_to_75: {
+          robot  : '/image/resize',
+          use    : ':original',
+          width  : 75,
+          height : 75
+        },
+        // more Steps here
+      }
+    }
+  });
+});
+</script>
+```
+
+By default, this will display an overlay with a progress bar.
+
+<span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
+
+## Example
+
+An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
+
+To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the html file) with your actual transloadit key and load the html file on your browser.
