@@ -79,7 +79,7 @@ $(function() {
     triggerUploadOnFileSelection: true,
 
     params : {
-      auth  : { key : 'YOUR_TRANSLOADIT_AUTH_KEY' },
+      auth  : { key : 'YOUR_TRANSLOADIT_KEY' },
       steps : {
         resize_to_75: {
           robot  : '/image/resize',
@@ -103,7 +103,7 @@ By default, this will display an overlay with a progress bar.
 
 An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
 
-To run it, simply replace `YOUR_TRANSLOADIT_AUTH_KEY` (on the HTML file) with your actual Transloadit key and load the html file on your browser.
+To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the HTML file) with your actual Transloadit key and load the html file on your browser.
 
 ## Releases
 
