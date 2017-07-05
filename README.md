@@ -12,6 +12,8 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 
 ## Install
 
+**Note** You may also be interested in checking out [Uppy](https://transloadit.com/docs/#uppy), Transloadit's next-gen file uploader for the web.
+
 Simply include the JavaScript asset in your HTML page like so:
 
 ```html
