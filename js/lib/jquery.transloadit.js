@@ -553,6 +553,7 @@ const tus = require('tus-js-client')
       this.stop()
       this.reset()
       this.unbindEvents()
+      clearInterval(this._internetConnectionChecker._interval)
       this._$form.data('transloadit.uploader', null)
     }
 
