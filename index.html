@@ -13,8 +13,8 @@
     </form>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <!-- <script src="http://localjquerysdk.com/build/jquery.transloadit2-v3-latest.js"></script> -->
-    <script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
+    <script src="http://localjquerysdk.com/build/jquery.transloadit2-v3-latest.js"></script>
+    <!-- <script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script> -->
 
 
     <script type="text/javascript">
@@ -31,65 +31,23 @@
         autoSubmit: false,
         // service: 'http://vbox.transloadit.com/',
         // service: 'http://api2-malaeka.transloadit.com/',
-        region: 'eu-west-1',
+        // region: 'eu-west-1',
         // assets: 'http://localjquerysdk.com/build/',
         triggerUploadOnFileSelection: true,
         pollInterval: 2500,
         fields: '*',
         translations: {
-          'startingUpload' : 'Progresser upload ...',
-          'processingFiles' : 'Upload done2, now processing files ...',
+          'startingUpload' : 'Starting the upload ...',
+          'processingFiles' : 'Upload done, now processing files ...',
         },
         params: {
           auth: { key: window.YOUR_TRANSLOADIT_AUTH_KEY },
           steps: {
-            // resize_to_75: {
-            //   robot: "/image/resize",
-            //   use: ":original",
-            //   width: 75,
-            //   height: 75
-            // }
-            "artwork_image": {
-              "use": ":original",
-              "robot": "/image/resize",
-              "format": "jpg",
-              "width": 1280,
-              "height": 1280,
-              "quality": 100,
-              "resize_strategy": "fit"
-            },
-            "thumbnail": {
-              "use": "artwork_image",
-              "robot": "/image/resize",
-              "format": "jpg",
-              "width": 100,
-              "height": 100,
-              "resize_strategy": "fillcrop",
-              "progressive": true
-            },
-            "artwork": {
-              "robot": "/video/merge",
-              "use": {
-                "steps": [
-                  {
-                    "name": ":original",
-                    "as": "audio"
-                  },
-                  {
-                    "name": "artwork_image",
-                    "as": "image"
-                  }
-                ]
-              },
-              "preset": "ipad-high",
-              "resize_strategy": "fit",
-              "width": 1280,
-              "height": 1280,
-              "ffmpeg_stack": "v2.2.3",
-              "ffmpeg": {
-                "vcodec": "libx264",
-                "pix_fmt": "yuv420p"
-              }
+            resize_to_75: {
+              robot: "/image/resize",
+              use: ":original",
+              width: 75,
+              height: 75
             }
           }
         },
@@ -100,7 +58,7 @@
           console.log(bytesIn, totalBytes);
         },
         onSuccess: function (assembly) {
-          console.log('Assembly finished successfully with', assembly.ok);
+          console.log('onSuccess: Assembly finished successfully with', assembly.ok);
         },
         onExecuting: function () {
           console.log('Uploading finished!');

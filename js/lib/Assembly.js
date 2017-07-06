@@ -2,11 +2,18 @@ var io = require('socket.io-client')
 require('../dep/jquery.jsonp')
 
 function Assembly (opts) {
-  this._id = opts.id
+  this._status = opts.status
+
+  this._id           = this._status.assembly_id
+  this._httpUrl      = this._status.assembly_url
+  this._httpsUrl     = this._status.assembly_ssl_url
+  this._tusUrl       = this._status.tus_url
+  this._websocketUrl = this._status.websocket_url
+  this._instance     = this._status.instance
+
   this._instance = opts.instance
   this._service = opts.service
-  this._websocketUrl = opts.websocketUrl
-  this._tusUrl = opts.tusUrl
+
   this._wait = opts.wait
   this._requireUploadMetaData = opts.requireUploadMetaData
   this._protocol = opts.protocol
@@ -21,8 +28,7 @@ function Assembly (opts) {
 
   this._i18n = opts.i18n
 
-  this._httpUrl = opts.httpUrl
-  this._httpsUrl = opts.httpsUrl
+  this._socket = null
 
   this._started = false
   this._ended = false
@@ -39,7 +45,19 @@ function Assembly (opts) {
 }
 
 Assembly.prototype.init = function (cb) {
-  this._createSocket(cb)
+  var self = this
+  this._createSocket(function () {
+    cb()
+
+    var canFinish = self._status.ok !== 'ASSEMBLY_UPLOADING' && self._status.ok !== 'ASSEMBLY_EXECUTING'
+    canFinish = canFinish || typeof self._status.error !== 'undefined'
+
+    if (canFinish) {
+      self._finished = true
+      self._ended    = true
+      self._handleSuccessfulPoll(self._status)
+    }
+  })
 }
 
 Assembly.prototype.cancel = function (cb) {
@@ -152,19 +170,19 @@ Assembly.prototype._end = function () {
 
 Assembly.prototype._createSocket = function (cb) {
   let split = this._websocketUrl.split('/')
-  var socket = io.connect(this._protocol + split[2], {path: '/' + split[3]})
+  this._socket = io.connect(this._protocol + split[2], {path: '/' + split[3]})
 
   var cbCalled = false
   var self = this
 
-  socket.on('error', function (error) {
+  this._socket.on('error', function (error) {
     if (!cbCalled) {
       cbCalled = true
       cb(error)
     }
   })
 
-  socket.on('connect', function (event) {
+  this._socket.on('connect', function (event) {
     self._socketConnected = true
 
     if (self._socketReconnectInterval) {
@@ -174,13 +192,13 @@ Assembly.prototype._createSocket = function (cb) {
     }
 
     if (!cbCalled) {
-      socket.emit('assembly_connect', {id: self._id})
+      self._socket.emit('assembly_connect', {id: self._id})
       cbCalled = true
       cb()
     }
   })
 
-  socket.on('assembly_uploading_finished', function () {
+  this._socket.on('assembly_uploading_finished', function () {
     self._uploadingFinished = true
 
     self._onExecuting()
@@ -190,34 +208,32 @@ Assembly.prototype._createSocket = function (cb) {
     }
   })
 
-  socket.on('assembly_upload_meta_data_extracted', function () {
+  this._socket.on('assembly_upload_meta_data_extracted', function () {
     if (!self._wait && self._requireUploadMetaData) {
       self._fetchStatus()
     }
   })
 
-  socket.on('assembly_error', function () {
+  this._socket.on('assembly_error', function () {
     self._finished = true
     self._fetchStatus()
   })
 
-  socket.on('assembly_finished', function () {
+  this._socket.on('assembly_finished', function () {
     self._finished = true
-    if (self._wait) {
-      self._fetchStatus()
-    }
+    self._fetchStatus()
   })
 
-  socket.on('assembly_upload_finished', function (file) {
+  this._socket.on('assembly_upload_finished', function (file) {
     self._onUpload(file)
   })
 
-  socket.on('assembly_result_finished', function (stepName, result) {
+  this._socket.on('assembly_result_finished', function (stepName, result) {
     self._onResult(stepName, result)
   })
 
-  socket.on('disconnect', function (event) {
-    socket.close()
+  this._socket.on('disconnect', function (event) {
+    self._socket.close()
     self.onDisconnect()
   })
 }
