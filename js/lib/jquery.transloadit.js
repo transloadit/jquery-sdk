@@ -527,9 +527,6 @@ const tus = require('tus-js-client')
     }
 
     stop () {
-      if (this._assembly) {
-        this._assembly.stopStatusFetching()
-      }
       this._ended = true
     }
 
