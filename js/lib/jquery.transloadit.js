@@ -208,10 +208,10 @@ const tus = require('tus-js-client')
       const self = this
 
       this._assembly = new Assembly({
-        status   : assemblyStatus,
-        i18n     : this._i18n,
-        protocol : this._options.protocol,
-        service  : this._service,
+        status  : assemblyStatus,
+        i18n    : this._i18n,
+        protocol: this._options.protocol,
+        service : this._service,
 
         wait                 : this._options['wait'],
         requireUploadMetaData: this._options['requireUploadMetaData'],
@@ -550,6 +550,11 @@ const tus = require('tus-js-client')
       this.stop()
       this.reset()
       this.unbindEvents()
+
+      if (this._internetConnectionChecker) {
+        this._internetConnectionChecker.stop()
+      }
+
       this._$form.data('transloadit.uploader', null)
     }
 

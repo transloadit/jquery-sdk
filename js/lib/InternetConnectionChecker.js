@@ -30,6 +30,12 @@ class InternetConnectionChecker {
     )
   }
 
+  stop () {
+    if (this._interval) {
+      clearInterval(this._interval)
+    }
+  }
+
   onlineCheck (cb) {
     let urls = [
       'https://api2.transloadit.com/',
