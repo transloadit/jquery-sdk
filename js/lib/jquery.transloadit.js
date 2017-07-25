@@ -667,12 +667,6 @@ const tus = require('tus-js-client')
 
     _detectFileInputs () {
       let $inputs = this._$form.find('input[type=file]').not(this._options.exclude)
-
-      if (!this._options['processZeroFiles']) {
-        $inputs = $inputs.filter(function () {
-          return this.value !== ''
-        })
-      }
       this._$inputs = $inputs
     }
 
