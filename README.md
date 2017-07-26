@@ -66,7 +66,7 @@ The Transloadit jQuery plugin allows you to
 - get uploaded results directly without further API queries, and
 - wait for upload processing to complete before redirecting to the result page or calling a callback function.
 
-Assuming a form with the ID `"upload-form"` (from the [minimal integration](https://transloadit.com/docs/#minimal-integration)), 
+Assuming a form with the ID `"upload-form"` (from the [minimal integration](https://transloadit.com/docs/#minimal-integration)),
 the jQuery plugin can be used like this:
 
 ```markup
@@ -100,6 +100,46 @@ $(function() {
 By default, this will display an overlay with a progress bar.
 
 <span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
+
+## Specifying Assembly Instructions in the Form
+
+Instead of using the plugin's `params` parameter, you could also have added the Assembly Instructions in a hidden form field named `params`.
+Sometimes, especially when your instructions need to be calculated by a back-end language, and also when you want to add [Signature authentication](https://transloadit.com/docs/#authentication) it is easier to specify them directly in the form, than to add them in the call to the jQuery SDK.
+
+The contents of the hidden params field need to be encoded as JSON, with **HTML entities escaped**.
+Have your preferred scripting language encode the JSON for you to maintain readability. Here is an example in PHP:
+
+```php
+$params = array(
+  "auth" => array("key" => "YOUR_TRANSLOADIT_KEY"),
+  "steps" => array(
+    "resize_to_75" => array(
+      "robot" => "/image/resize",
+      "use" => ":original",
+      "width" => 75,
+      "height" => 75
+    )
+  )
+);
+
+printf(
+  '<input type="hidden" name="params" value="%s" />',
+  htmlentities(json_encode($params))
+);
+```
+
+Your form should then look like this (just with `YOUR_TRANSLOADIT_KEY` replaced with your real <dfn>Auth Key</dfn>):
+
+```markup
+<form id="upload-form" action="http://api2.transloadit.com/assemblies" enctype="multipart/form-data" method="POST">
+  <input type="hidden" name="params" value="{&quot;auth&quot;:{&quot;key&quot;:&quot;YOUR_TRANSLOADIT_KEY&quot;},&quot;steps&quot;:{&quot;resize_to_75&quot;:{&quot;robot&quot;:&quot;\/image\/resize&quot;,&quot;use&quot;:&quot;:original&quot;,&quot;width&quot;:75,&quot;height&quot;:75}}}" />
+  <input type="file" name="my_file" />
+  <input type="submit" value="Upload">
+</form>
+```
+
+Both ways of adding the Assembly Instructions are valid. When you upload a file you should see the same result.
+
 
 ## Example
 
