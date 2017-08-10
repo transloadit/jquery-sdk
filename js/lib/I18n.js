@@ -53,7 +53,8 @@ class I18n {
     const locale = this._locale
     const translated = this._dict[locale] && this._dict[locale][key] || this._dict.en[key]
     if (!translated) {
-      throw new Error(`Unknown i18n key: ${key}`)
+      console.error(`Unknown i18n key: ${key}`)
+      return key
     }
 
     return helpers.sprintf(translated, args)
