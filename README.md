@@ -56,7 +56,7 @@ Changes from version 2 to version 3:
 - There is now a new parameter "maxNumberOfUploadedFiles", with which you can set a limit to the number of uploaded files.
 - There are two new callbacks implemented: onDisconnect() and onReconnect()
 
-*Version 2 of the plugin is DEPRECATED and will CEASE TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible.*
+*Version 2 of the plugin is DEPRECATED and will CEASE TO EXIST on January 01, 2018. Please upgrade to version 3 as soon as possible.*
 
 ## Usage
 
@@ -166,7 +166,7 @@ We have two *magic* releases:
   This is the latest version across majors and is **not** recommended to use. We do not want to auto-upgrade users between major versions to allow us to make BC breaking changes.
   *Note: This version requires jQuery < 1.9 to work.*
 
-  On **September 30, 2017** we will remove this version.
+  On **January 01, 2018** we will remove this version.
   <https://assets.transloadit.com/js/jquery.transloadit2-latest.js>
 
 ## Callbacks
