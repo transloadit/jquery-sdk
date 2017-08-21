@@ -14,23 +14,46 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 
 **Note** You may also be interested in checking out [Uppy](https://transloadit.com/docs/#uppy), Transloadit's next-gen file uploader for the web.
 
-Simply include the JavaScript asset in your HTML page like so:
+Simply include the JavaScript asset in your HTML page like so. jQuery >= 1.9 is also required.
 
 ```html
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
 ```
 
-To install **the deprecated version 2** of the SDK, use the following script tag instead:
+## How does it work
 
-```html
-<script src="//assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
+You have an HTML form on your page like this one for example:
+
+```
+<form id="upload-form" action="/uploads" enctype="multipart/form-data" method="POST">
+  <input type="file" name="my_file" multiple="multiple" />
+  <div class="transloadit-drop-area">Drag and drop files here</div>
+  <div class="transloadit-file-preview-area"></div>
+  <input type="text" name="album_id" value="foo_id" />
+  <input type="submit" value="Upload">
+</form>
 ```
 
-This plugin requires jQuery >= 1.9, so be sure to have jQuery loaded on your page before loading this:
-
-```html
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+By attaching the jQuery SDK to the form you enable uploading functionality on the form:
+```javascript
+$('#upload-form').transloadit({
+  wait: true,
+  triggerUploadOnFileSelection: true,
+  params : {
+    auth  : { key : 'YOUR_TRANSLOADIT_KEY' },
+    template_id : 'YOUR_TEMPLATE_ID'
+  }
+});
 ```
+
+Once you select some files over the file input field (or the drag and drop area) a modal will appear that will upload your fils.
+The `wait` parameter set to `true` instruct the SDK to wait for all transcoding to finish. Once it's finished it will attach a long JSON
+string to a hidden textarea in your form.
+
+You can then submit the form as you normally would. On your backend you have an extra POST field named `"transloadit"` then in the payload including JSON with information about all uploads and transcoding results, their meta data and the URLs to them.
+
+It's that simple. :)
 
 ## Version 3
 
