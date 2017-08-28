@@ -273,6 +273,7 @@ const tus = require('tus-js-client')
               upload.start()
             }
           }
+          self._renderProgress(0, 1)
         } else {
           self._renderProgress()
         }
