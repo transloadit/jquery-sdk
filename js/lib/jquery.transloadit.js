@@ -266,14 +266,16 @@ const tus = require('tus-js-client')
 
         if (Object.keys(self._files).length > 0) {
           // adding uploads from drag/dropped files and input fields
+          var totalSize = 0
           for (const name in self._files) {
             for (let i = 0; i < self._files[name].length; i++) {
               const file = self._files[name][i]
+              totalSize += file.size
               const upload = self._addResumableUpload(name, file)
               upload.start()
             }
           }
-          self._renderProgress(0, 1)
+          self._renderProgress(0, totalSize)
         } else {
           self._renderProgress()
         }
