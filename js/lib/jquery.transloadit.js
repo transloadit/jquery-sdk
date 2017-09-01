@@ -294,10 +294,7 @@ const tus = require('tus-js-client')
       this._xhr = true
 
       const f   = new XMLHttpRequest()
-      // The redirect=false is necessary, otherwise we will get a response header with
-      // Location: [[redirect_url]]?some_parameters_like_assembly_id, which screws up the
-      // XHR request.
-      const url = this._service + 'assemblies?redirect=false'
+      const url = this._service + 'assemblies'
 
       f.open('POST', url)
       f.onreadystatechange = () => {
