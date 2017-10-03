@@ -163,7 +163,6 @@ Your form should then look like this (just with `YOUR_TRANSLOADIT_KEY` replaced 
 
 Both ways of adding the Assembly Instructions are valid. When you upload a file you should see the same result.
 
-
 ## Example
 
 An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
