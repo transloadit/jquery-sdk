@@ -13,7 +13,7 @@ casper.test.begin('test-simple-image-resize', numberOfPlannedTests, (test) => {
       height_field: '400',
     })
 
-    this.evaluate(function () { $('#entryForm').submit() })
+    this.evaluate(function () { window.jQuery('#entryForm').submit() })
 
     this.waitFor(function () {
       return curr !== this.getCurrentUrl()

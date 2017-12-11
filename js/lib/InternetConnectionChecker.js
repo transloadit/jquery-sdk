@@ -1,11 +1,12 @@
 class InternetConnectionChecker {
-  constructor ({ onDisconnect, onReconnect, intervalLength }) {
+  constructor ({ onDisconnect, onReconnect, intervalLength, $ }) {
     this._onDisconnect = onDisconnect || (() => {})
     this._onReconnect = onReconnect || (() => {})
     this._intervalLength = intervalLength || 3000
 
     this._interval = null
     this._isOnline = true
+    this.$ = $
   }
 
   start () {
@@ -66,7 +67,7 @@ class InternetConnectionChecker {
   }
 
   _onlineCheck (url, cb) {
-    $.ajax({
+    this.$.ajax({
       url: url,
     }).done(data => {
       cb(true)
