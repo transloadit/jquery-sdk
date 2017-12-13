@@ -4,15 +4,17 @@ class FilePreview {
       opts = {}
     }
 
+    this.$ = opts.$
     this._$el = opts.$el
     this.onFileRemove = opts.onFileRemove || (() => {})
 
-    this._$ul = $('<ul />').appendTo(this._$el)
+    this._$ul = this.$('<ul />').appendTo(this._$el)
     this._bindEvents()
   }
 
   _bindEvents () {
     const self = this
+    const $    = this.$
 
     this._$el.on('click', '.remove_file', function (e) {
       e.stopPropagation()
@@ -38,7 +40,7 @@ class FilePreview {
     fileName = fileName.replace(/>/g, '&gt;')
 
     const html = `<li>${fileName} - ${size} - ${closeLink}</li>`
-    const $li = $(html).appendTo(this._$ul)
+    const $li = this.$(html).appendTo(this._$ul)
 
     $li.data('size', file.size)
     $li.data('name', fileName)
@@ -46,6 +48,8 @@ class FilePreview {
   }
 
   removeFile (file) {
+    const $ = this.$
+
     this._$ul.find('li').each(function () {
       const name = $(this).data('name')
       const size = $(this).data('size')

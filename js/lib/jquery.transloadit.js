@@ -75,7 +75,7 @@ const tus = require('tus-js-client')
 
     method = args.shift()
     if (method === 'init') {
-      uploader = new Uploader()
+      uploader = new Uploader({ $ })
       args.unshift(this)
       this.data('transloadit.uploader', uploader)
     } else {
@@ -91,7 +91,7 @@ const tus = require('tus-js-client')
   }
 
   class Uploader {
-    constructor () {
+    constructor ({ $ }) {
       this._service = null
 
       this._assembly = null
@@ -118,10 +118,12 @@ const tus = require('tus-js-client')
       this._isOnline = true
 
       this._error = null
+      this.$ = $
     }
 
     init ($form, options) {
       const self = this
+      const $    = this.$
       this.options($.extend({}, OPTIONS, options || {}))
 
       this._initI18n()
@@ -212,6 +214,7 @@ const tus = require('tus-js-client')
         i18n    : this._i18n,
         protocol: this._options.protocol,
         service : this._service,
+        $       : this.$,
 
         wait                 : this._options['wait'],
         requireUploadMetaData: this._options['requireUploadMetaData'],
@@ -468,6 +471,7 @@ const tus = require('tus-js-client')
     _appendFilteredFormFields () {
       const $fields = this._getFilteredFormFields()
       const self = this
+      const $    = this.$
 
       $fields.each(function () {
         const name = $(this).attr('name')
@@ -598,7 +602,7 @@ const tus = require('tus-js-client')
       }
 
       if (assemblyData !== null) {
-        $('<textarea/>')
+        this.$('<textarea/>')
           .attr('name', 'transloadit')
           .text(JSON.stringify(assemblyData))
           .prependTo(this._$form)
@@ -630,6 +634,7 @@ const tus = require('tus-js-client')
       }
 
       let fileInputFieldsAreGood = true
+      const $ = this.$
       this._$inputs.each(function () {
         const name = $(this).attr('name')
         if (!name) {
@@ -740,6 +745,7 @@ const tus = require('tus-js-client')
           self.cancel()
         },
         i18n: this._i18n,
+        $   : this.$,
       })
     }
 
@@ -750,6 +756,7 @@ const tus = require('tus-js-client')
       }
 
       const self = this
+      const $    = this.$
       let i = 0
       $dropAreas.each(function () {
         const name = $(this).data('name') || 'files'
@@ -783,6 +790,7 @@ const tus = require('tus-js-client')
       }
 
       const self = this
+      const $    = this.$
       let i = 0
       $previewAreas.each(function () {
         // const name = $(this).data('name') || 'files'
@@ -836,6 +844,7 @@ const tus = require('tus-js-client')
 
       this._internetConnectionChecker = new InternetConnectionChecker({
         intervalLength: this._options.connectionCheckInterval,
+        $             : this.$,
         onDisconnect () {
           self._isOnline = false
           let errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
@@ -900,7 +909,7 @@ const tus = require('tus-js-client')
         return this._options
       }
 
-      $.extend(this._options, options)
+      this.$.extend(this._options, options)
     }
 
     option (key, val) {

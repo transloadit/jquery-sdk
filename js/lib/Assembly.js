@@ -42,6 +42,8 @@ function Assembly (opts) {
 
   this._uploadingFinished = true
   this._isOnline = true
+
+  this.$ = opts.$
 }
 
 Assembly.prototype.init = function (cb) {
@@ -97,7 +99,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
   this._inAssemblyRequest = true
 
   function attempt () {
-    $.jsonp({
+    self.$.jsonp({
       url              : url,
       timeout          : 8000,
       callbackParameter: 'callback',

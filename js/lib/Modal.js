@@ -2,7 +2,7 @@ const helpers = require('./helpers')
 require('../dep/toolbox.expose')
 
 class Modal {
-  constructor ({ i18n, onClose } = {}) {
+  constructor ({ i18n, onClose, $ } = {}) {
     this._$modal = null
     this._lastUploadSpeedUpdateOn = 0
     this._uploadRate = null
@@ -12,6 +12,7 @@ class Modal {
 
     this._i18n = i18n
     this.onClose = onClose || (() => {})
+    this.$ = $
   }
 
   reset () {
@@ -23,7 +24,7 @@ class Modal {
   }
 
   hide () {
-    $.mask.close()
+    this.$.mask.close()
 
     if (!this._$modal) {
       return
@@ -42,7 +43,7 @@ class Modal {
     const startingUploadTxt = this._i18n.translate('startingUpload')
     const detailsTxt = this._i18n.translate('details')
 
-    this._$modal = $(
+    this._$modal = this.$(
       `<div id="transloadit">
         <div class="content">
           <a href="#close" class="close">${cancelTxt}</a>
@@ -62,7 +63,7 @@ class Modal {
       </div>`
     ).appendTo('body')
 
-    $.extend(this._$modal, {
+    this.$.extend(this._$modal, {
       $content           : this._$modal.find('.content'),
       $close             : this._$modal.find('.close'),
       $label             : this._$modal.find('label'),
@@ -118,7 +119,7 @@ class Modal {
     const self = this
     let ip = null
 
-    $
+    this.$
       .getJSON('https://jsonip.com/', ipData => {
         ip = ipData.ip
       })
@@ -132,7 +133,7 @@ class Modal {
           agent      : navigator.userAgent,
           error      : `${err.message} ${err.reason || ''}`,
         }
-        $.post('https://status.transloadit.com/client_error', details)
+        self.$.post('https://status.transloadit.com/client_error', details)
 
         const detailsArr = []
         for (const key in details) {

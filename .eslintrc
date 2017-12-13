@@ -7,7 +7,6 @@
   "globals": {
     "window": true,
     "jQuery": true,
-    "$": true,
     "casper": true,
     "testhost": true
   },
@@ -32,5 +31,5 @@
         }
       }
     ]
-  }  
+  }
 }
