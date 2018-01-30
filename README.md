@@ -8,7 +8,7 @@ A jQuery Integration for [Transloadit](https://transloadit.com)'s file uploading
 
 [Transloadit](https://transloadit.com) is a service that helps you handle file uploads, resize, crop and watermark your images, make GIFs, transcode your videos, extract thumbnails, generate audio waveforms, and so much more. In short, [Transloadit](https://transloadit.com) is the Swiss Army Knife for your files.
 
-This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://transloadit.com) REST API.
+This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://transloadit.com) REST API. It supports resumable file uploads out of the box including a modal box with a progress bar, drag and drop support and several other nice things. :)
 
 ## Install
 
@@ -54,32 +54,6 @@ string to a hidden textarea in your form.
 You can then submit the form as you normally would. On your backend you have an extra POST field named `"transloadit"` then in the payload including JSON with information about all uploads and transcoding results, their meta data and the URLs to them.
 
 It's that simple. :)
-
-## Version 3
-
-Changes from version 2 to version 3:
-
-### BC Breaking changes:
-
-- The onExecuting() callback does not have the array of `uploads` anymore. Please use the `onUpload` callback to track received uploads.
-- The onUpload() and onResult() callbacks no longer receive the assembly object as a parameter.
-- The formData parameter has been removed, because all uploads use XHR now. This will only break BC for you if you used formData: customFormDataObj. In that case you should add the contents of your custom form data as hidden input fields to the form now.
-- Several new translations have been added for which you would need to add a translation in case you run on a custom locale. Please check "How to add your own localization / other language strings" at the bottom of this page for details.
-- There is a new `translations` parameter now that must be used to get your custom locale working.
-
-### Non-BC Breaking Changes and new features:
-
-- There is now support for resumable file uploads! It works out of the box, you do not need to change anything for it.
-- Performance has been improved in all areas of the plugin.
-- Drag and Drop support has been added.
-- Support for file preview lists has been added.
-- All options related to polling have been removed.
-- There is now a lot less network traffic for assembly status updates.
-- There is now the ability to not wait for file upload meta data anymore, which is a big speed improvement. This change was also backported to the last version in the 2.x series.
-- There is now a new parameter "maxNumberOfUploadedFiles", with which you can set a limit to the number of uploaded files.
-- There are two new callbacks implemented: onDisconnect() and onReconnect()
-
-*Version 2 of the plugin is DEPRECATED and will CEASE TO EXIST on January 01, 2018. Please upgrade to version 3 as soon as possible.*
 
 ## Usage
 
@@ -171,25 +145,13 @@ To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the HTML file) with your ac
 
 ## Releases
 
-We have two *magic* releases:
+We have one *magic* release:
 
 - `jquery.transloadit-v3-latest.js`
   This is always the latest version of the v3 branch and is **the recommended version to use**. <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js>
 
-- `jquery.transloadit2-v2-latest.js`
-  This is always the latest version of the deprecated v2 branch. <https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js>
-
 - You can also pin specific versions via:
   <https://assets.transloadit.com/js/jquery.transloadit2-v3.0.0.js>. Remember that it then becomes your responsibility to keep track of security and performance upgrades in our [releases](https://github.com/transloadit/jquery-sdk/releases).
-
-### Legacy
-
-- `jquery.transloadit2-latest.js`
-  This is the latest version across majors and is **not** recommended to use. We do not want to auto-upgrade users between major versions to allow us to make BC breaking changes.
-  *Note: This version requires jQuery < 1.9 to work.*
-
-  On **January 01, 2018** we will remove this version.
-  <https://assets.transloadit.com/js/jquery.transloadit2-latest.js>
 
 ## Callbacks
 
