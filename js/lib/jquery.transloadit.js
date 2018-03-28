@@ -796,6 +796,7 @@ const tus = require('tus-js-client')
         // const name = $(this).data('name') || 'files'
 
         self._previewAreaObjects[i] = new FilePreview({
+          $: self.$,
           onFileRemove (file) {
             self._removeFileFromFormData(file)
             self._removeFileFromPreviewAreas(file)
