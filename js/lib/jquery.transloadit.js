@@ -46,7 +46,6 @@ const tus = require('tus-js-client')
     locale                      : 'en',
     translations                : null,
     maxNumberOfUploadedFiles    : -1,
-    connectionCheckInterval     : 3000,
     debug                       : true,
   }
 
@@ -375,13 +374,11 @@ const tus = require('tus-js-client')
         },
         onError (error) {
           self._xhr = false
-          self._internetConnectionChecker.isCurrentlyOnline(online => {
-            // If this is not a connection problem, bubble up the error.
-            // Otherwise if this is a connection problem, we will have our own error handling for it.
-            if (online) {
-              self._errorOut(error)
-            }
-          })
+          // If this is not a connection problem, bubble up the error.
+          // Otherwise if this is a connection problem, we will have our own error handling for it.
+          if (self._isOnline) {
+            self._errorOut(error)
+          }
         },
         onSuccess () {
           self._xhr = false
@@ -557,11 +554,6 @@ const tus = require('tus-js-client')
       this.stop()
       this.reset()
       this.unbindEvents()
-
-      if (this._internetConnectionChecker) {
-        this._internetConnectionChecker.stop()
-      }
-
       this._$form.data('transloadit.uploader', null)
     }
 
@@ -844,8 +836,6 @@ const tus = require('tus-js-client')
       const self = this
 
       this._internetConnectionChecker = new InternetConnectionChecker({
-        intervalLength: this._options.connectionCheckInterval,
-        $             : this.$,
         onDisconnect () {
           self._isOnline = false
           let errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
