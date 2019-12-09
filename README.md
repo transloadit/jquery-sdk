@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/transloadit/jquery-sdk.svg)](https://travis-ci.org/transloadit/jquery-sdk)
 
+> Warning: We recommend using [Uppy](https://uppy.io/docs/robodog/form/#Migrating-From-the-jQuery-SDK) instead of the jQuery SDK these days.
+
 # Transloadit jQuery SDK
 
 A jQuery Integration for [Transloadit](https://transloadit.com)'s file uploading and encoding service
