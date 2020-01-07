@@ -13,8 +13,8 @@
     </form>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script src="http://localjquerysdk.com/build/jquery.transloadit2-v3-latest.js"></script>
-    <!-- <script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script> -->
+    <!-- <script src="http://localjquerysdk.com/build/jquery.transloadit2-v3-latest.js"></script> -->
+    <script src="https://assets.transloadit.com/js/jquery.transloadit2-v2-latest.js"></script>
 
 
     <script type="text/javascript">
@@ -30,7 +30,7 @@
         processZeroFiles: false,
         autoSubmit: false,
         // service: 'http://vbox.transloadit.com/',
-        // service: 'http://api2-malaeka.transloadit.com/',
+        service: 'http://api2-fyz.transloadit.com/',
         // region: 'eu-west-1',
         // assets: 'http://localjquerysdk.com/build/',
         triggerUploadOnFileSelection: true,
@@ -44,10 +44,11 @@
           auth: { key: window.YOUR_TRANSLOADIT_AUTH_KEY },
           steps: {
             resize_to_75: {
-              robot: "/image/resize",
+              robot: "/video/encode",
               use: ":original",
-              width: 75,
-              height: 75
+              preset: 'ipad-low',
+              ffmpeg_stack: 'v3.3.3',
+              turbo: true
             }
           }
         },
