@@ -1,5 +1,5 @@
 {
-  "name": "transloadit-jquery-sdk",
+  "name": "@transloadit/jquery-sdk",
   "version": "3.3.0",
   "scripts": {
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run inject_comment && npm run gzip && npm run versionify",
