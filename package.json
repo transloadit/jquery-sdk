@@ -1,6 +1,7 @@
 {
   "name": "@transloadit/jquery-sdk",
   "version": "3.3.1",
+  "private": false,
   "scripts": {
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run inject_comment && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",
@@ -24,8 +25,9 @@
     "version": "node -e 'console.log(require(\"./package.json\").version)'"
   },
   "files": [
-    "js",
-    "css"
+    "build",
+    "css",
+    "js"
   ],
   "dependencies": {
     "socket.io-client": "1.7.2",
