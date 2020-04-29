@@ -434,6 +434,7 @@ const tus = require('tus-js-client')
         const oldFiles = this._files[name]
         for (let i = 0; i < oldFiles.length; i++) {
           this._removeFileFromPreviewAreas(oldFiles[i])
+          this._files[name] = this._files[name].splice(i, 1)
         }
       }
 
