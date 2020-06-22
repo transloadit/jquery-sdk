@@ -569,7 +569,7 @@ babel-plugin-transform-strict-mode@^6.22.0:
     babel-runtime "^6.22.0"
     babel-types "^6.22.0"
 
-babel-polyfill@6.23.0, babel-polyfill@^6.23.0:
+babel-polyfill@^6.23.0:
   version "6.23.0"
   resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.23.0.tgz#8364ca62df8eafb830499f699177466c3b03499d"
   dependencies:
@@ -2929,9 +2929,10 @@ tunnel-agent@~0.4.1:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.4.3.tgz#6373db76909fe570e08d73583365ed828a74eeeb"
 
-tus-js-client@1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/tus-js-client/-/tus-js-client-1.4.2.tgz#7d83edfbe515cbd825ab829a9c3913750da48a0f"
+tus-js-client@1.4.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/tus-js-client/-/tus-js-client-1.4.3.tgz#e43375e9a1a42b6fa8da96cf59ab38bea40bc1d9"
+  integrity sha1-5DN16aGkK2+o2pbPWas4vqQLwdk=
   dependencies:
     extend "^3.0.0"
     resolve-url "^0.2.1"
@@ -3001,10 +3002,6 @@ util@0.10.3, util@~0.10.1:
   resolved "https://registry.yarnpkg.com/util/-/util-0.10.3.tgz#7afb1afe50805246489e3db7fe0ed379336ac0f9"
   dependencies:
     inherits "2.0.1"
-
-uuid@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.2.tgz#48bd5698f0677e3c7901a1c46ef15b1643794726"
 
 uuid@^3.0.0:
   version "3.0.1"
