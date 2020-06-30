@@ -1,4 +1,4 @@
-const numberOfPlannedTests = 6
+const numberOfPlannedTests = 5
 casper.test.begin('test-simple-image-resize', numberOfPlannedTests, (test) => {
   casper.start(`http://${testhost}`, function () {
   })
