@@ -1,3 +1,5 @@
+const util = require('util')
+
 const numberOfPlannedTests = 6
 casper.test.begin('test-trigger-upload-on-file-selection', numberOfPlannedTests, (test) => {
   casper.start(`http://${testhost}/trigger-on-file-select`, function () {
@@ -16,7 +18,7 @@ casper.test.begin('test-trigger-upload-on-file-selection', numberOfPlannedTests,
   })
 
   casper.then(function () {
-    console.log(this.test)
+    console.log(util.inspect(this.test))
     this.test.assertTextExists('"ok":"ASSEMBLY_COMPLETED"')
   })
 
