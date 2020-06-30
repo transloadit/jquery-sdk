@@ -14,8 +14,9 @@ notifications:
   slack:
     secure: gTNTTwFYpakA7O8yBhnk/cU3zP5lK2aHBkcTdiwmaNxbSNnfgQrrXlY8+ZBbEiAu83t7KZR50G8uX55SZ/QguVx8gMy5Acx1a+ihhZB83RAn1pmm56h3iNjD3EAcb3kjZrSaHTd50/27ZQLJIE/QGLMx+FNOjXQ5Rjl9pwev1DQ=
 env:
-- secure: B+Nha+TarsZCCoOYIyeMEFyiAWY/o7kgmyj9hwCBikOOoM/FLBrldW8E4DYhP2ub0xv/VtQywcMovDkPi+y4b5ooMnWodDYtDwzkOlyrDqNJIzsaT6KQ5Q7qsXVxEMK/RsLLrwRMlGZJiu1nqFsUJNVswmu4o71fb+Rnc6sXxbY=
+  matrix:
+  - secure: B+Nha+TarsZCCoOYIyeMEFyiAWY/o7kgmyj9hwCBikOOoM/FLBrldW8E4DYhP2ub0xv/VtQywcMovDkPi+y4b5ooMnWodDYtDwzkOlyrDqNJIzsaT6KQ5Q7qsXVxEMK/RsLLrwRMlGZJiu1nqFsUJNVswmu4o71fb+Rnc6sXxbY=
+  global:
+    secure: WZ7d9RevZxdaBNafAhi+D7taEPgWUC1NzZ3cH1nNXJmKBwg4bDoQmpWr+d5UAdu/gmveqH/NpV74zxQlcj4svLpb0SKRh3pUdsm0FsisPfBBVelK9qzGmpAa4P2peuDJs1oVAjRypZsn4DHUmAXV7doTiE0F2NS1DrjCwQVi+KY=
 before_script: npm run build
 script: npm run test
-TRANSLOADIT_ACCESS_KEY=8a0245b6411f553b98140491391144cb:
-  secure: PptRG9SOn1HqqsV8c2nYETuKoGDkr6kuOwL1siO/1rk6KHN9lwkP8q5wDTuHH+awMPe66BZbbuJs6UCAj8/1YgrKwr5C0Kjl8RN/3Hz5oRRquz3O/Z2RfLtLt2H5ZApKH8bssKQidGzH6WVPfzALVhvq83bpWznkmtR6L1bcOJ8=
