@@ -23,7 +23,7 @@ casper.test.begin('test-xss', numberOfPlannedTests, (test) => {
 
   casper.then(function () {
     this.test.assertTextDoesntExist('1337')
-    this.test.assertTextExists('"ok":"ASSEMBLY_COMPLETED"')
+    this.test.assertTextExists('ASSEMBLY_COMPLETED')
   })
 
   casper.run(function () {

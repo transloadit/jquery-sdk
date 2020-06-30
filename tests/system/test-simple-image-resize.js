@@ -21,7 +21,7 @@ casper.test.begin('test-simple-image-resize', numberOfPlannedTests, (test) => {
   })
 
   casper.then(function () {
-    this.test.assertTextExists('"ok":"ASSEMBLY_COMPLETED"')
+    this.test.assertTextExists('ASSEMBLY_COMPLETED')
   })
 
   casper.run(function () {
