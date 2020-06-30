@@ -1,4 +1,4 @@
-const numberOfPlannedTests = 7
+const numberOfPlannedTests = 6
 casper.test.begin('test-xss', numberOfPlannedTests, (test) => {
   casper.start(`http://${testhost}`, function () {
   })
