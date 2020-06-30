@@ -16,8 +16,7 @@ casper.test.begin('test-trigger-upload-on-file-selection', numberOfPlannedTests,
   })
 
   casper.then(function () {
-    this.test.assertTextExists('{\\"width\\":400')
-    this.test.assertTextExists('\\"height\\":400')
+    this.test.assertTextExists('"ok":"ASSEMBLY_COMPLETED"')
   })
 
   casper.run(function () {
