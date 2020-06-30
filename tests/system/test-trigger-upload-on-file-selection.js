@@ -1,4 +1,4 @@
-const numberOfPlannedTests = 6
+const numberOfPlannedTests = 5
 casper.test.begin('test-trigger-upload-on-file-selection', numberOfPlannedTests, (test) => {
   casper.start(`http://${testhost}/trigger-on-file-select`, function () {
   })
