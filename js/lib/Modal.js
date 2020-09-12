@@ -133,7 +133,7 @@ class Modal {
           agent      : navigator.userAgent,
           error      : `${err.message} ${err.reason || ''}`,
         }
-        self.$.post('https://status.transloadit.com/client_error', details)
+        self.$.post('https://transloaditstatus.com/client_error', details)
 
         const detailsArr = []
         for (const key in details) {
