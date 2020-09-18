@@ -367,6 +367,7 @@ const tus = require('tus-js-client')
           filename    : file.name,
           assembly_url: assemblyUrl,
         },
+        retryDelays: [0, 1000, 3000, 5000],
         fingerprint (file) {
           // Fingerprinting is not necessary any more since we have disabled
           // the resuming of previous uploads.
