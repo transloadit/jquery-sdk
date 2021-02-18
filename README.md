@@ -14,7 +14,9 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 
 ## Install
 
-**Note** You may also be interested in checking out [Uppy](https://transloadit.com/docs/#uppy), Transloadit's next-gen file uploader for the web.
+<div class="tip" markdown="1">
+  You may also be interested in checking out [Uppy](https://transloadit.com/docs/#uppy), Transloadit's next-gen file uploader for the web.
+</div>
 
 Simply include the JavaScript asset in your HTML page like so. jQuery >= 1.9 is also required.
 
@@ -124,7 +126,7 @@ $(function() {
 
 By default, this will display an overlay with a progress bar.
 
-<span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.
+<div class="alert alert-warning"><span class="label label-danger">Important</span> Your file input fields must each have a proper <code>name</code> attribute for our jQuery SDK to work properly.</div>
 
 ## Specifying Assembly Instructions in the Form
 
