@@ -1,0 +1,48 @@
+name: jQuery SDK CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps  : 
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@master
+        with:
+          node-version: 10.x 
+      - name: Get yarn cache directory path
+        id  : yarn-cache-dir-path
+        run : echo "##[set-output name=dir;]$(yarn cache dir)"
+      - uses: actions/cache@v2
+        with:
+          path        : ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key         : ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - uses: sergioramos/yarn-actions/install@master
+        with:
+          frozen-lockfile: true
+      - name: Install phantom
+        run : |
+          wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
+          tar jxf phantomjs-2.1.1-linux-x86_64.tar.bz2
+          sudo cp -Raf --remove-destination phantomjs-*/* /usr/local/
+          wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.1.4-1
+          tar zvxf 1.1.4-1
+          sudo cp -Raf --remove-destination casperjs-casperjs-*/* /usr/local/
+      - name: Lint
+        run : |
+          yarn lint
+      - name: Build
+        run : |
+          yarn build
+      - name: Test
+        run : |
+          yarn test
