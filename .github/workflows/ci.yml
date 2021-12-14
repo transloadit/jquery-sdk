@@ -1,4 +1,4 @@
-name: jQuery SDK CI
+name: CI
 on:
   push:
     branches:
