@@ -83,7 +83,7 @@ Changes from version 2 to version 3:
 - There is now a new parameter "maxNumberOfUploadedFiles", with which you can set a limit to the number of uploaded files.
 - There are two new callbacks implemented: onDisconnect() and onReconnect()
 
-*Version 2 of the plugin is CEASEED TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible.*
+*Version 2 of the plugin is CEASED TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible.*
 
 ## Usage
 
