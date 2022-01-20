@@ -15,7 +15,7 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 ## Install
 
 <div class="tip" markdown="1">
-  You may also be interested in checking out [Uppy](https://transloadit.com/docs/#uppy), Transloadit's next-gen file uploader for the web.
+  You may also be interested in checking out [Uppy](https://transloadit.com/docs/sdks/uppy/), Transloadit's next-gen file uploader for the web.
 </div>
 
 Simply include the JavaScript asset in your HTML page like so. jQuery >= 1.9 is also required.
@@ -131,7 +131,7 @@ By default, this will display an overlay with a progress bar.
 ## Specifying Assembly Instructions in the Form
 
 Instead of using the plugin's `params` parameter, you could also have added the Assembly Instructions in a hidden form field named `params`.
-Sometimes, especially when your instructions need to be calculated by a back-end language, and also when you want to add [Signature authentication](https://transloadit.com/docs/#authentication) it is easier to specify them directly in the form, than to add them in the call to the jQuery SDK.
+Sometimes, especially when your instructions need to be calculated by a back-end language, and also when you want to add [Signature authentication](https://transloadit.com/docs/topics/signature-authentication/) it is easier to specify them directly in the form, than to add them in the call to the jQuery SDK.
 
 The contents of the hidden params field need to be encoded as JSON, with **HTML entities escaped**.
 Have your preferred scripting language encode the JSON for you to maintain readability. Here is an example in PHP:
