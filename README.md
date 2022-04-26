@@ -14,8 +14,8 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 
 ## Install
 
-<div class="tip" markdown="1">
-  You may also be interested in checking out [Uppy](https://transloadit.com/docs/sdks/uppy/), Transloadit's next-gen file uploader for the web.
+<div class="alert alert-note">
+  <strong>Note:</strong> You may also be interested in checking out <a href="https://transloadit.com/docs/sdks/uppy/">Uppy</a>, Transloadit's next-gen file uploader for the web.
 </div>
 
 Simply include the JavaScript asset in your HTML page like so. jQuery >= 1.9 is also required.
