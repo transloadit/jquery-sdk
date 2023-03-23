@@ -1,6 +1,11 @@
 {
   "name": "@transloadit/jquery-sdk",
-  "keywords": ["uploader", "jquery uploader", "transloadit", "transload it"],
+  "keywords": [
+    "uploader",
+    "jquery uploader",
+    "transloadit",
+    "transload it"
+  ],
   "version": "3.3.5",
   "private": false,
   "scripts": {
@@ -19,8 +24,7 @@
     "release:minor": "env SEMANTIC=minor npm run release",
     "release:patch": "env SEMANTIC=patch npm run release",
     "release": "npm version ${SEMANTIC:-patch} -m \"Release %s\" && git push --tags && git push && npm publish",
-    "start:test:server": "node tests/server.js",
-    "test": "npm run lint && tests/run.sh",
+    "test": "npm-run-all lint test:e2e",
     "test:e2e": "playwright test tests/*.test.js",
     "test:server": "node tests/server.js",
     "uglify": "uglifyjs --comments --stats --output=build/jquery.transloadit2-v3-latest.js --source-map=build/jquery.transloadit2-v3-latest.js.map -- build/jquery.transloadit2-v3-latest.js",
@@ -57,6 +61,7 @@
     "eslint-plugin-promise": "3.4.1",
     "eslint-plugin-standard": "2.0.1",
     "fakefile": "0.0.8",
+    "npm-run-all": "^4.1.5",
     "uglify-js": "2.8.16"
   }
 }
