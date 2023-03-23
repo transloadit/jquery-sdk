@@ -14,12 +14,12 @@
     "css": "mkdir -p build/css/img && cp css/transloadit.css build/css/transloadit2-v3-latest.css && cp -v css/img/* build/css/img/",
     "browserify": "browserify -t [ babelify --presets [ es2015 ] ] js/lib/*.js -o build/jquery.transloadit2-v3-latest.js",
     "dev": "npm run clean && npm run css && npm run browserify",
-    "fix": "eslint . --fix",
+    "fix": "eslint . --fix && yarn fix:formatting",
     "gzip": "gzip --force --best < build/jquery.transloadit2-v3-latest.js > build/jquery.transloadit2-v3-latest.js.gz",
     "inject": "cp -v build/css/transloadit2-v3-latest.css ${WEBSITEDIR:-~/code/content}/css/transloadit2-v3-latest.css && cp -v build/css/img/* ${WEBSITEDIR:-~/code/content}/css/img/ && cp -v build/jquery.transloadit2-v3*.js* ${WEBSITEDIR:-~/code/content}/js",
     "inject_comment": "node inject_comment.js",
     "link": "ln -nfs $(pwd) ${WEBSITEDIR:-../content}/jquery-sdk",
-    "lint": "eslint .",
+    "lint": "eslint . && yarn lint:formatting",
     "release:major": "env SEMANTIC=major npm run release",
     "release:minor": "env SEMANTIC=minor npm run release",
     "release:patch": "env SEMANTIC=patch npm run release",
@@ -29,7 +29,9 @@
     "test:server": "node tests/server.js",
     "uglify": "uglifyjs --comments --stats --output=build/jquery.transloadit2-v3-latest.js --source-map=build/jquery.transloadit2-v3-latest.js.map -- build/jquery.transloadit2-v3-latest.js",
     "versionify": "cd build && for file in *.*; do cp -v ${file} $(echo ${file} |sed \"s/v3-latest/v$(npm run --silent version)/g\" ); done",
-    "version": "node -e 'console.log(require(\"./package.json\").version)'"
+    "version": "node -e 'console.log(require(\"./package.json\").version)'",
+    "fix:formatting": "prettier --write .",
+    "lint:formatting": "prettier --check ."
   },
   "files": [
     "build",
@@ -57,11 +59,13 @@
     "debug": "2.6.9",
     "es6-promise": "4.1.0",
     "eslint": "4.18.2",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-config-standard": "6.2.1",
     "eslint-plugin-promise": "3.4.1",
     "eslint-plugin-standard": "2.0.1",
     "fakefile": "0.0.8",
     "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.6",
     "uglify-js": "2.8.16"
   }
 }
