@@ -169,7 +169,7 @@ Both ways of adding the Assembly Instructions are valid. When you upload a file 
 
 ## Example
 
-An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/master/examples) directory.
+An example use of this plugin can be found in the [examples](https://github.com/transloadit/jquery-sdk/tree/HEAD/examples) directory.
 
 To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the HTML file) with your actual Transloadit key and load the html file on your browser.
 
@@ -611,7 +611,7 @@ $('#upload-form').transloadit({
 });
 ```
 
-If you like the default Transloadit progress bar but just want to change a few colors, customize [these css selectors](https://github.com/transloadit/jquery-sdk/blob/master/css/transloadit2.css) in your own css.
+If you like the default Transloadit progress bar but just want to change a few colors, customize [these css selectors](https://github.com/transloadit/jquery-sdk/blob/HEAD/css/transloadit2.css) in your own css.
 
 ### Unbinding the plugin
 

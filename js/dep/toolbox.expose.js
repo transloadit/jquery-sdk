@@ -16,7 +16,7 @@
  * This version is by @pekeler as proposed in https://gist.github.com/pekeler/4965712
  * and discussed in https://github.com/transloadit/jquery-sdk/issues/13#issuecomment-13645153
  *
- * https://github.com/jquerytools/jquerytools/blob/master/src/toolbox/toolbox.expose.js
+ * https://github.com/jquerytools/jquerytools/blob/HEAD/src/toolbox/toolbox.expose.js
  * simplified, minimally tested in Safari 6.0.2, FF 18.0.2, Chrome 24.0.1312.57,
  * IE9, IE8, IE7. Works with jQuery 1.9
  */
