@@ -29,14 +29,23 @@ jobs:
       - uses: sergioramos/yarn-actions/install@master
         with:
           frozen-lockfile: true
-      - name: Install phantom
+      - name: Install playwright dependencies
         run: |
-          wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
-          tar jxf phantomjs-2.1.1-linux-x86_64.tar.bz2
-          sudo cp -Raf --remove-destination phantomjs-*/* /usr/local/
-          wget --retry-connrefused https://github.com/n1k0/casperjs/tarball/1.1.4-1
-          tar zvxf 1.1.4-1
-          sudo cp -Raf --remove-destination casperjs-casperjs-*/* /usr/local/
+          sudo -HE env DEBIAN_FRONTEND=noninteractive apt-get --option Dpkg::Options::=--force-confnew -qy --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install \
+            fonts-ipafont-gothic \
+            fonts-liberation \
+            fonts-tlwg-loma-otf \
+            fonts-wqy-zenhei \
+            libdrm2 \
+            libfontconfig \
+            libfreetype6 \
+            libgbm1 \
+            msttcorefonts \
+            ttf-ubuntu-font-family \
+            xfonts-cyrillic \
+            xfonts-scalable \
+          && true
+          npx playwright install --with-deps chromium
       - name: Lint
         run: |
           yarn lint
