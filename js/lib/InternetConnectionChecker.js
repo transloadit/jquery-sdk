@@ -1,12 +1,12 @@
 class InternetConnectionChecker {
-  constructor ({ onDisconnect, onReconnect }) {
+  constructor({ onDisconnect, onReconnect }) {
     this._onDisconnect = onDisconnect || (() => {})
     this._onReconnect = onReconnect || (() => {})
 
     this._isOnline = true
   }
 
-  start () {
+  start() {
     if (typeof window !== 'undefined') {
       window.addEventListener('online', () => this.onlineCheck())
       window.addEventListener('offline', () => this.onlineCheck())
@@ -14,11 +14,8 @@ class InternetConnectionChecker {
     }
   }
 
-  onlineCheck (cb) {
-    const online =
-      typeof window.navigator.onLine !== 'undefined'
-        ? window.navigator.onLine
-        : true
+  onlineCheck(cb) {
+    const online = typeof window.navigator.onLine !== 'undefined' ? window.navigator.onLine : true
 
     if (this._isOnline && !online) {
       this._onDisconnect()
@@ -29,7 +26,7 @@ class InternetConnectionChecker {
     this._isOnline = online
   }
 
-  isOnline () {
+  isOnline() {
     return this._isOnline
   }
 }

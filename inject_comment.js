@@ -7,8 +7,12 @@ const errorOut = (err) => {
 }
 
 let comment = '/*\n'
-comment += '  jQuery Easing v1.3: Copyright (c) 2008 George McGinley Smith | BSD License: http://www.opensource.org/licenses/bsd-license.php\n'
-comment += '  jquery.transloadit2-' + version + '.js: Copyright (c) 2016 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php\n'
+comment +=
+  '  jQuery Easing v1.3: Copyright (c) 2008 George McGinley Smith | BSD License: http://www.opensource.org/licenses/bsd-license.php\n'
+comment +=
+  '  jquery.transloadit2-' +
+  version +
+  '.js: Copyright (c) 2016 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php\n'
 comment += '\n'
 comment += '  Fork this on Github: http://github.com/transloadit/jquery-sdk\n'
 comment += '\n'

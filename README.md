@@ -21,7 +21,10 @@ This is a **jQuery** SDK to make it easy to talk to the [Transloadit](https://tr
 Simply include the JavaScript asset in your HTML page like so. jQuery >= 1.9 is also required.
 
 ```html
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+  type="text/javascript"
+  src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+></script>
 <script src="//assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
 ```
 
@@ -40,15 +43,16 @@ You have an HTML form on your page like this one for example:
 ```
 
 By attaching the jQuery SDK to the form you enable uploading functionality on the form:
+
 ```javascript
 $('#upload-form').transloadit({
   wait: true,
   triggerUploadOnFileSelection: true,
-  params : {
-    auth  : { key : 'YOUR_TRANSLOADIT_KEY' },
-    template_id : 'YOUR_TEMPLATE_ID'
-  }
-});
+  params: {
+    auth: { key: 'YOUR_TRANSLOADIT_KEY' },
+    template_id: 'YOUR_TEMPLATE_ID',
+  },
+})
 ```
 
 Once you select some files over the file input field (or the drag and drop area) a modal will appear that will upload your fils.
@@ -83,7 +87,7 @@ Changes from version 2 to version 3:
 - There is now a new parameter "maxNumberOfUploadedFiles", with which you can set a limit to the number of uploaded files.
 - There are two new callbacks implemented: onDisconnect() and onReconnect()
 
-*Version 2 of the plugin is CEASED TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible.*
+_Version 2 of the plugin is CEASED TO EXIST on September 30, 2017. Please upgrade to version 3 as soon as possible._
 
 ## Usage
 
@@ -175,7 +179,7 @@ To run it, simply replace `YOUR_TRANSLOADIT_KEY` (on the HTML file) with your ac
 
 ## Releases
 
-We have one *magic* release:
+We have one _magic_ release:
 
 - `jquery.transloadit-v3-latest.js`
   This is always the latest version of the v3 branch and is **the recommended version to use**. <https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js>
@@ -247,9 +251,10 @@ $(function() {
   <td markdown="1">
    This is fired once for each uploaded file. This is useful for custom renderings of multiple file uploads.
 
-   Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
+Each upload here has an ID field. You can map that back to the <code>original_id</code> field of results on the <code>onResult</code> callback.
 
-   Please set <code>requireUploadMetaData</code> to true if you use this callback.
+Please set <code>requireUploadMetaData</code> to true if you use this callback.
+
   </td>
 </tr>
 <tr>
@@ -260,7 +265,8 @@ $(function() {
    This is fired each time a result becomes available for a given Step, and is only available when <code>wait</code> is set to <code>true</code>. This can be used
    to show thumbnails for videos or images once they are uploaded.
 
-   Results here contain a key <code>original_id</code>, which maps them back to the ID of the originally uploaded file's ID.
+Results here contain a key <code>original_id</code>, which maps them back to the ID of the originally uploaded file's ID.
+
   </td>
 </tr>
 <tr>
@@ -359,9 +365,10 @@ $(function() {
    Specifies whether the plugin should wait for meta data of uploaded files to first be extracted before it calls the <code>onSuccess</code> callback.
    If you set <code>wait</code> to <code>true</code>, this option does not have any effect, because extracting meta of uploaded files is a prerequisite for the files to be transcoded.
 
-   However, if you set <code>wait</code> to <code>false</code>, the <code>onSuccess</code> callback is fired as soon as the uploading is finished. The  <code>uploads</code> array in the passed assembly object will be empty in this case. If you need this uploads array to be populated, set this option to <code>true</code>.
+However, if you set <code>wait</code> to <code>false</code>, the <code>onSuccess</code> callback is fired as soon as the uploading is finished. The <code>uploads</code> array in the passed assembly object will be empty in this case. If you need this uploads array to be populated, set this option to <code>true</code>.
 
-   This option is <code>false</code> by default to fire the <code>onSuccess</code> callback as soon as possible to increase perceived performance.
+This option is <code>false</code> by default to fire the <code>onSuccess</code> callback as soon as possible to increase perceived performance.
+
   </td>
 </tr>
 <tr>
@@ -370,9 +377,9 @@ $(function() {
   </td>
   <td markdown="1">
 
- An object of Assembly instructions that should be executed. For examples please check [the minimal integration](https://transloadit.com/docs/#13-the-minimal-integration). This is <code>null</code> by default, which means the instructions are read from the hidden input field named <code>params</code>.
+An object of Assembly instructions that should be executed. For examples please check [the minimal integration](https://transloadit.com/docs/#13-the-minimal-integration). This is <code>null</code> by default, which means the instructions are read from the hidden input field named <code>params</code>.
 
- Here is an example:
+Here is an example:
 
  <pre><code>
  $('#upload-form').transloadit({
@@ -401,7 +408,8 @@ $(function() {
   <td markdown="1">
    Specifies the signature string, which is required if signature authentication is enabled in your account. This is <code>null</code> by default. The old way of providing this in a hidden input field named <code>signature</code> is still valid and will not be deprecated.
 
-   Please make sure the signature is calculated in your back-end code, so that your Transloadit Auth Secret is not exposed in your public JavaScript code!
+Please make sure the signature is calculated in your back-end code, so that your Transloadit Auth Secret is not exposed in your public JavaScript code!
+
   </td>
 </tr>
 <tr>
@@ -466,9 +474,9 @@ $(function() {
   </td>
   <td markdown="1">
 
- A CSS selector that specifies the form fields to be sent to Transloadit. This is <code>false</code> by default, which means no form fields are submitted with an upload.
+A CSS selector that specifies the form fields to be sent to Transloadit. This is <code>false</code> by default, which means no form fields are submitted with an upload.
 
- For example:
+For example:
 
  <pre><code>
  $('form').transloadit({
@@ -477,7 +485,7 @@ $(function() {
  });
  </code></pre>
 
- If you would like to only send some fields, set this parameter to a CSS selector string matching the fields to be sent:
+If you would like to only send some fields, set this parameter to a CSS selector string matching the fields to be sent:
 
  <pre><code>
  $('form').transloadit({
@@ -486,7 +494,7 @@ $(function() {
  });
  </code></pre>
 
- If you would like to send all form fields, set this to true:
+If you would like to send all form fields, set this to true:
 
  <pre><code>
  $('form').transloadit({
@@ -494,7 +502,7 @@ $(function() {
  });
  </code></pre>
 
- You can also set this to an object of key/value pairs:
+You can also set this to an object of key/value pairs:
 
  <pre><code>
  $('form').transloadit({
@@ -505,7 +513,8 @@ $(function() {
  });
  </code></pre>
 
- The fields that you send here will be available as <code>${fields.*}</code> variables in your Assembly instructions. Learn more about that [here](#form-fields-in-assembly-instructions).
+The fields that you send here will be available as <code>${fields.\*}</code> variables in your Assembly instructions. Learn more about that [here](#form-fields-in-assembly-instructions).
+
   </td>
 </tr>
 <tr>
@@ -527,7 +536,7 @@ $(function() {
 </table>
 
 <span class="label label-danger">Important</span> For very specific use-cases it may help to
- take a look at the [plugin's source code](https://github.com/transloadit/jquery-sdk). You can also always [ask us](/support) to clarify something or help you with integration.
+take a look at the [plugin's source code](https://github.com/transloadit/jquery-sdk). You can also always [ask us](/support) to clarify something or help you with integration.
 
 ## Drag and drop
 
@@ -576,8 +585,8 @@ This will create a file preview area with some default CSS in your form. This is
   border: 1px solid #ccc;
 }
 .transloadit-file-preview-area ul {
-  margin: 0!important;
-  padding: 0!important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 .transloadit-file-preview-area li {
   border-top: 1px solid #ddd;
@@ -600,15 +609,14 @@ If you don't like the Transloadit progress bar, you can render your own, like th
 ```javascript
 $('#upload-form').transloadit({
   modal: false,
-  onProgress: function(bytesReceived, bytesExpected) {
+  onProgress: function (bytesReceived, bytesExpected) {
     // render your own progress bar!
-    $('#progress')
-      .text((bytesReceived / bytesExpected * 100).toFixed(2) + '%');
+    $('#progress').text(((bytesReceived / bytesExpected) * 100).toFixed(2) + '%')
   },
-  onError: function(assembly) {
-    alert(assembly.error + ': ' + assembly.message);
-  }
-});
+  onError: function (assembly) {
+    alert(assembly.error + ': ' + assembly.message)
+  },
+})
 ```
 
 If you like the default Transloadit progress bar but just want to change a few colors, customize [these css selectors](https://github.com/transloadit/jquery-sdk/blob/master/css/transloadit2.css) in your own css.
@@ -618,7 +626,7 @@ If you like the default Transloadit progress bar but just want to change a few c
 You can unbind the plugin by calling
 
 ```javascript
-$('#upload-form').unbind('submit.transloadit');
+$('#upload-form').unbind('submit.transloadit')
 ```
 
 ## How to add your own localization / other language strings
@@ -655,23 +663,23 @@ Then just replace the English strings with your custom language strings.
 You can access the internal uploader object to call methods directly on it like so:
 
 ```javascript
-var $el = $('#upload-form');
+var $el = $('#upload-form')
 $el.transloadit({
-  wait: true
-});
+  wait: true,
+})
 
-var uploader = $el.data('transloadit.uploader');
+var uploader = $el.data('transloadit.uploader')
 
 // then call some methods on the uploader object
-uploader.start();
-uploader.stop();
+uploader.start()
+uploader.stop()
 
 // hide the modal if it exists
-uploader.hideModal();
+uploader.hideModal()
 
 // alternatively you could also do it like this
-$el.transloadit('start');
-$el.transloadit('stop');
+$el.transloadit('start')
+$el.transloadit('stop')
 ```
 
 Please consult the [plugin's source code](https://github.com/transloadit/jquery-sdk) to see all available methods.
@@ -686,10 +694,10 @@ before you start to avoid not seeing them merged.
 
 This plugin includes the following dependencies:
 
-* [jquery.jsonp.js](http://code.google.com/p/jquery-jsonp/) by Julian Aubourg (MIT License)
-* [toolbox.expose.js](http://jquerytools.github.io/documentation/toolbox/expose.html) by Tero Piirainen (Public domain)
-* [json2.js](https://cdnjs.cloudflare.com/ajax/libs/json2/20150503/json2.js) by Douglas Crockford (Public domain)
-* [socket.io](https://socket.io) by Guillermo Rauch (MIT License)
+- [jquery.jsonp.js](http://code.google.com/p/jquery-jsonp/) by Julian Aubourg (MIT License)
+- [toolbox.expose.js](http://jquerytools.github.io/documentation/toolbox/expose.html) by Tero Piirainen (Public domain)
+- [json2.js](https://cdnjs.cloudflare.com/ajax/libs/json2/20150503/json2.js) by Douglas Crockford (Public domain)
+- [socket.io](https://socket.io) by Guillermo Rauch (MIT License)
 
 A big thanks goes to the authors of these fantastic projects!
 

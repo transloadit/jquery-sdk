@@ -2,7 +2,7 @@ const helpers = require('./helpers')
 require('../dep/toolbox.expose')
 
 class Modal {
-  constructor ({ i18n, onClose, $ } = {}) {
+  constructor({ i18n, onClose, $ } = {}) {
     this._$modal = null
     this._lastUploadSpeedUpdateOn = 0
     this._uploadRate = null
@@ -15,7 +15,7 @@ class Modal {
     this.$ = $
   }
 
-  reset () {
+  reset() {
     this._uploadRate = null
     this._durationLeft = null
     this._lastUploadSpeedUpdateOn = 0
@@ -23,7 +23,7 @@ class Modal {
     this._animatedTo100 = false
   }
 
-  hide () {
+  hide() {
     this.$.mask.close()
 
     if (!this._$modal) {
@@ -33,7 +33,7 @@ class Modal {
     this._$modal = null
   }
 
-  show () {
+  show() {
     // Make sure to not show a second modal
     if (this._$modal) {
       return
@@ -64,14 +64,14 @@ class Modal {
     ).appendTo('body')
 
     this.$.extend(this._$modal, {
-      $content           : this._$modal.find('.content'),
-      $close             : this._$modal.find('.close'),
-      $label             : this._$modal.find('label'),
-      $progress          : this._$modal.find('.progress'),
-      $percent           : this._$modal.find('.progress .percent'),
-      $progressBar       : this._$modal.find('.progress .bar'),
-      $error             : this._$modal.find('.error'),
-      $errorDetails      : this._$modal.find('.error-details'),
+      $content: this._$modal.find('.content'),
+      $close: this._$modal.find('.close'),
+      $label: this._$modal.find('label'),
+      $progress: this._$modal.find('.progress'),
+      $percent: this._$modal.find('.progress .percent'),
+      $progressBar: this._$modal.find('.progress .bar'),
+      $error: this._$modal.find('.error'),
+      $errorDetails: this._$modal.find('.error-details'),
       $errorDetailsToggle: this._$modal.find('.error-details-toggle'),
     })
 
@@ -80,11 +80,11 @@ class Modal {
     this._$modal.$errorDetailsToggle.hide()
 
     this._$modal.expose({
-      api         : true,
-      maskId      : 'transloadit_expose',
-      opacity     : 0.9,
-      loadSpeed   : 250,
-      closeOnEsc  : false,
+      api: true,
+      maskId: 'transloadit_expose',
+      opacity: 0.9,
+      loadSpeed: 250,
+      closeOnEsc: false,
       closeOnClick: false,
     })
 
@@ -95,7 +95,7 @@ class Modal {
     })
   }
 
-  renderError (err) {
+  renderError(err) {
     if (!this._$modal) {
       return
     }
@@ -119,42 +119,44 @@ class Modal {
     const self = this
     let ip = null
 
-    this.$
-      .getJSON('https://jsonip.com/', ipData => {
-        ip = ipData.ip
-      })
-      .always(() => {
-        const details = {
-          endpoint   : err.url,
-          instance   : err.instance,
-          assembly_id: err.assemblyId,
-          ip,
-          time       : helpers.getUTCDatetime(),
-          agent      : navigator.userAgent,
-          error      : `${err.message} ${err.reason || ''}`,
-        }
-        self.$.post('https://transloaditstatus.com/client_error', details)
+    this.$.getJSON('https://jsonip.com/', (ipData) => {
+      ip = ipData.ip
+    }).always(() => {
+      const details = {
+        endpoint: err.url,
+        instance: err.instance,
+        assembly_id: err.assemblyId,
+        ip,
+        time: helpers.getUTCDatetime(),
+        agent: navigator.userAgent,
+        error: `${err.message} ${err.reason || ''}`,
+      }
+      self.$.post('https://transloaditstatus.com/client_error', details)
 
-        const detailsArr = []
-        for (const key in details) {
-          detailsArr.push(`${key}: ${details[key]}`)
-        }
+      const detailsArr = []
+      for (const key in details) {
+        detailsArr.push(`${key}: ${details[key]}`)
+      }
 
-        const detailsTxt = `${self._i18n.translate('errors.troubleshootDetails')}<br /><br />`
-        self._$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
+      const detailsTxt = `${self._i18n.translate('errors.troubleshootDetails')}<br /><br />`
+      self._$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'))
 
-        self._$modal.$errorDetailsToggle.show().find('a').off('click').on('click', e => {
+      self._$modal.$errorDetailsToggle
+        .show()
+        .find('a')
+        .off('click')
+        .on('click', (e) => {
           e.preventDefault()
           self._$modal.$errorDetails.toggle()
         })
-      })
+    })
   }
 
-  renderCancelling (received, expected) {
+  renderCancelling(received, expected) {
     this._$modal.$label.text(this._i18n.translate('cancelling'))
   }
 
-  renderProgress (received, expected) {
+  renderProgress(received, expected) {
     // this._$modal can actually be gone if cancel was hit in the meantime.
     if (!this._$modal) {
       return
@@ -178,7 +180,7 @@ class Modal {
       return this._renderProcessingFiles()
     }
 
-    let progress = received / expected * 100
+    let progress = (received / expected) * 100
     let progressInt = Math.floor(progress)
     if (progress > 100) {
       progress = 0
@@ -210,9 +212,7 @@ class Modal {
 
     if (!this._animatedTo100 && updateSpeed) {
       const bytesReceived = received - this._bytesReceivedBefore
-      const uploadRate = (bytesReceived / 1024 / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(
-        1
-      )
+      const uploadRate = (bytesReceived / 1024 / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(1)
 
       const outstanding = expected - received
       const speedInBytes = (bytesReceived / (timeSinceLastUploadSpeedUpdate / 1000)).toFixed(1)
@@ -260,26 +260,23 @@ class Modal {
 
     if (progressInt === 100 && !this._animatedTo100) {
       this._animatedTo100 = true
-      setTimeout(
-        () => {
-          // self._$modal can actually be gone if cancel was hit in the meantime
-          if (!self._$modal) {
-            return
-          }
-          self._renderProcessingFiles()
-        },
-        250
-      )
+      setTimeout(() => {
+        // self._$modal can actually be gone if cancel was hit in the meantime
+        if (!self._$modal) {
+          return
+        }
+        self._renderProcessingFiles()
+      }, 250)
     }
   }
 
-  _renderProcessingFiles () {
+  _renderProcessingFiles() {
     this._$modal.$label.text(this._i18n.translate('processingFiles'))
     this._$modal.$progress.addClass('active')
     this._$modal.$percent.text('')
   }
 
-  _setProgressbarPercent (percent) {
+  _setProgressbarPercent(percent) {
     if (percent > 100) {
       percent = 100
     }
@@ -291,7 +288,7 @@ class Modal {
     }
   }
 
-  _toggleErrorTexts (mode) {
+  _toggleErrorTexts(mode) {
     if (!this._$modal) {
       return
     }
@@ -306,7 +303,7 @@ class Modal {
     }
   }
 
-  _toggleProgressTexts (mode) {
+  _toggleProgressTexts(mode) {
     if (!this._$modal) {
       return
     }

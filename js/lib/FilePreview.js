@@ -1,5 +1,5 @@
 class FilePreview {
-  constructor (opts) {
+  constructor(opts) {
     if (!opts) {
       opts = {}
     }
@@ -12,9 +12,9 @@ class FilePreview {
     this._bindEvents()
   }
 
-  _bindEvents () {
+  _bindEvents() {
     const self = this
-    const $    = this.$
+    const $ = this.$
 
     this._$el.on('click', '.remove_file', function (e) {
       e.stopPropagation()
@@ -22,15 +22,15 @@ class FilePreview {
 
       const $li = $(this).parent()
       const file = {
-        size        : $li.data('size'),
-        name        : $li.data('name'),
+        size: $li.data('size'),
+        name: $li.data('name'),
         lastModified: $li.data('lastModified'),
       }
       self.onFileRemove(file)
     })
   }
 
-  addFile (file) {
+  addFile(file) {
     const size = this._niceSize(file.size)
 
     const closeLink = '<a href="#" class="remove_file">Remove</a>'
@@ -47,7 +47,7 @@ class FilePreview {
     $li.data('lastModified', file.lastModified)
   }
 
-  removeFile (file) {
+  removeFile(file) {
     const $ = this.$
 
     this._$ul.find('li').each(function () {
@@ -61,11 +61,11 @@ class FilePreview {
     })
   }
 
-  removeAllFiles (file) {
+  removeAllFiles(file) {
     this._$ul.find('li').remove()
   }
 
-  _niceSize (bytes) {
+  _niceSize(bytes) {
     let result = `${bytes}bytes`
     const aMultiples = ['KB', 'MB', 'GB']
     let nMultiple = 0

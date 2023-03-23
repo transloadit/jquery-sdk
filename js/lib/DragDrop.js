@@ -1,5 +1,5 @@
 class DragDrop {
-  constructor (opts) {
+  constructor(opts) {
     if (!opts) {
       opts = {}
     }
@@ -11,7 +11,7 @@ class DragDrop {
     this._bindEvents()
   }
 
-  _bindEvents () {
+  _bindEvents() {
     this._$el.on('dragenter', this.dragEnterCb.bind(this))
     this._$el.on('dragexit', this.dragExitCb.bind(this))
     this._$el.on('dragover', this.dragOverCb.bind(this))
@@ -19,24 +19,24 @@ class DragDrop {
     this._$el.on('drop', this.dropCb.bind(this))
   }
 
-  dragEnterCb (e) {
+  dragEnterCb(e) {
     e.stopPropagation()
     e.preventDefault()
   }
 
-  dragExitCb (e) {
+  dragExitCb(e) {
     e.stopPropagation()
     e.preventDefault()
     this._$el.removeClass('hover')
   }
 
-  dragOverCb (e) {
+  dragOverCb(e) {
     e.stopPropagation()
     e.preventDefault()
     this._$el.addClass('hover')
   }
 
-  dropCb (e) {
+  dropCb(e) {
     e.stopPropagation()
     e.preventDefault()
     this._$el.removeClass('hover')

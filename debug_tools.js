@@ -1,10 +1,10 @@
-function pad (n, width, z) {
+function pad(n, width, z) {
   z = z || '0'
   n = n + ''
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n
 }
 
-function timeDump (msg) {
+function timeDump(msg) {
   var now = new Date()
   var h = pad(now.getHours(), 2)
   var min = pad(now.getMinutes(), 2)
