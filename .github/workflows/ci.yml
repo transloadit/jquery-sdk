@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - uses: sergioramos/yarn-actions/install@main
+      - uses: sergioramos/yarn-actions/install@master
         with:
           frozen-lockfile: true
       - name: Install playwright dependencies
