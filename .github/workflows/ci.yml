@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 1
       - uses: actions/setup-node@master
         with:
-          node-version: 12.x
+          node-version: 18.x
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "##[set-output name=dir;]$(yarn cache dir)"
