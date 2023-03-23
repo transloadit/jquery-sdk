@@ -65,7 +65,10 @@ casper.on('step.complete', function (page) {
   }
 
   return this.test.assertEval(
-    () => !$('div.container').text().match(/(warning|error|exception|unable|could not)/i),
-    `no errors texts in ${u}`
+    () =>
+      !$('div.container')
+        .text()
+        .match(/(warning|error|exception|unable|could not)/i),
+    `no errors texts in ${u}. text=${$('div.container').text()}`
   )
 })

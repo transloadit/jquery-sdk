@@ -68,7 +68,7 @@ pushd "${__dir}"
     fi
   done
 
-popd "${__dir}"
+popd
 
 curl http://${testhost}/shutdown || true
 
