@@ -6,14 +6,14 @@ import readline from 'readline'
 
 const BASE_URL = `http://localhost:3000`
 
-async function delay (ms) {
+async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function pause () {
+async function pause() {
   return new Promise((resolve) => {
     const rl = readline.createInterface({
-      input : process.stdin,
+      input: process.stdin,
       output: process.stdout,
     })
     rl.question('Hanging for debugging purposes, press any key to exit ', (answer) => {
@@ -62,18 +62,16 @@ test.describe('e2e', async () => {
 
     page.on('pageerror', (exception) => {
       console.error({
-        name : exception.name,
-        text : exception.message,
-        type : `exception`,
+        name: exception.name,
+        text: exception.message,
+        type: `exception`,
         stack: exception.stack,
       })
       throw new Error(`Above pageerror Happened`)
     })
   })
 
-  test('simple image resize', async ({
-    page,
-  }) => {
+  test('simple image resize', async ({ page }) => {
     try {
       await page.goto(`${BASE_URL}/`)
       const fixturePath = await page.textContent('#fixture_path')
@@ -95,9 +93,7 @@ test.describe('e2e', async () => {
     }
   })
 
-  test('trigger upload on file selection', async ({
-    page,
-  }) => {
+  test('trigger upload on file selection', async ({ page }) => {
     try {
       await page.goto(`${BASE_URL}/trigger-on-file-select`)
       const fixturePath = await page.textContent('#fixture_path')

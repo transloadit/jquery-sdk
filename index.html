@@ -9,78 +9,77 @@
       <div class="transloadit-drop-area" data-name="files">Drag and drop files here</div>
       <div class="transloadit-file-preview-area"></div>
       <input type="text" name="album_id" value="foo_id" />
-      <input type="submit" value="Upload">
+      <input type="submit" value="Upload" />
     </form>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="http://localjquerysdk.com/build/jquery.transloadit2-v3-latest.js"></script>
     <!-- <script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script> -->
 
-
     <script type="text/javascript">
-    window.YOUR_TRANSLOADIT_AUTH_KEY='YOUR_AUTH_KEY'
+      window.YOUR_TRANSLOADIT_AUTH_KEY = 'YOUR_AUTH_KEY'
     </script>
     <script src="http://localjquerysdk.com/auth_key.js"></script>
 
     <script type="text/javascript">
-    $(function() {
-      $('#upload-form').transloadit({
-        wait: true,
-        requireUploadMetaData: false,
-        processZeroFiles: false,
-        autoSubmit: false,
-        // service: 'http://vbox.transloadit.com/',
-        // service: 'http://api2-malaeka.transloadit.com/',
-        // region: 'eu-west-1',
-        // assets: 'http://localjquerysdk.com/build/',
-        triggerUploadOnFileSelection: true,
-        pollInterval: 2500,
-        maxNumberOfUploadedFiles: 2,
-        fields: '*',
-        translations: {
-          'startingUpload' : 'Starting the upload ...',
-          'processingFiles' : 'Upload done, now processing files ...',
-        },
-        params: {
-          auth: { key: window.YOUR_TRANSLOADIT_AUTH_KEY },
-          steps: {
-            resize_to_75: {
-              robot: "/image/resize",
-              use: ":original",
-              width: 75,
-              height: 75
-            }
-          }
-        },
-        onStart: function (assembly) {
-          console.log(">>> onStart", assembly);
-        },
-        onProgress: function (bytesIn, totalBytes) {
-          console.log(bytesIn, totalBytes);
-        },
-        onSuccess: function (assembly) {
-          console.log('onSuccess: Assembly finished successfully with', assembly.ok);
-        },
-        onExecuting: function () {
-          console.log('Uploading finished!');
-        },
-        onUpload: function (uploadedFile) {
-          console.log('Upload added', uploadedFile);
-        },
-        onResult: function (stepName, result) {
-          console.log('Result added', stepName, result);
-        },
-        onError: function (error) {
-          console.log('Assembly got an error:', error);
-        },
-        onDisconnect: function () {
-          console.log('Disconnected!');
-        },
-        onReconnect: function (error) {
-          console.log('Reconnected!');
-        }
-      });
-    });
+      $(function () {
+        $('#upload-form').transloadit({
+          wait: true,
+          requireUploadMetaData: false,
+          processZeroFiles: false,
+          autoSubmit: false,
+          // service: 'http://vbox.transloadit.com/',
+          // service: 'http://api2-malaeka.transloadit.com/',
+          // region: 'eu-west-1',
+          // assets: 'http://localjquerysdk.com/build/',
+          triggerUploadOnFileSelection: true,
+          pollInterval: 2500,
+          maxNumberOfUploadedFiles: 2,
+          fields: '*',
+          translations: {
+            startingUpload: 'Starting the upload ...',
+            processingFiles: 'Upload done, now processing files ...',
+          },
+          params: {
+            auth: { key: window.YOUR_TRANSLOADIT_AUTH_KEY },
+            steps: {
+              resize_to_75: {
+                robot: '/image/resize',
+                use: ':original',
+                width: 75,
+                height: 75,
+              },
+            },
+          },
+          onStart: function (assembly) {
+            console.log('>>> onStart', assembly)
+          },
+          onProgress: function (bytesIn, totalBytes) {
+            console.log(bytesIn, totalBytes)
+          },
+          onSuccess: function (assembly) {
+            console.log('onSuccess: Assembly finished successfully with', assembly.ok)
+          },
+          onExecuting: function () {
+            console.log('Uploading finished!')
+          },
+          onUpload: function (uploadedFile) {
+            console.log('Upload added', uploadedFile)
+          },
+          onResult: function (stepName, result) {
+            console.log('Result added', stepName, result)
+          },
+          onError: function (error) {
+            console.log('Assembly got an error:', error)
+          },
+          onDisconnect: function () {
+            console.log('Disconnected!')
+          },
+          onReconnect: function (error) {
+            console.log('Reconnected!')
+          },
+        })
+      })
     </script>
   </body>
 </html>

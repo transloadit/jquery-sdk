@@ -15,38 +15,40 @@ const InternetConnectionChecker = require('./InternetConnectionChecker')
 const I18n = require('./I18n')
 const tus = require('tus-js-client')
 
-!($ => {
+!(($) => {
   const OPTIONS = {
-    service                     : null,
-    region                      : null,
-    assets                      : 'https://assets.transloadit.com/',
-    protocol                    : 'https://',
-    beforeStart                 : function () { return true },
-    onFileSelect                : function () { },
-    onStart                     : function () { },
-    onExecuting                 : function () { },
-    onProgress                  : function () { },
-    onUpload                    : function () { },
-    onResult                    : function () { },
-    onCancel                    : function () { },
-    onError                     : function () { },
-    onSuccess                   : function () { },
-    onDisconnect                : function () { },
-    onReconnect                 : function () { },
-    wait                        : false,
-    processZeroFiles            : true,
+    service: null,
+    region: null,
+    assets: 'https://assets.transloadit.com/',
+    protocol: 'https://',
+    beforeStart: function () {
+      return true
+    },
+    onFileSelect: function () {},
+    onStart: function () {},
+    onExecuting: function () {},
+    onProgress: function () {},
+    onUpload: function () {},
+    onResult: function () {},
+    onCancel: function () {},
+    onError: function () {},
+    onSuccess: function () {},
+    onDisconnect: function () {},
+    onReconnect: function () {},
+    wait: false,
+    processZeroFiles: true,
     triggerUploadOnFileSelection: false,
-    requireUploadMetaData       : false,
-    autoSubmit                  : true,
-    modal                       : true,
-    exclude                     : '',
-    fields                      : false,
-    params                      : null,
-    signature                   : null,
-    locale                      : 'en',
-    translations                : null,
-    maxNumberOfUploadedFiles    : -1,
-    debug                       : true,
+    requireUploadMetaData: false,
+    autoSubmit: true,
+    modal: true,
+    exclude: '',
+    fields: false,
+    params: null,
+    signature: null,
+    locale: 'en',
+    translations: null,
+    maxNumberOfUploadedFiles: -1,
+    debug: true,
   }
 
   let CSS_LOADED = false
@@ -68,7 +70,7 @@ const tus = require('tus-js-client')
       return
     }
 
-    if (args.length === 1 && typeof args[0] === 'object' || args[0] === undefined) {
+    if ((args.length === 1 && typeof args[0] === 'object') || args[0] === undefined) {
       args.unshift('init')
     }
 
@@ -90,7 +92,7 @@ const tus = require('tus-js-client')
   }
 
   class Uploader {
-    constructor ({ $ }) {
+    constructor({ $ }) {
       this._service = null
 
       this._assembly = null
@@ -120,9 +122,9 @@ const tus = require('tus-js-client')
       this.$ = $
     }
 
-    init ($form, options) {
+    init($form, options) {
       const self = this
-      const $    = this.$
+      const $ = this.$
       this.options($.extend({}, OPTIONS, options || {}))
 
       this._initI18n()
@@ -159,7 +161,7 @@ const tus = require('tus-js-client')
       this.includeCss()
     }
 
-    start () {
+    start() {
       this._xhr = null
       this._ended = false
       this._fileCount = 0
@@ -205,20 +207,20 @@ const tus = require('tus-js-client')
       })
     }
 
-    _setupAssemblyObj (assemblyStatus) {
+    _setupAssemblyObj(assemblyStatus) {
       const self = this
 
       this._assembly = new Assembly({
-        status  : assemblyStatus,
-        i18n    : this._i18n,
+        status: assemblyStatus,
+        i18n: this._i18n,
         protocol: this._options.protocol,
-        service : this._service,
-        $       : this.$,
+        service: this._service,
+        $: this.$,
 
-        wait                 : this._options['wait'],
+        wait: this._options['wait'],
         requireUploadMetaData: this._options['requireUploadMetaData'],
 
-        onExecuting () {
+        onExecuting() {
           // If the assembly is executing meaning all uploads are done, we will not get more progress
           // events from XHR. But if there was a connection interruption in the meantime, we want to
           // make sure all components (like the modal) now know that the error is gone.
@@ -227,7 +229,7 @@ const tus = require('tus-js-client')
           assemblyStatus.ok = 'ASSEMBLY_EXECUTING'
           self._options.onExecuting(assemblyStatus)
         },
-        onSuccess (assemblyResult) {
+        onSuccess(assemblyResult) {
           self._ended = true
           self._options.onSuccess(assemblyResult)
           self.reset()
@@ -237,19 +239,19 @@ const tus = require('tus-js-client')
           }
           self.submitForm(assemblyResult)
         },
-        onCancel (assemblyResult) {
+        onCancel(assemblyResult) {
           self._ended = true
           self._options.onCancel(assemblyResult)
         },
-        onError (assemblyObjContainingError) {
+        onError(assemblyObjContainingError) {
           self._errorOut(assemblyObjContainingError)
         },
-        onUpload (upload) {
+        onUpload(upload) {
           if (!self._ended) {
             self._options.onUpload(upload)
           }
         },
-        onResult (step, result) {
+        onResult(step, result) {
           if (!self._ended) {
             self._options.onResult(step, result)
           }
@@ -257,9 +259,9 @@ const tus = require('tus-js-client')
       })
     }
 
-    _startUploading (assemblyStatus) {
+    _startUploading(assemblyStatus) {
       const self = this
-      this._assembly.init(err => {
+      this._assembly.init((err) => {
         if (err) {
           return self._errorOut(err)
         }
@@ -284,7 +286,7 @@ const tus = require('tus-js-client')
       })
     }
 
-    _createAssembly (cb = () => {}) {
+    _createAssembly(cb = () => {}) {
       const self = this
       this._formData = this._prepareFormData()
       this._formData.append('tus_num_expected_upload_files', this._fileCount)
@@ -295,7 +297,7 @@ const tus = require('tus-js-client')
       // We need this to control retries/resumes
       this._xhr = true
 
-      const f   = new XMLHttpRequest()
+      const f = new XMLHttpRequest()
       // The redirect=false is necessary, otherwise we will get a response header with
       // Location: [[redirect_url]]?some_parameters_like_assembly_id, which screws up the
       // XHR request.
@@ -310,9 +312,9 @@ const tus = require('tus-js-client')
           } catch (e) {
             let errMsg = 'errors.SERVER_CONNECTION_ERROR'
             var err = {
-              error  : 'SERVER_CONNECTION_ERROR',
+              error: 'SERVER_CONNECTION_ERROR',
               message: self._i18n.translate(errMsg),
-              url    : url,
+              url: url,
             }
 
             return cb(err)
@@ -330,7 +332,7 @@ const tus = require('tus-js-client')
       f.send(this._formData)
     }
 
-    _addResumableUpload (nameAttr, file) {
+    _addResumableUpload(nameAttr, file) {
       const self = this
       // We need to force HTTPS in this case, because - only if the website is on
       // plain HTTP - the response to the CORS preflight request, will contain a
@@ -361,19 +363,19 @@ const tus = require('tus-js-client')
         //    the Uploader object gets destroyed (for example, if the page is
         //    reloaded) so we do not know to which assembly a file belongs and
         //    more.
-        resume  : false,
+        resume: false,
         metadata: {
-          fieldname   : nameAttr,
-          filename    : file.name,
+          fieldname: nameAttr,
+          filename: file.name,
           assembly_url: assemblyUrl,
         },
         retryDelays: [0, 1000, 3000, 5000],
-        fingerprint (file) {
+        fingerprint(file) {
           // Fingerprinting is not necessary any more since we have disabled
           // the resuming of previous uploads.
           throw new Error('fingerprinting should not happend')
         },
-        onError (error) {
+        onError(error) {
           self._xhr = false
           // If this is not a connection problem, bubble up the error.
           // Otherwise if this is a connection problem, we will have our own error handling for it.
@@ -381,10 +383,10 @@ const tus = require('tus-js-client')
             self._errorOut(error)
           }
         },
-        onSuccess () {
+        onSuccess() {
           self._xhr = false
         },
-        onProgress (bytesUploaded, bytesTotal) {
+        onProgress(bytesUploaded, bytesTotal) {
           // Calculate the number of uploaded bytes of all uploads by removing
           // the last known value and then adding the new value.
           self._uploadedBytes = self._uploadedBytes - lastBytesUploaded + bytesUploaded
@@ -399,7 +401,7 @@ const tus = require('tus-js-client')
       return upload
     }
 
-    _prepareFormData () {
+    _prepareFormData() {
       let assemblyParams = this._options.params
       if (this._$params) {
         assemblyParams = this._$params.val()
@@ -423,7 +425,7 @@ const tus = require('tus-js-client')
       return result
     }
 
-    _updateInputFileSelection ($input) {
+    _updateInputFileSelection($input) {
       const files = $input[0].files
       const name = $input.attr('name')
       if (!name) {
@@ -455,7 +457,7 @@ const tus = require('tus-js-client')
       }
     }
 
-    _countAddedFilesAndSizes () {
+    _countAddedFilesAndSizes() {
       this._fileCount = 0
       this._fileSizes = 0
 
@@ -467,10 +469,10 @@ const tus = require('tus-js-client')
       }
     }
 
-    _appendFilteredFormFields () {
+    _appendFilteredFormFields() {
       const $fields = this._getFilteredFormFields()
       const self = this
-      const $    = this.$
+      const $ = this.$
 
       $fields.each(function () {
         const name = $(this).attr('name')
@@ -485,7 +487,7 @@ const tus = require('tus-js-client')
       })
     }
 
-    _checkFileCountExceeded () {
+    _checkFileCountExceeded() {
       if (this._options.maxNumberOfUploadedFiles === -1) {
         return true
       }
@@ -493,7 +495,7 @@ const tus = require('tus-js-client')
       if (this._fileCount > this._options.maxNumberOfUploadedFiles) {
         const max = this._options.maxNumberOfUploadedFiles
         const err = {
-          error  : 'MAX_FILES_EXCEEDED',
+          error: 'MAX_FILES_EXCEEDED',
           message: this._i18n.translate('errors.MAX_FILES_EXCEEDED', max),
         }
         this._errorOut(err)
@@ -503,7 +505,7 @@ const tus = require('tus-js-client')
       return true
     }
 
-    _appendCustomFormData () {
+    _appendCustomFormData() {
       if (!this._options.formData) {
         return
       }
@@ -514,7 +516,7 @@ const tus = require('tus-js-client')
       }
     }
 
-    _getFilteredFormFields () {
+    _getFilteredFormFields() {
       let fieldsFilter = '[name=params], [name=signature]'
       if (this._options.fields === true) {
         fieldsFilter = '*'
@@ -532,11 +534,11 @@ const tus = require('tus-js-client')
       return $fields.filter(fieldsFilter)
     }
 
-    stop () {
+    stop() {
       this._ended = true
     }
 
-    reset () {
+    reset() {
       this._files = {}
       this._resumableUploads = []
       this._fileCount = 0
@@ -547,25 +549,25 @@ const tus = require('tus-js-client')
       }
     }
 
-    unbindEvents () {
+    unbindEvents() {
       this._$form.unbind('submit.transloadit')
       this._$inputs.unbind('change.transloadit')
     }
 
-    destroy () {
+    destroy() {
       this.stop()
       this.reset()
       this.unbindEvents()
       this._$form.data('transloadit.uploader', null)
     }
 
-    cancel () {
+    cancel() {
       this._formData = this._prepareFormData()
       this._abortUpload()
       this.reset()
 
       const self = this
-      function hideModal () {
+      function hideModal() {
         if (self._options.modal) {
           self._modal.hide()
         }
@@ -588,7 +590,7 @@ const tus = require('tus-js-client')
       }
     }
 
-    submitForm (assemblyData) {
+    submitForm(assemblyData) {
       // prevent that files are uploaded to the final destination
       // after all that is what we use this plugin for :)
       if (this._$form.attr('enctype') === 'multipart/form-data') {
@@ -608,7 +610,7 @@ const tus = require('tus-js-client')
       }
     }
 
-    validate () {
+    validate() {
       if (!this._options.params) {
         const $params = this._$form.find('input[name=params]')
         if (!$params.length) {
@@ -650,7 +652,7 @@ const tus = require('tus-js-client')
       }
     }
 
-    _renderError (err) {
+    _renderError(err) {
       if (!this._options.modal) {
         return
       }
@@ -667,12 +669,12 @@ const tus = require('tus-js-client')
       this._modal.renderError(err)
     }
 
-    _detectFileInputs () {
+    _detectFileInputs() {
       let $inputs = this._$form.find('input[type=file]').not(this._options.exclude)
       this._$inputs = $inputs
     }
 
-    _renderProgress (received, expected) {
+    _renderProgress(received, expected) {
       if (!this._options.modal) {
         return
       }
@@ -687,7 +689,7 @@ const tus = require('tus-js-client')
       this._modal.renderProgress(received, expected)
     }
 
-    includeCss () {
+    includeCss() {
       if (CSS_LOADED) {
         return
       }
@@ -698,7 +700,7 @@ const tus = require('tus-js-client')
       ).appendTo('head')
     }
 
-    _errorOut (err) {
+    _errorOut(err) {
       if (!err.message) {
         err.message = this._i18n.translate(`errors.${err.error}`)
       }
@@ -717,7 +719,7 @@ const tus = require('tus-js-client')
       this._abortUpload()
     }
 
-    _abortUpload () {
+    _abortUpload() {
       if (this._xhr && typeof this._xhr.abort === 'function') {
         this._xhr.abort()
       }
@@ -728,35 +730,35 @@ const tus = require('tus-js-client')
       }
     }
 
-    _initI18n () {
+    _initI18n() {
       this._i18n = new I18n(this._locale, this._options.translations)
     }
 
-    _initModal () {
+    _initModal() {
       const self = this
       this._modal = new Modal({
-        onClose () {
+        onClose() {
           self.cancel()
         },
         i18n: this._i18n,
-        $   : this.$,
+        $: this.$,
       })
     }
 
-    _initDragAndDrop () {
+    _initDragAndDrop() {
       const $dropAreas = this._$form.find('.transloadit-drop-area')
       if ($dropAreas.length === 0) {
         return
       }
 
       const self = this
-      const $    = this.$
+      const $ = this.$
       let i = 0
       $dropAreas.each(function () {
         const name = $(this).data('name') || 'files'
 
         self._dragDropObjects[i] = new DragDrop({
-          onFileAdd (file) {
+          onFileAdd(file) {
             if (self._files[name]) {
               self._files[name].push(file)
             } else {
@@ -766,7 +768,7 @@ const tus = require('tus-js-client')
             self._options.onFileSelect(file, $(this))
             self._addFileToPreviewAreas(file)
           },
-          onDrop () {
+          onDrop() {
             if (self._options.triggerUploadOnFileSelection) {
               self._$form.trigger('submit.transloadit')
             }
@@ -777,21 +779,21 @@ const tus = require('tus-js-client')
       })
     }
 
-    _initFilePreview () {
+    _initFilePreview() {
       const $previewAreas = this._$form.find('.transloadit-file-preview-area')
       if ($previewAreas.length === 0) {
         return
       }
 
       const self = this
-      const $    = this.$
+      const $ = this.$
       let i = 0
       $previewAreas.each(function () {
         // const name = $(this).data('name') || 'files'
 
         self._previewAreaObjects[i] = new FilePreview({
           $: self.$,
-          onFileRemove (file) {
+          onFileRemove(file) {
             self._removeFileFromFormData(file)
             self._removeFileFromPreviewAreas(file)
           },
@@ -801,19 +803,19 @@ const tus = require('tus-js-client')
       })
     }
 
-    _addFileToPreviewAreas (file) {
+    _addFileToPreviewAreas(file) {
       for (let i = 0; i < this._previewAreaObjects.length; i++) {
         this._previewAreaObjects[i].addFile(file)
       }
     }
 
-    _removeFileFromPreviewAreas (file) {
+    _removeFileFromPreviewAreas(file) {
       for (let i = 0; i < this._previewAreaObjects.length; i++) {
         this._previewAreaObjects[i].removeFile(file)
       }
     }
 
-    _removeFileFromFormData (file) {
+    _removeFileFromFormData(file) {
       for (let i = 0; i < this._previewAreaObjects.length; i++) {
         this._previewAreaObjects[i].removeFile(file)
       }
@@ -834,11 +836,11 @@ const tus = require('tus-js-client')
       }
     }
 
-    _initInternetConnectionChecker () {
+    _initInternetConnectionChecker() {
       const self = this
 
       this._internetConnectionChecker = new InternetConnectionChecker({
-        onDisconnect () {
+        onDisconnect() {
           self._isOnline = false
           let errorType = 'INTERNET_CONNECTION_ERROR_UPLOAD_IN_PROGRESS'
 
@@ -847,7 +849,7 @@ const tus = require('tus-js-client')
           }
 
           const err = {
-            error  : errorType,
+            error: errorType,
             message: self._i18n.translate(`errors.${errorType}`),
           }
           self._renderError(err)
@@ -857,7 +859,7 @@ const tus = require('tus-js-client')
           }
           self._options.onDisconnect()
         },
-        onReconnect () {
+        onReconnect() {
           self._isOnline = true
 
           if (self._xhr && !self._options.resumable) {
@@ -881,7 +883,7 @@ const tus = require('tus-js-client')
       this._internetConnectionChecker.start()
     }
 
-    _getService () {
+    _getService() {
       if (this._options.service) {
         const len = this._options.service.length
         if (this._options.service[len - 1] !== '/') {
@@ -897,7 +899,7 @@ const tus = require('tus-js-client')
       return result
     }
 
-    options (options) {
+    options(options) {
       if (arguments.length === 0) {
         return this._options
       }
@@ -905,7 +907,7 @@ const tus = require('tus-js-client')
       this.$.extend(this._options, options)
     }
 
-    option (key, val) {
+    option(key, val) {
       if (arguments.length === 1) {
         return this._options[key]
       }

@@ -1,5 +1,5 @@
 const helpers = {
-  getUTCDatetime () {
+  getUTCDatetime() {
     const now = new Date()
     const dateObj = new Date(
       now.getUTCFullYear(),
@@ -10,7 +10,7 @@ const helpers = {
       now.getUTCSeconds()
     )
 
-    const zeroPad = numberToPad => numberToPad < 10 ? `0${numberToPad}` : numberToPad
+    const zeroPad = (numberToPad) => (numberToPad < 10 ? `0${numberToPad}` : numberToPad)
 
     const timezoneOffset = dateObj.getTimezoneOffset()
     let tzs = (timezoneOffset > 0 ? '-' : '+') + zeroPad(parseInt(timezoneOffset / 60, 10))
@@ -29,7 +29,7 @@ const helpers = {
       dateObj.getSeconds()
     )}${tzs}`
   },
-  duration (t) {
+  duration(t) {
     const min = 60
     const h = 60 * min
     const hours = Math.floor(t / h)
@@ -57,7 +57,7 @@ const helpers = {
 
     return r
   },
-  sprintf (str, args = []) {
+  sprintf(str, args = []) {
     return str.replace(/(%[s])/g, (m, i, s) => {
       const arg = args.shift()
       if (!arg && arg !== 0) {

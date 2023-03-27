@@ -1,53 +1,54 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>
-    Tranloadit Upload example
-  </title>
+  <head>
+    <title>Tranloadit Upload example</title>
 
-  <style type="text/css">
-    .center {
-      text-align: center;
-      margin: 0 auto;
-    }
-  </style>
-</head>
-<body>
-  <div class="center">
-    <form id="upload-form">
-      <h1>SELECT A FILE TO UPLOAD</h1>
-      <input type="file" name="upload">
-    </form>
-    <hr>
-    <img class="result">
-  </div>
-</body>
-
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
-<script type="text/javascript">
-  // We call .transloadit() after the DOM is initialized:
-  $(function() {
-    $('#upload-form').transloadit({
-      wait: true,
-      fields: true,
-      autoSubmit: false,
-      triggerUploadOnFileSelection: true,
-      params: {
-        auth: { key: 'YOUR_TRANSLOADIT_KEY' },
-        steps: {
-          resize_to_150: {
-            robot: '/image/resize',
-            use: ':original',
-            width: 150,
-            height: 150
-          }
-        }
-      },
-      onResult: function(step, result) {
-        $('.result').attr('src', result.ssl_url)
+    <style type="text/css">
+      .center {
+        text-align: center;
+        margin: 0 auto;
       }
-    });
-  });
-</script>
+    </style>
+  </head>
+  <body>
+    <div class="center">
+      <form id="upload-form">
+        <h1>SELECT A FILE TO UPLOAD</h1>
+        <input type="file" name="upload" />
+      </form>
+      <hr />
+      <img class="result" />
+    </div>
+  </body>
+
+  <script
+    type="text/javascript"
+    src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"
+  ></script>
+  <script src="https://assets.transloadit.com/js/jquery.transloadit2-v3-latest.js"></script>
+  <script type="text/javascript">
+    // We call .transloadit() after the DOM is initialized:
+    $(function () {
+      $('#upload-form').transloadit({
+        wait: true,
+        fields: true,
+        autoSubmit: false,
+        triggerUploadOnFileSelection: true,
+        params: {
+          auth: { key: 'YOUR_TRANSLOADIT_KEY' },
+          steps: {
+            resize_to_150: {
+              robot: '/image/resize',
+              use: ':original',
+              width: 150,
+              height: 150,
+            },
+          },
+        },
+        onResult: function (step, result) {
+          $('.result').attr('src', result.ssl_url)
+        },
+      })
+    })
+  </script>
 </html>

@@ -1,15 +1,15 @@
 var io = require('socket.io-client')
 require('../dep/jquery.jsonp')
 
-function Assembly (opts) {
+function Assembly(opts) {
   this._status = opts.status
 
-  this._id           = this._status.assembly_id
-  this._httpUrl      = this._status.assembly_url
-  this._httpsUrl     = this._status.assembly_ssl_url
-  this._tusUrl       = this._status.tus_url
+  this._id = this._status.assembly_id
+  this._httpUrl = this._status.assembly_url
+  this._httpsUrl = this._status.assembly_ssl_url
+  this._tusUrl = this._status.tus_url
   this._websocketUrl = this._status.websocket_url
-  this._instance     = this._status.instance
+  this._instance = this._status.instance
 
   this._instance = opts.instance
   this._service = opts.service
@@ -51,12 +51,13 @@ Assembly.prototype.init = function (cb) {
   this._createSocket(function () {
     cb()
 
-    var canFinish = self._status.ok !== 'ASSEMBLY_UPLOADING' && self._status.ok !== 'ASSEMBLY_EXECUTING'
+    var canFinish =
+      self._status.ok !== 'ASSEMBLY_UPLOADING' && self._status.ok !== 'ASSEMBLY_EXECUTING'
     canFinish = canFinish || typeof self._status.error !== 'undefined'
 
     if (canFinish) {
       self._finished = true
-      self._ended    = true
+      self._ended = true
       self._handleSuccessfulPoll(self._status)
     }
   })
@@ -98,12 +99,12 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
   var attemptCount = 0
   this._inAssemblyRequest = true
 
-  function attempt () {
+  function attempt() {
     self.$.jsonp({
-      url              : url,
-      timeout          : 8000,
+      url: url,
+      timeout: 8000,
       callbackParameter: 'callback',
-      success          : function (assembly) {
+      success: function (assembly) {
         self._handleSuccessfulPoll(assembly)
         self._inAssemblyRequest = false
         cb()
@@ -139,7 +140,8 @@ Assembly.prototype._handleSuccessfulPoll = function (assembly) {
   if (assembly.error || assembly.ok === 'REQUEST_ABORTED') {
     if (assembly.ok === 'REQUEST_ABORTED') {
       assembly.error = 'REQUEST_ABORTED'
-      assembly.msg = 'Your internet connection is flaky and was offline for at least a moment. Please try again.'
+      assembly.msg =
+        'Your internet connection is flaky and was offline for at least a moment. Please try again.'
     }
 
     this._end()
@@ -172,7 +174,7 @@ Assembly.prototype._end = function () {
 
 Assembly.prototype._createSocket = function (cb) {
   let split = this._websocketUrl.split('/')
-  this._socket = io.connect(this._protocol + split[2], {path: '/' + split[3]})
+  this._socket = io.connect(this._protocol + split[2], { path: '/' + split[3] })
 
   var cbCalled = false
   var self = this
@@ -194,7 +196,7 @@ Assembly.prototype._createSocket = function (cb) {
     }
 
     if (!cbCalled) {
-      self._socket.emit('assembly_connect', {id: self._id})
+      self._socket.emit('assembly_connect', { id: self._id })
       cbCalled = true
       cb()
     }
@@ -274,9 +276,9 @@ Assembly.prototype._connectionError = function (retriesExhausted) {
   }
 
   var err = {
-    error  : 'SERVER_CONNECTION_ERROR',
+    error: 'SERVER_CONNECTION_ERROR',
     message: this._i18n.translate(errMsg),
-    url    : this._service,
+    url: this._service,
   }
 
   return err
