@@ -534,7 +534,6 @@ __metadata:
     "@vitest/coverage-v8": "npm:^2.1.1"
     babel-cli: "npm:6.26.0"
     babel-core: "npm:6.26.3"
-    babel-eslint: "npm:7.2.3"
     babel-plugin-add-module-exports: "npm:0.2.1"
     babel-plugin-es6-promise: "npm:1.1.1"
     babel-plugin-syntax-async-functions: "npm:6.13.0"
@@ -1034,18 +1033,6 @@ __metadata:
     slash: "npm:^1.0.0"
     source-map: "npm:^0.5.0"
   checksum: 10c0/151d7202715f026267029a93c38602305094ab3f08e9c4734302b0a0d07d4eea76c145ecc1c25031d70e7641afda0b1970daecec8ea94577a894c7f399695481
-  languageName: node
-  linkType: hard
-
-"babel-eslint@npm:7.2.3":
-  version: 7.2.3
-  resolution: "babel-eslint@npm:7.2.3"
-  dependencies:
-    babel-code-frame: "npm:^6.22.0"
-    babel-traverse: "npm:^6.23.1"
-    babel-types: "npm:^6.23.0"
-    babylon: "npm:^6.17.0"
-  checksum: 10c0/8d0374db05c4ae96d7be459eb0d6d48c29f91eb0bdd966071af4df0ddf1741bffd7e548b5fbc28d6dec9e3bcb8761fcd0a8f8f07adf463002cb2d37cc37e3d4a
   languageName: node
   linkType: hard
 
@@ -1719,7 +1706,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babylon@npm:^6.17.0, babylon@npm:^6.18.0":
+"babylon@npm:^6.18.0":
   version: 6.18.0
   resolution: "babylon@npm:6.18.0"
   bin:
