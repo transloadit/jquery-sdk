@@ -29,23 +29,6 @@ jobs:
       - uses: sergioramos/yarn-actions/install@master
         with:
           frozen-lockfile: true
-      - name: Install playwright dependencies
-        run: |
-          sudo -HE env DEBIAN_FRONTEND=noninteractive apt-get --option Dpkg::Options::=--force-confnew -qy --no-install-recommends --allow-downgrades --allow-remove-essential --allow-change-held-packages install \
-            fonts-ipafont-gothic \
-            fonts-liberation \
-            fonts-tlwg-loma-otf \
-            fonts-wqy-zenhei \
-            libdrm2 \
-            libfontconfig \
-            libfreetype6 \
-            libgbm1 \
-            msttcorefonts \
-            ttf-ubuntu-font-family \
-            xfonts-cyrillic \
-            xfonts-scalable \
-          && true
-          npx playwright install --with-deps chromium
       - name: Lint
         run: yarn lint
       - name: Build
@@ -54,11 +37,12 @@ jobs:
         run: yarn test:unit
       - name: E2E Test
         env:
-          TRANSLOADIT_ACCESS_KEY: "${{ secrets.TRANSLOADIT_ACCESS_KEY }}"
+          TRANSLOADIT_ACCESS_KEY: '${{ secrets.TRANSLOADIT_ACCESS_KEY }}'
         run: |
           if [ -z "$TRANSLOADIT_ACCESS_KEY" ]; then
             echo "TRANSLOADIT_ACCESS_KEY is not set. Skipping E2E tests."
           else
+            npx playwright install --with-deps chromium
             yarn test:e2e
           fi
       - name: Upload Coverage Report
