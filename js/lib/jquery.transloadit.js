@@ -289,6 +289,13 @@ const tus = require('tus-js-client')
     _createAssembly(cb = () => {}) {
       const self = this
       this._formData = this._prepareFormData()
+
+      // Add this check
+      if (!this._formData) {
+        console.error('FormData is undefined in _createAssembly')
+        return cb(new Error('FormData initialization failed'))
+      }
+
       this._formData.append('tus_num_expected_upload_files', this._fileCount)
 
       this._appendFilteredFormFields()
