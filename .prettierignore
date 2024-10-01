@@ -3,3 +3,4 @@ flow/
 js/dep/
 node_modules/
 tests/fixtures/
+test-results/
