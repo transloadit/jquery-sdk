@@ -2,8 +2,6 @@ const http = require('http')
 const querystring = require('querystring')
 const fs = require('fs')
 const path = require('path')
-// var debug = require('debug')('tlj:testserver')
-// var util = require('util')
 
 if (!process.env.TRANSLOADIT_ACCESS_KEY) {
   console.error('process.env.TRANSLOADIT_ACCESS_KEY not found. Did you source env.sh ?')
