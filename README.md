@@ -1,6 +1,6 @@
 # DEPRECATED
 
-> <https://uppy.io> is Transloadit's current browser integration that works with any framework including jQuery.
+> <https://uppy.io> is Transloadit's current browser integration that works with any framework including jQuery. Please use that instead of our jQuery SDK, as this project will not receive maintenance anymore. Uppy also offers many features beyond what this SDK is capable of.
 
 # Transloadit jQuery SDK
 
