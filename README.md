@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/transloadit/jquery-sdk.svg)](https://travis-ci.org/transloadit/jquery-sdk)
+# DEPRECATED
 
-> Warning: We recommend using [Uppy](https://uppy.io/docs/robodog/form/#Migrating-From-the-jQuery-SDK) instead of the jQuery SDK these days.
+> <https://uppy.io> is Transloadit's current browser integration that works with any framework including jQuery.
 
 # Transloadit jQuery SDK
 
