@@ -6,3 +6,4 @@ env.sh
 auth_key.js
 flow-osx-latest.zip
 npm-debug.log
+.yarn/install-state.gz
