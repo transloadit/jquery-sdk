@@ -1,8 +1,8 @@
+// import os from 'os'
+import readline from 'readline'
 /* eslint-disable max-len,quote-props */
 // @ts-check
 import { expect, test } from '@playwright/test'
-// import os from 'os'
-import readline from 'readline'
 
 const BASE_URL = `http://localhost:3000`
 

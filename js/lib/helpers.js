@@ -7,7 +7,7 @@ const helpers = {
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
-      now.getUTCSeconds()
+      now.getUTCSeconds(),
     )
 
     const zeroPad = (numberToPad) => (numberToPad < 10 ? `0${numberToPad}` : numberToPad)
@@ -24,9 +24,9 @@ const helpers = {
     }
 
     return `${dateObj.getFullYear()}-${zeroPad(dateObj.getMonth() + 1)}-${zeroPad(
-      dateObj.getDate()
+      dateObj.getDate(),
     )}T${zeroPad(dateObj.getHours())}:${zeroPad(dateObj.getMinutes())}:${zeroPad(
-      dateObj.getSeconds()
+      dateObj.getSeconds(),
     )}${tzs}`
   },
   duration(t) {

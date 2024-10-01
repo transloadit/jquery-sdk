@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import I18n from '../../js/lib/I18n'
 
 describe('I18n', () => {

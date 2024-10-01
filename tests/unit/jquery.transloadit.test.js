@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import jQuery from 'jquery'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Ensure global.window and window.jQuery are defined before importing Uploader
 global.window = global
@@ -118,7 +118,7 @@ describe('Uploader class', () => {
     const formDataEntries = Array.from(uploader._formData.entries())
     console.log('FormData entries:', formDataEntries)
     const testFieldEntry = formDataEntries.find(
-      ([key, value]) => key === 'testField' && value === 'testValue'
+      ([key, value]) => key === 'testField' && value === 'testValue',
     )
     expect(testFieldEntry).toBeDefined()
   })

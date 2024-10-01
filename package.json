@@ -1,11 +1,6 @@
 {
   "name": "@transloadit/jquery-sdk",
-  "keywords": [
-    "uploader",
-    "jquery uploader",
-    "transloadit",
-    "transload it"
-  ],
+  "keywords": ["uploader", "jquery uploader", "transloadit", "transload it"],
   "version": "3.3.5",
   "scripts": {
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run inject_comment && npm run gzip && npm run versionify",
@@ -34,11 +29,7 @@
     "fix:formatting": "prettier --write .",
     "lint:formatting": "prettier --check ."
   },
-  "files": [
-    "build",
-    "css",
-    "js"
-  ],
+  "files": ["build", "css", "js"],
   "dependencies": {
     "@playwright/test": "^1.47.2",
     "socket.io-client": "1.7.4",
