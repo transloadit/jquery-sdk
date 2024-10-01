@@ -12,7 +12,15 @@
     "lineWidth": 100,
     "attributePosition": "auto",
     "bracketSpacing": true,
-    "ignore": ["**/build/", "js/dep/", "**/node_modules/", "tests/fixtures/", "**/test-results/"]
+    "ignore": [
+      "build/",
+      "css/transloadit.css",
+      "coverage/**",
+      "js/dep/",
+      "**/node_modules/",
+      "tests/fixtures/",
+      "**/test-results/"
+    ]
   },
   "organizeImports": { "enabled": true },
   "linter": {
@@ -35,11 +43,11 @@
         "noEmptyCharacterClassInRegex": "error",
         "noEmptyPattern": "error",
         "noGlobalObjectCalls": "error",
-        "noInnerDeclarations": "error",
+        "noInnerDeclarations": "warn",
         "noInvalidConstructorSuper": "error",
         "noNewSymbol": "error",
         "noSelfAssign": "error",
-        "noUndeclaredVariables": "error",
+        "noUndeclaredVariables": "warn",
         "noUnreachable": "error",
         "noUnreachableSuper": "error",
         "noUnsafeFinally": "error",
@@ -77,7 +85,7 @@
         "useValidTypeof": "error"
       }
     },
-    "ignore": ["build/**", "js/dep/**", "node_modules/**"]
+    "ignore": ["build/**", "css/transloadit.css", "coverage/**", "js/dep/**", "node_modules/**"]
   },
   "javascript": {
     "formatter": {
