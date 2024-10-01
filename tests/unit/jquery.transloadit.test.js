@@ -103,10 +103,20 @@ describe('Uploader class', () => {
 
     // Prepare form data
     uploader._prepareFormData()
+    console.log('FormData after _prepareFormData:', uploader._formData)
+
+    // Now append filtered form fields
     uploader._appendFilteredFormFields()
+    console.log('FormData after _appendFilteredFormFields:', uploader._formData)
+
+    // Check if the form data is initialized
+    if (!uploader._formData) {
+      throw new Error('FormData is not initialized')
+    }
 
     // Check if the form data includes the testField
     const formDataEntries = Array.from(uploader._formData.entries())
+    console.log('FormData entries:', formDataEntries)
     const testFieldEntry = formDataEntries.find(
       ([key, value]) => key === 'testField' && value === 'testValue'
     )

@@ -444,14 +444,13 @@ const tus = require('tus-js-client')
         assemblyParams = JSON.stringify(assemblyParams)
       }
 
-      let result
       try {
         if (this._options.formData instanceof FormData) {
           console.log('Using provided FormData')
-          result = this._options.formData
+          this._formData = this._options.formData
         } else {
           console.log('Creating new FormData')
-          result = new FormData()
+          this._formData = new FormData()
         }
         console.log('FormData created successfully')
       } catch (error) {
@@ -460,9 +459,9 @@ const tus = require('tus-js-client')
       }
 
       try {
-        result.append('params', assemblyParams)
+        this._formData.append('params', assemblyParams)
         if (this._options.signature) {
-          result.append('signature', this._options.signature)
+          this._formData.append('signature', this._options.signature)
         }
         console.log('Params appended to FormData')
       } catch (error) {
@@ -470,7 +469,7 @@ const tus = require('tus-js-client')
         throw error
       }
 
-      return result
+      return this._formData
     }
 
     _updateInputFileSelection($input) {
@@ -522,6 +521,12 @@ const tus = require('tus-js-client')
       const self = this
       const $ = this.$
 
+      if (!this._formData) {
+        console.error('FormData is not initialized in _appendFilteredFormFields')
+        return
+      }
+
+      console.log('Filtered fields:', $fields.length)
       $fields.each(function () {
         const name = $(this).attr('name')
         if (!name) {
@@ -531,6 +536,7 @@ const tus = require('tus-js-client')
         if (!this.files) {
           // Files are added via appendFiles
           self._formData.append(name, $(this).val())
+          console.log(`Appended field: ${name} = ${$(this).val()}`)
         }
       })
     }
