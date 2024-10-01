@@ -1,11 +1,6 @@
 {
   "name": "@transloadit/jquery-sdk",
-  "keywords": [
-    "uploader",
-    "jquery uploader",
-    "transloadit",
-    "transload it"
-  ],
+  "keywords": ["uploader", "jquery uploader", "transloadit", "transload it"],
   "version": "3.3.5",
   "scripts": {
     "browserify": "browserify -t [ babelify --presets [ es2015 ] ] js/lib/*.js -o build/jquery.transloadit2-v3-latest.js",
@@ -13,14 +8,13 @@
     "clean": "rm -rf build/*",
     "css": "mkdir -p build/css/img && cp css/transloadit.css build/css/transloadit2-v3-latest.css && cp -v css/img/* build/css/img/",
     "dev": "npm run clean && npm run css && npm run browserify",
-    "fix:formatting": "prettier --write .",
-    "fix": "eslint . --fix && yarn fix:formatting",
+    "fix": "biome check --write .",
+    "fix:unsafe": "biome check --write --unsafe .",
     "gzip": "gzip --force --best < build/jquery.transloadit2-v3-latest.js > build/jquery.transloadit2-v3-latest.js.gz",
     "inject_comment": "node inject_comment.js",
     "inject": "cp -v build/css/transloadit2-v3-latest.css ${WEBSITEDIR:-~/code/content}/css/transloadit2-v3-latest.css && cp -v build/css/img/* ${WEBSITEDIR:-~/code/content}/css/img/ && cp -v build/jquery.transloadit2-v3*.js* ${WEBSITEDIR:-~/code/content}/js",
     "link": "ln -nfs $(pwd) ${WEBSITEDIR:-../content}/jquery-sdk",
-    "lint:formatting": "prettier --check .",
-    "lint": "eslint . && yarn lint:formatting",
+    "lint": "biome check .",
     "release:major": "env SEMANTIC=major npm run release",
     "release:minor": "env SEMANTIC=minor npm run release",
     "release:patch": "env SEMANTIC=patch npm run release",
@@ -34,11 +28,7 @@
     "version": "node -e 'console.log(require(\"./package.json\").version)'",
     "versionify": "cd build && for file in *.*; do cp -v ${file} $(echo ${file} |sed \"s/v3-latest/v$(npm run --silent version)/g\" ); done"
   },
-  "files": [
-    "build",
-    "css",
-    "js"
-  ],
+  "files": ["build", "css", "js"],
   "dependencies": {
     "@playwright/test": "^1.47.2",
     "socket.io-client": "1.7.4",
