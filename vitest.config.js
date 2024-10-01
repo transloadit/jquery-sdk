@@ -8,6 +8,7 @@ export default defineConfig({
     setupFiles: ['tests/setup.js'], // Add this line
     coverage: {
       reporter: ['text', 'json', 'html'],
+      include: ['js/lib/'],
     },
     transformMode: {
       web: [/.[tj]sx?$/],

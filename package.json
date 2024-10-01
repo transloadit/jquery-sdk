@@ -24,7 +24,7 @@
     "release:patch": "env SEMANTIC=patch npm run release",
     "release": "npm version ${SEMANTIC:-patch} -m \"Release %s\" && git push --tags && git push && npm publish",
     "test": "npm-run-all build lint test:unit test:e2e",
-    "test:unit": "vitest run tests/unit",
+    "test:unit": "vitest run tests/unit --coverage",
     "test:watch": "vitest watch tests/unit",
     "test:e2e": "playwright test tests/e2e.test.js",
     "test:server": "node tests/server.js",
@@ -45,6 +45,7 @@
     "tus-js-client": "1.4.3"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.1",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
     "babel-eslint": "7.2.3",
