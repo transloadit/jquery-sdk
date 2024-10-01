@@ -67,5 +67,6 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.6",
     "uglify-js": "2.8.16"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
