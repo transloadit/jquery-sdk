@@ -23,7 +23,7 @@
     "release:minor": "env SEMANTIC=minor npm run release",
     "release:patch": "env SEMANTIC=patch npm run release",
     "release": "npm version ${SEMANTIC:-patch} -m \"Release %s\" && git push --tags && git push && npm publish",
-    "test": "vitest",
+    "test": "npm-run-all build lint test:unit test:e2e",
     "test:unit": "vitest run tests/unit",
     "test:watch": "vitest watch tests/unit",
     "test:e2e": "playwright test tests/e2e.test.js",
