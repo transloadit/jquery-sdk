@@ -7,6 +7,9 @@ on:
     types:
       - opened
       - synchronize
+env:
+  SKIP_YARN_COREPACK_CHECK: true
+
 jobs:
   ci:
     runs-on: ubuntu-latest
