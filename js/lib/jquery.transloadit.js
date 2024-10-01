@@ -93,13 +93,13 @@ const tus = require('tus-js-client')
 
   class Uploader {
     constructor({ $ }) {
-      console.log('Uploader constructor called');
+      console.log('Uploader constructor called')
       if (typeof FormData === 'undefined') {
-        console.error('FormData is not defined in the global scope');
+        console.error('FormData is not defined in the global scope')
       } else {
-        console.log('FormData is available');
+        console.log('FormData is available')
       }
-      console.log('User Agent:', navigator.userAgent);
+      console.log('User Agent:', navigator.userAgent)
       this._service = null
 
       this._assembly = null
@@ -130,7 +130,7 @@ const tus = require('tus-js-client')
     }
 
     init($form, options) {
-      console.log('Uploader init called');
+      console.log('Uploader init called')
       const self = this
       const $ = this.$
       this.options($.extend({}, OPTIONS, options || {}))
@@ -268,19 +268,19 @@ const tus = require('tus-js-client')
     }
 
     _startUploading(assemblyStatus) {
-      console.log('_startUploading called');
+      console.log('_startUploading called')
       const self = this
       this._assembly.init((err) => {
         if (err) {
-          console.error('Assembly initialization error:', err);
+          console.error('Assembly initialization error:', err)
           return self._errorOut(err)
         }
 
-        console.log('Assembly initialized successfully');
+        console.log('Assembly initialized successfully')
         self._options.onStart(assemblyStatus)
 
         if (Object.keys(self._files).length > 0) {
-          console.log('Starting file uploads');
+          console.log('Starting file uploads')
           // adding uploads from drag/dropped files and input fields
           var totalSize = 0
           for (const name in self._files) {
@@ -291,23 +291,23 @@ const tus = require('tus-js-client')
               upload.start()
             }
           }
-          console.log('Total upload size:', totalSize);
+          console.log('Total upload size:', totalSize)
           self._renderProgress(0, totalSize)
         } else {
-          console.log('No files to upload');
+          console.log('No files to upload')
           self._renderProgress()
         }
       })
     }
 
     _createAssembly(cb = () => {}) {
-      console.log('_createAssembly called');
+      console.log('_createAssembly called')
       const self = this
       try {
         this._formData = this._prepareFormData()
       } catch (error) {
-        console.error('Error in _prepareFormData:', error);
-        return cb(error);
+        console.error('Error in _prepareFormData:', error)
+        return cb(error)
       }
 
       if (!this._formData) {
@@ -315,7 +315,7 @@ const tus = require('tus-js-client')
         return cb(new Error('FormData initialization failed'))
       }
 
-      console.log('FormData initialized successfully');
+      console.log('FormData initialized successfully')
       this._formData.append('tus_num_expected_upload_files', this._fileCount)
 
       this._appendFilteredFormFields()
@@ -330,13 +330,13 @@ const tus = require('tus-js-client')
       f.open('POST', url)
       f.onreadystatechange = () => {
         if (f.readyState === 4) {
-          console.log('XHR request completed. Status:', f.status);
+          console.log('XHR request completed. Status:', f.status)
           let parsed = null
           try {
             parsed = JSON.parse(f.response)
-            console.log('Parsed response:', parsed);
+            console.log('Parsed response:', parsed)
           } catch (e) {
-            console.error('Error parsing XHR response:', e);
+            console.error('Error parsing XHR response:', e)
             let errMsg = 'errors.SERVER_CONNECTION_ERROR'
             var err = {
               error: 'SERVER_CONNECTION_ERROR',
@@ -348,19 +348,19 @@ const tus = require('tus-js-client')
           }
 
           if (f.status === 200) {
-            console.log('Assembly created successfully');
+            console.log('Assembly created successfully')
             return cb(null, parsed)
           }
 
-          console.error('Assembly creation failed. Status:', f.status);
+          console.error('Assembly creation failed. Status:', f.status)
           cb(parsed)
         }
       }
       f.onerror = (error) => {
-        console.error('XHR request failed:', error);
-        cb(new Error('XHR request failed'));
+        console.error('XHR request failed:', error)
+        cb(new Error('XHR request failed'))
       }
-      console.log('Sending XHR request to create assembly');
+      console.log('Sending XHR request to create assembly')
       f.send(this._formData)
     }
 
@@ -434,43 +434,43 @@ const tus = require('tus-js-client')
     }
 
     _prepareFormData() {
-      console.log('Preparing FormData...');
-      let assemblyParams = this._options.params;
+      console.log('Preparing FormData...')
+      let assemblyParams = this._options.params
       if (this._$params) {
-        assemblyParams = this._$params.val();
+        assemblyParams = this._$params.val()
       }
-      console.log('Assembly params:', assemblyParams);
+      console.log('Assembly params:', assemblyParams)
       if (typeof assemblyParams !== 'string') {
-        assemblyParams = JSON.stringify(assemblyParams);
+        assemblyParams = JSON.stringify(assemblyParams)
       }
 
-      let result;
+      let result
       try {
         if (this._options.formData instanceof FormData) {
-          console.log('Using provided FormData');
-          result = this._options.formData;
+          console.log('Using provided FormData')
+          result = this._options.formData
         } else {
-          console.log('Creating new FormData');
-          result = new FormData();
+          console.log('Creating new FormData')
+          result = new FormData()
         }
-        console.log('FormData created successfully');
+        console.log('FormData created successfully')
       } catch (error) {
-        console.error('Error creating FormData:', error);
-        throw error;
+        console.error('Error creating FormData:', error)
+        throw error
       }
 
       try {
-        result.append('params', assemblyParams);
+        result.append('params', assemblyParams)
         if (this._options.signature) {
-          result.append('signature', this._options.signature);
+          result.append('signature', this._options.signature)
         }
-        console.log('Params appended to FormData');
+        console.log('Params appended to FormData')
       } catch (error) {
-        console.error('Error appending to FormData:', error);
-        throw error;
+        console.error('Error appending to FormData:', error)
+        throw error
       }
 
-      return result;
+      return result
     }
 
     _updateInputFileSelection($input) {
