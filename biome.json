@@ -43,11 +43,11 @@
         "noEmptyCharacterClassInRegex": "error",
         "noEmptyPattern": "error",
         "noGlobalObjectCalls": "error",
-        "noInnerDeclarations": "warn",
+        "noInnerDeclarations": "error",
         "noInvalidConstructorSuper": "error",
         "noNewSymbol": "error",
         "noSelfAssign": "error",
-        "noUndeclaredVariables": "warn",
+        "noUndeclaredVariables": "error",
         "noUnreachable": "error",
         "noUnreachableSuper": "error",
         "noUnsafeFinally": "error",
@@ -99,6 +99,6 @@
       "attributePosition": "auto",
       "bracketSpacing": true
     },
-    "globals": ["jQuery", "testhost", "casper"]
+    "globals": ["jQuery", "testhost", "casper", "arguments"]
   }
 }

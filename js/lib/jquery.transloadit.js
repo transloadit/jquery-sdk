@@ -282,7 +282,7 @@ const tus = require('tus-js-client')
         if (Object.keys(self._files).length > 0) {
           console.log('Starting file uploads')
           // adding uploads from drag/dropped files and input fields
-          var totalSize = 0
+          let totalSize = 0
           for (const name in self._files) {
             for (let i = 0; i < self._files[name].length; i++) {
               const file = self._files[name][i]
@@ -338,7 +338,7 @@ const tus = require('tus-js-client')
           } catch (e) {
             console.error('Error parsing XHR response:', e)
             let errMsg = 'errors.SERVER_CONNECTION_ERROR'
-            var err = {
+            const err = {
               error: 'SERVER_CONNECTION_ERROR',
               message: self._i18n.translate(errMsg),
               url: url,
