@@ -31,7 +31,7 @@ jobs:
         env:
           TRANSLOADIT_ACCESS_KEY: '${{ secrets.TRANSLOADIT_ACCESS_KEY }}'
         run: |
-          if [ -z "$TRANSLOADIT_ACCESS_KEY" ]; then
+          if [ "${TRANSLOADIT_ACCESS_KEY}" = "" ]; then
             echo "TRANSLOADIT_ACCESS_KEY is not set. Skipping E2E tests."
           else
             npx playwright install --with-deps chromium
