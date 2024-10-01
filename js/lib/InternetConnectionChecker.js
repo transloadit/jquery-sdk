@@ -14,7 +14,7 @@ class InternetConnectionChecker {
     }
   }
 
-  onlineCheck(cb) {
+  onlineCheck(_cb) {
     const online = typeof window.navigator.onLine !== 'undefined' ? window.navigator.onLine : true
 
     if (this._isOnline && !online) {

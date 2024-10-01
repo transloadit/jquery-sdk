@@ -83,7 +83,7 @@ function serveHtmlFile(res, filename) {
 
     content = content.replace(
       /{TRANSLOADIT_ACCESS_KEY}/g,
-      `${process.env.TRANSLOADIT_ACCESS_KEY}`.trim()
+      `${process.env.TRANSLOADIT_ACCESS_KEY}`.trim(),
     )
     respondHtml(res, content)
   })

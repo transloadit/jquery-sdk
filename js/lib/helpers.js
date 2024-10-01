@@ -7,7 +7,7 @@ const helpers = {
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
-      now.getUTCSeconds()
+      now.getUTCSeconds(),
     )
 
     const zeroPad = (numberToPad) => (numberToPad < 10 ? `0${numberToPad}` : numberToPad)
@@ -24,9 +24,9 @@ const helpers = {
     }
 
     return `${dateObj.getFullYear()}-${zeroPad(dateObj.getMonth() + 1)}-${zeroPad(
-      dateObj.getDate()
+      dateObj.getDate(),
     )}T${zeroPad(dateObj.getHours())}:${zeroPad(dateObj.getMinutes())}:${zeroPad(
-      dateObj.getSeconds()
+      dateObj.getSeconds(),
     )}${tzs}`
   },
   duration(t) {
@@ -58,7 +58,7 @@ const helpers = {
     return r
   },
   sprintf(str, args = []) {
-    return str.replace(/(%[s])/g, (m, i, s) => {
+    return str.replace(/(%[s])/g, (_m, _i, _s) => {
       const arg = args.shift()
       if (!arg && arg !== 0) {
         return ''

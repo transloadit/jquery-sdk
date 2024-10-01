@@ -60,7 +60,7 @@ class Modal {
           </div>
           <p class="error-details"></p>
         </div>
-      </div>`
+      </div>`,
     ).appendTo('body')
 
     this.$.extend(this._$modal, {
@@ -105,7 +105,7 @@ class Modal {
 
     if (!err.message) {
       err.message = `${this._i18n.translate('errors.unknown')} ${this._i18n.translate(
-        'errors.tryAgain'
+        'errors.tryAgain',
       )}`
     }
 
@@ -152,7 +152,7 @@ class Modal {
     })
   }
 
-  renderCancelling(received, expected) {
+  renderCancelling(_received, _expected) {
     this._$modal.$label.text(this._i18n.translate('cancelling'))
   }
 
@@ -234,7 +234,7 @@ class Modal {
         mbReceived,
         mbExpected,
         this._uploadRate,
-        this._durationLeft
+        this._durationLeft,
       )
       this._$modal.$label.text(txt)
     }

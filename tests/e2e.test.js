@@ -1,8 +1,8 @@
+// import os from 'os'
+import readline from 'readline'
 /* eslint-disable max-len,quote-props */
 // @ts-check
 import { expect, test } from '@playwright/test'
-// import os from 'os'
-import readline from 'readline'
 
 const BASE_URL = `http://localhost:3000`
 
@@ -41,20 +41,20 @@ test.describe('e2e', async () => {
     // eslint-disable-next-line no-param-reassign
     testInfo.snapshotSuffix = ''
 
-    // Bubble up page exceptions and console errors
+    // Bubble up all page console messages
     page.on('console', (message) => {
-      const denyPatterns = [
-        /\/__webpack_hmr/,
-        /\/debug_kit\/js\/toolbar\.js/,
-        /\/@sentry\/utils\/dist/,
-      ]
-
+      const type = message.type()
+      const text = message.text()
       const location = message.location()
-      const isDenied = denyPatterns.some((pattern) => pattern.test(location.url))
-      if (message.type() === 'error' && !isDenied) {
+
+      // Log all console messages, regardless of type
+      console.log(`Browser Console [${type}]: ${text}`)
+
+      // For error messages, log additional details
+      if (type === 'error') {
         console.error({
-          text: message.text(),
-          type: `console.${message.type()}`,
+          text: text,
+          type: `console.${type}`,
           ...location,
         })
       }
@@ -74,6 +74,21 @@ test.describe('e2e', async () => {
   test('simple image resize', async ({ page }) => {
     try {
       await page.goto(`${BASE_URL}/`)
+      console.log('Navigated to the page')
+
+      // Check if jQuery and Transloadit SDK are loaded
+      const sdkLoaded = await page.evaluate(() => {
+        console.log('Checking SDK loading status')
+        return (
+          typeof jQuery !== 'undefined' &&
+          typeof jQuery.fn.transloadit !== 'undefined' &&
+          jQuery('#entryForm').data('transloadit.uploader') !== undefined
+        )
+      })
+
+      console.log('SDK loaded status:', sdkLoaded)
+      expect(sdkLoaded).toBe(true, 'jQuery Transloadit SDK is not loaded or initialized')
+
       const fixturePath = await page.textContent('#fixture_path')
       await page.fill('[name="width_field"]', `400`)
       await page.fill('[name="height_field"]', `400`)
@@ -84,10 +99,10 @@ test.describe('e2e', async () => {
       const locator = page.locator('body')
       await expect(locator).toContainText('ASSEMBLY_COMPLETED')
     } catch (err) {
+      console.error('Test error:', err)
       if (process.env.CI) {
         throw err
       }
-      console.error(err)
       await pause()
       throw err
     }
@@ -96,6 +111,21 @@ test.describe('e2e', async () => {
   test('trigger upload on file selection', async ({ page }) => {
     try {
       await page.goto(`${BASE_URL}/trigger-on-file-select`)
+      console.log('Navigated to the trigger-on-file-select page')
+
+      // Check if jQuery and Transloadit SDK are loaded
+      const sdkLoaded = await page.evaluate(() => {
+        console.log('Checking SDK loading status')
+        return (
+          typeof jQuery !== 'undefined' &&
+          typeof jQuery.fn.transloadit !== 'undefined' &&
+          jQuery('#entryForm').data('transloadit.uploader') !== undefined
+        )
+      })
+
+      console.log('SDK loaded status:', sdkLoaded)
+      expect(sdkLoaded).toBe(true, 'jQuery Transloadit SDK is not loaded or initialized')
+
       const fixturePath = await page.textContent('#fixture_path')
       await page.setInputFiles('#file', `${fixturePath}/1.jpg`)
       // await page.click('[type="submit"]')
@@ -104,10 +134,10 @@ test.describe('e2e', async () => {
       const locator = page.locator('body')
       await expect(locator).toContainText('ASSEMBLY_COMPLETED')
     } catch (err) {
+      console.error('Test error:', err)
       if (process.env.CI) {
         throw err
       }
-      console.error(err)
       await pause()
       throw err
     }
