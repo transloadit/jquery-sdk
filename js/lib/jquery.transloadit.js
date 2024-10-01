@@ -93,6 +93,13 @@ const tus = require('tus-js-client')
 
   class Uploader {
     constructor({ $ }) {
+      console.log('Uploader constructor called');
+      if (typeof FormData === 'undefined') {
+        console.error('FormData is not defined in the global scope');
+      } else {
+        console.log('FormData is available');
+      }
+      console.log('User Agent:', navigator.userAgent);
       this._service = null
 
       this._assembly = null
@@ -123,6 +130,7 @@ const tus = require('tus-js-client')
     }
 
     init($form, options) {
+      console.log('Uploader init called');
       const self = this
       const $ = this.$
       this.options($.extend({}, OPTIONS, options || {}))
@@ -260,15 +268,19 @@ const tus = require('tus-js-client')
     }
 
     _startUploading(assemblyStatus) {
+      console.log('_startUploading called');
       const self = this
       this._assembly.init((err) => {
         if (err) {
+          console.error('Assembly initialization error:', err);
           return self._errorOut(err)
         }
 
+        console.log('Assembly initialized successfully');
         self._options.onStart(assemblyStatus)
 
         if (Object.keys(self._files).length > 0) {
+          console.log('Starting file uploads');
           // adding uploads from drag/dropped files and input fields
           var totalSize = 0
           for (const name in self._files) {
@@ -279,23 +291,31 @@ const tus = require('tus-js-client')
               upload.start()
             }
           }
+          console.log('Total upload size:', totalSize);
           self._renderProgress(0, totalSize)
         } else {
+          console.log('No files to upload');
           self._renderProgress()
         }
       })
     }
 
     _createAssembly(cb = () => {}) {
+      console.log('_createAssembly called');
       const self = this
-      this._formData = this._prepareFormData()
+      try {
+        this._formData = this._prepareFormData()
+      } catch (error) {
+        console.error('Error in _prepareFormData:', error);
+        return cb(error);
+      }
 
-      // Add this check
       if (!this._formData) {
         console.error('FormData is undefined in _createAssembly')
         return cb(new Error('FormData initialization failed'))
       }
 
+      console.log('FormData initialized successfully');
       this._formData.append('tus_num_expected_upload_files', this._fileCount)
 
       this._appendFilteredFormFields()
@@ -305,18 +325,18 @@ const tus = require('tus-js-client')
       this._xhr = true
 
       const f = new XMLHttpRequest()
-      // The redirect=false is necessary, otherwise we will get a response header with
-      // Location: [[redirect_url]]?some_parameters_like_assembly_id, which screws up the
-      // XHR request.
       const url = this._service + 'assemblies?redirect=false'
 
       f.open('POST', url)
       f.onreadystatechange = () => {
         if (f.readyState === 4) {
+          console.log('XHR request completed. Status:', f.status);
           let parsed = null
           try {
             parsed = JSON.parse(f.response)
+            console.log('Parsed response:', parsed);
           } catch (e) {
+            console.error('Error parsing XHR response:', e);
             let errMsg = 'errors.SERVER_CONNECTION_ERROR'
             var err = {
               error: 'SERVER_CONNECTION_ERROR',
@@ -328,14 +348,19 @@ const tus = require('tus-js-client')
           }
 
           if (f.status === 200) {
+            console.log('Assembly created successfully');
             return cb(null, parsed)
           }
 
-          // Parsed is an error object in this case containing an "error" key like
-          // "TEMPLATE_NOT_FOUND" for example
+          console.error('Assembly creation failed. Status:', f.status);
           cb(parsed)
         }
       }
+      f.onerror = (error) => {
+        console.error('XHR request failed:', error);
+        cb(new Error('XHR request failed'));
+      }
+      console.log('Sending XHR request to create assembly');
       f.send(this._formData)
     }
 
@@ -409,28 +434,43 @@ const tus = require('tus-js-client')
     }
 
     _prepareFormData() {
-      let assemblyParams = this._options.params
+      console.log('Preparing FormData...');
+      let assemblyParams = this._options.params;
       if (this._$params) {
-        assemblyParams = this._$params.val()
+        assemblyParams = this._$params.val();
       }
+      console.log('Assembly params:', assemblyParams);
       if (typeof assemblyParams !== 'string') {
-        assemblyParams = JSON.stringify(assemblyParams)
+        assemblyParams = JSON.stringify(assemblyParams);
       }
 
-      let result = {}
-      if (this._options.formData instanceof FormData) {
-        result = this._options.formData
-      } else {
-        result = new FormData()
+      let result;
+      try {
+        if (this._options.formData instanceof FormData) {
+          console.log('Using provided FormData');
+          result = this._options.formData;
+        } else {
+          console.log('Creating new FormData');
+          result = new FormData();
+        }
+        console.log('FormData created successfully');
+      } catch (error) {
+        console.error('Error creating FormData:', error);
+        throw error;
       }
 
-      result.append('params', assemblyParams)
-      if (this._options.signature) {
-        result.append('signature', this._options.signature)
+      try {
+        result.append('params', assemblyParams);
+        if (this._options.signature) {
+          result.append('signature', this._options.signature);
+        }
+        console.log('Params appended to FormData');
+      } catch (error) {
+        console.error('Error appending to FormData:', error);
+        throw error;
       }
 
-      // Assign the result to this._formData
-      this._formData = result
+      return result;
     }
 
     _updateInputFileSelection($input) {
