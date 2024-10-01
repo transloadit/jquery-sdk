@@ -72,5 +72,5 @@
     "uglify-js": "2.8.16",
     "vitest": "^2.1.1"
   },
-  "packageManager": "yarn@4.0.0"
+  "packageManager": "yarn@4.5.0"
 }
