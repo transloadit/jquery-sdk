@@ -61,7 +61,7 @@ class FilePreview {
     })
   }
 
-  removeAllFiles(file) {
+  removeAllFiles(_file) {
     this._$ul.find('li').remove()
   }
 

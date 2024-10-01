@@ -58,7 +58,7 @@ const helpers = {
     return r
   },
   sprintf(str, args = []) {
-    return str.replace(/(%[s])/g, (m, i, s) => {
+    return str.replace(/(%[s])/g, (_m, _i, _s) => {
       const arg = args.shift()
       if (!arg && arg !== 0) {
         return ''

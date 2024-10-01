@@ -152,7 +152,7 @@ class Modal {
     })
   }
 
-  renderCancelling(received, expected) {
+  renderCancelling(_received, _expected) {
     this._$modal.$label.text(this._i18n.translate('cancelling'))
   }
 

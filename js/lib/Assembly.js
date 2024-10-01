@@ -109,7 +109,7 @@ Assembly.prototype._assemblyRequest = function (query, cb) {
         self._inAssemblyRequest = false
         cb()
       },
-      error: function (xhr, status, jsonpErr) {
+      error: function (_xhr, status, jsonpErr) {
         var retriesExhausted = attemptCount >= self._statusFetchRetries
         var err = self._connectionError(retriesExhausted)
         err.reason = 'Could not fetch assembly status.'
@@ -186,7 +186,7 @@ Assembly.prototype._createSocket = function (cb) {
     }
   })
 
-  this._socket.on('connect', function (event) {
+  this._socket.on('connect', function (_event) {
     self._socketConnected = true
 
     if (self._socketReconnectInterval) {
@@ -236,7 +236,7 @@ Assembly.prototype._createSocket = function (cb) {
     self._onResult(stepName, result)
   })
 
-  this._socket.on('disconnect', function (event) {
+  this._socket.on('disconnect', function (_event) {
     self._socket.close()
     self.onDisconnect()
   })

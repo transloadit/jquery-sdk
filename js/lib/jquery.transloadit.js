@@ -402,7 +402,7 @@ const tus = require('tus-js-client')
           assembly_url: assemblyUrl,
         },
         retryDelays: [0, 1000, 3000, 5000],
-        fingerprint(file) {
+        fingerprint(_file) {
           // Fingerprinting is not necessary any more since we have disabled
           // the resuming of previous uploads.
           throw new Error('fingerprinting should not happend')
@@ -418,7 +418,7 @@ const tus = require('tus-js-client')
         onSuccess() {
           self._xhr = false
         },
-        onProgress(bytesUploaded, bytesTotal) {
+        onProgress(bytesUploaded, _bytesTotal) {
           // Calculate the number of uploaded bytes of all uploads by removing
           // the last known value and then adding the new value.
           self._uploadedBytes = self._uploadedBytes - lastBytesUploaded + bytesUploaded
@@ -675,7 +675,7 @@ const tus = require('tus-js-client')
         this._$params = $params
         try {
           this._params = JSON.parse($params.val())
-        } catch (e) {
+        } catch (_e) {
           alert('Error: input[name=params] seems to contain invalid JSON.')
           return
         }
