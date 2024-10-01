@@ -24,8 +24,9 @@
     "release:minor": "env SEMANTIC=minor npm run release",
     "release:patch": "env SEMANTIC=patch npm run release",
     "release": "npm version ${SEMANTIC:-patch} -m \"Release %s\" && git push --tags && git push && npm publish",
-    "test": "npm-run-all lint test:e2e",
-    "test:e2e": "playwright test tests/*.test.js",
+    "test": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:e2e": "playwright test tests/e2e/*.test.js",
     "test:server": "node tests/server.js",
     "uglify": "uglifyjs --comments --stats --output=build/jquery.transloadit2-v3-latest.js --source-map=build/jquery.transloadit2-v3-latest.js.map -- build/jquery.transloadit2-v3-latest.js",
     "versionify": "cd build && for file in *.*; do cp -v ${file} $(echo ${file} |sed \"s/v3-latest/v$(npm run --silent version)/g\" ); done",
@@ -64,9 +65,12 @@
     "eslint-plugin-promise": "3.4.1",
     "eslint-plugin-standard": "2.0.1",
     "fakefile": "0.0.8",
+    "jquery": "3",
+    "jsdom": "^25.0.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.6",
-    "uglify-js": "2.8.16"
+    "uglify-js": "2.8.16",
+    "vitest": "^2.1.1"
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }

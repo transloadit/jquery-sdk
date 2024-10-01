@@ -422,7 +422,8 @@ const tus = require('tus-js-client')
         result.append('signature', this._options.signature)
       }
 
-      return result
+      // Assign the result to this._formData
+      this._formData = result
     }
 
     _updateInputFileSelection($input) {
@@ -914,5 +915,13 @@ const tus = require('tus-js-client')
 
       this._options[key] = val
     }
+  }
+
+  // Attach Uploader to jQuery namespace (existing functionality)
+  $.transloadit = Uploader
+
+  // Conditionally export Uploader for testing
+  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = Uploader
   }
 })(window.jQuery)
