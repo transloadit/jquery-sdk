@@ -55,7 +55,7 @@ jobs:
       - name: E2E Test
         if: "${{ secrets.TRANSLOADIT_ACCESS_KEY != '' }}"
         env:
-          TRANSLOADIT_ACCESS_KEY: ${{ secrets.TRANSLOADIT_ACCESS_KEY }}
+          TRANSLOADIT_ACCESS_KEY: "${{ secrets.TRANSLOADIT_ACCESS_KEY }}"
         run: yarn test:e2e
       - name: Upload Coverage Report
         if: ${{ always() }}
