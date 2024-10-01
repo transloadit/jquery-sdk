@@ -1,7 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
-  "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
-  "files": { "ignoreUnknown": false, "ignore": [] },
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": []
+  },
   "formatter": {
     "enabled": true,
     "useEditorconfig": true,
@@ -15,6 +22,7 @@
     "ignore": [
       "build/",
       "css/transloadit.css",
+      "package.json",
       "coverage/**",
       "js/dep/",
       "**/node_modules/",
@@ -22,7 +30,9 @@
       "**/test-results/"
     ]
   },
-  "organizeImports": { "enabled": true },
+  "organizeImports": {
+    "enabled": true
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -55,7 +65,9 @@
         "useArrayLiterals": "error",
         "useIsNan": "error"
       },
-      "security": { "noGlobalEval": "error" },
+      "security": {
+        "noGlobalEval": "error"
+      },
       "style": {
         "noCommaOperator": "error",
         "noYodaExpression": "error",
@@ -85,7 +97,14 @@
         "useValidTypeof": "error"
       }
     },
-    "ignore": ["build/**", "css/transloadit.css", "coverage/**", "js/dep/**", "node_modules/**"]
+    "ignore": [
+      "build/**",
+      "css/transloadit.css",
+      "package.json",
+      "coverage/**",
+      "js/dep/**",
+      "node_modules/**"
+    ]
   },
   "javascript": {
     "formatter": {
