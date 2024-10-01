@@ -542,7 +542,6 @@ __metadata:
     babel-preset-es2015: "npm:6.24.1"
     babelify: "npm:7.3.0"
     browserify: "npm:13.0.0"
-    debug: "npm:3.2.7"
     es6-promise: "npm:4.2.8"
     jquery: "npm:3.7.1"
     jsdom: "npm:^25.0.1"
@@ -2411,15 +2410,6 @@ __metadata:
   dependencies:
     ms: "npm:0.7.2"
   checksum: 10c0/c53325c15b80b059dcfcab9eae162e0878487d3acc0f12813a488cbe8dd96139730fd0eec5d8d8274fe324bd0d874d0414666a0e29c79ed1fd01de8bce287c86
-  languageName: node
-  linkType: hard
-
-"debug@npm:3.2.7":
-  version: 3.2.7
-  resolution: "debug@npm:3.2.7"
-  dependencies:
-    ms: "npm:^2.1.1"
-  checksum: 10c0/37d96ae42cbc71c14844d2ae3ba55adf462ec89fd3a999459dec3833944cd999af6007ff29c780f1c61153bcaaf2c842d1e4ce1ec621e4fc4923244942e4a02a
   languageName: node
   linkType: hard
 
@@ -4376,13 +4366,6 @@ __metadata:
   version: 2.0.0
   resolution: "ms@npm:2.0.0"
   checksum: 10c0/f8fda810b39fd7255bbdc451c46286e549794fcc700dc9cd1d25658bbc4dc2563a5de6fe7c60f798a16a60c6ceb53f033cb353f493f0cf63e5199b702943159d
-  languageName: node
-  linkType: hard
-
-"ms@npm:^2.1.1":
-  version: 2.1.2
-  resolution: "ms@npm:2.1.2"
-  checksum: 10c0/a437714e2f90dbf881b5191d35a6db792efbca5badf112f87b9e1c712aace4b4b9b742dd6537f3edf90fd6f684de897cec230abde57e87883766712ddda297cc
   languageName: node
   linkType: hard
 
