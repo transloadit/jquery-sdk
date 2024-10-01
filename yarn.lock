@@ -542,7 +542,7 @@ __metadata:
     babel-preset-es2015: "npm:6.24.1"
     babelify: "npm:8.0.0"
     browserify: "npm:17.0.0"
-    debug: "npm:4.3.1"
+    debug: "npm:4.3.2"
     es6-promise: "npm:4.2.8"
     jquery: "npm:3.7.1"
     jsdom: "npm:^25.0.1"
@@ -2410,15 +2410,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4.3.1":
-  version: 4.3.1
-  resolution: "debug@npm:4.3.1"
+"debug@npm:4.3.2":
+  version: 4.3.2
+  resolution: "debug@npm:4.3.2"
   dependencies:
     ms: "npm:2.1.2"
   peerDependenciesMeta:
     supports-color:
       optional: true
-  checksum: 10c0/610bcc2eb07c533d6a9964478422f7d741095d67301888ee0b77b8f2ad0a15d115c93fb2adb13d10a9eda3d81f2d4d335405540b09596fb23aca070e77497d95
+  checksum: 10c0/3cc408070bcee066ee9b2a4f3a9c40f53728919ec7c7ff568f7c3a75b0723cb5a8407191a63495be4e10669e99b0ff7f26ec70e10b025da1898cdce4876d96ca
   languageName: node
   linkType: hard
 
