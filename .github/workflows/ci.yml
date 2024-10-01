@@ -53,10 +53,14 @@ jobs:
       - name: Run Unit Tests
         run: yarn test:unit
       - name: E2E Test
-        if: "${{ secrets.TRANSLOADIT_ACCESS_KEY != '' }}"
         env:
           TRANSLOADIT_ACCESS_KEY: "${{ secrets.TRANSLOADIT_ACCESS_KEY }}"
-        run: yarn test:e2e
+        run: |
+          if [ -z "$TRANSLOADIT_ACCESS_KEY" ]; then
+            echo "TRANSLOADIT_ACCESS_KEY is not set. Skipping E2E tests."
+          else
+            yarn test:e2e
+          fi
       - name: Upload Coverage Report
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
