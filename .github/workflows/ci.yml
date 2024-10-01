@@ -32,6 +32,13 @@ jobs:
         run: corepack enable
       - name: Install Dependencies
         run: yarn install --immutable
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Lint
         run: yarn lint
       - name: Build
