@@ -25,6 +25,7 @@
     "release": "npm version ${SEMANTIC:-patch} -m \"Release %s\" && git push --tags && git push && npm publish",
     "test": "vitest",
     "test:unit": "vitest run tests/unit",
+    "test:watch": "vitest watch tests/unit",
     "test:e2e": "playwright test tests/e2e.test.js",
     "test:server": "node tests/server.js",
     "uglify": "uglifyjs --comments --output build/jquery.transloadit2-v3-latest.js --source-map -- build/jquery.transloadit2-v3-latest.js",
