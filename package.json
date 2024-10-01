@@ -7,7 +7,6 @@
     "transload it"
   ],
   "version": "3.3.5",
-  "private": false,
   "scripts": {
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run inject_comment && npm run gzip && npm run versionify",
     "clean": "rm -rf build/*",
