@@ -1,6 +1,7 @@
 node_modules/
 /build/
 /flow/
+test-results/
 /tests/screen-*
 env.sh
 auth_key.js
