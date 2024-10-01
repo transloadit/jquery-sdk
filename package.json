@@ -1,6 +1,11 @@
 {
   "name": "@transloadit/jquery-sdk",
-  "keywords": ["uploader", "jquery uploader", "transloadit", "transload it"],
+  "keywords": [
+    "uploader",
+    "jquery uploader",
+    "transloadit",
+    "transload it"
+  ],
   "version": "3.3.5",
   "scripts": {
     "browserify": "browserify -t [ babelify --presets [ es2015 ] ] js/lib/*.js -o build/jquery.transloadit2-v3-latest.js",
@@ -28,25 +33,29 @@
     "version": "node -e 'console.log(require(\"./package.json\").version)'",
     "versionify": "cd build && for file in *.*; do cp -v ${file} $(echo ${file} |sed \"s/v3-latest/v$(npm run --silent version)/g\" ); done"
   },
-  "files": ["build", "css", "js"],
+  "files": [
+    "build",
+    "css",
+    "js"
+  ],
   "dependencies": {
     "@playwright/test": "^1.47.2",
     "socket.io-client": "1.7.4",
-    "tus-js-client": "1.4.3"
+    "tus-js-client": "1.8.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.3",
     "@vitest/coverage-v8": "^2.1.1",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
-    "babel-plugin-add-module-exports": "0.2.1",
+    "babel-plugin-add-module-exports": "1.0.4",
     "babel-plugin-es6-promise": "1.1.1",
     "babel-plugin-syntax-async-functions": "6.13.0",
     "babel-plugin-transform-async-to-generator": "6.24.1",
     "babel-plugin-transform-object-assign": "6.22.0",
     "babel-preset-es2015": "6.24.1",
-    "babelify": "7.3.0",
-    "browserify": "13.0.0",
+    "babelify": "8.0.0",
+    "browserify": "17.0.0",
     "debug": "3.2.7",
     "es6-promise": "4.2.8",
     "jquery": "3.7.1",
