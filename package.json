@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.3",
-    "@vitest/coverage-v8": "^2.1.1",
+    "@vitest/coverage-v8": "^3.2.4",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
     "babel-plugin-add-module-exports": "1.0.4",
@@ -61,7 +61,11 @@
     "jsdom": "^25.0.1",
     "npm-run-all": "^4.1.5",
     "uglify-js": "3.19.3",
-    "vitest": "^2.1.1"
+    "vite": "^6.4.2",
+    "vitest": "^3.2.4"
+  },
+  "resolutions": {
+    "vite": "6.4.2"
   },
   "packageManager": "yarn@4.5.0"
 }
