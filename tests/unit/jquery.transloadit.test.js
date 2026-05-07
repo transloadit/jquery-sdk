@@ -33,7 +33,8 @@ vi.mock('../../js/lib/I18n', () => {
 })
 vi.mock('tus-js-client', () => {
   return {
-    Upload: vi.fn(() => ({
+    Upload: vi.fn((_file, options) => ({
+      options,
       start: vi.fn(),
       abort: vi.fn(),
     })),
@@ -135,6 +136,21 @@ describe('Uploader class', () => {
     expect(uploader.reset).toHaveBeenCalled()
     expect(uploader._modal.renderCancelling).toHaveBeenCalled()
     expect(uploader._assembly.cancel).toHaveBeenCalled()
+  })
+
+  it('should configure tus uploads without resumable URL storage', () => {
+    uploader._assembly = {
+      getTusUrl: vi.fn(() => 'https://tus.test.com/files/'),
+      getHttpsUrl: vi.fn(() => 'https://api2.transloadit.com/assemblies/test'),
+      getHttpUrl: vi.fn(() => 'http://api2.transloadit.com/assemblies/test'),
+    }
+    uploader._renderProgress = vi.fn()
+
+    const upload = uploader._addResumableUpload('file', { name: 'test.jpg' })
+
+    const uploadOptions = upload.options
+    expect(uploadOptions.storeFingerprintForResuming).toBe(false)
+    expect(uploadOptions).not.toHaveProperty('resume')
   })
 
   // Add more tests to cover other methods and scenarios
