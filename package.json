@@ -6,7 +6,7 @@
     "transloadit",
     "transload it"
   ],
-  "version": "3.3.6",
+  "version": "3.3.7",
   "scripts": {
     "browserify": "browserify -t babelify js/lib/*.js -o build/jquery.transloadit2-v3-latest.js",
     "build": "npm run clean && npm run css && npm run browserify && npm run uglify && npm run inject_comment && npm run gzip && npm run versionify",
