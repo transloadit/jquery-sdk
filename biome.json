@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.14/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -7,7 +7,16 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["test-results/"]
+    "includes": [
+      "**",
+      "!build/**",
+      "!coverage/**",
+      "!css/transloadit.css",
+      "!js/dep/**",
+      "!node_modules/**",
+      "!tests/fixtures/**",
+      "!test-results/**"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -19,33 +28,32 @@
     "lineWidth": 100,
     "attributePosition": "auto",
     "bracketSpacing": true,
-    "ignore": [
-      "build/",
-      "css/transloadit.css",
-      "package.json",
-      "coverage/**",
-      "js/dep/",
-      "**/node_modules/",
-      "tests/fixtures/",
-      "test-results/"
+    "includes": [
+      "**",
+      "!**/build/",
+      "!**/css/transloadit.css",
+      "!**/package.json",
+      "!**/coverage/**",
+      "!**/js/dep/",
+      "!**/node_modules/",
+      "!**/tests/fixtures/",
+      "!**/test-results/"
     ]
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": false,
       "complexity": {
         "noExtraBooleanCast": "error",
-        "noMultipleSpacesInRegularExpressionLiterals": "error",
         "noUselessConstructor": "error",
         "noUselessLoneBlockStatements": "error",
         "noUselessRename": "error",
         "noUselessTernary": "error",
         "noUselessUndefinedInitialization": "error",
-        "noWith": "error"
+        "noAdjacentSpacesInRegex": "error",
+        "noCommaOperator": "error"
       },
       "correctness": {
         "noConstAssign": "error",
@@ -55,25 +63,25 @@
         "noGlobalObjectCalls": "error",
         "noInnerDeclarations": "error",
         "noInvalidConstructorSuper": "error",
-        "noNewSymbol": "error",
         "noSelfAssign": "error",
         "noUndeclaredVariables": "error",
         "noUnreachable": "error",
         "noUnreachableSuper": "error",
         "noUnsafeFinally": "error",
         "noUnusedVariables": "error",
-        "useArrayLiterals": "error",
-        "useIsNan": "error"
+        "useIsNan": "error",
+        "noInvalidBuiltinInstantiation": "error",
+        "useValidTypeof": "error"
       },
       "security": {
         "noGlobalEval": "error"
       },
       "style": {
-        "noCommaOperator": "error",
         "noYodaExpression": "error",
         "useBlockStatements": "error",
         "useConsistentBuiltinInstantiation": "error",
-        "useSingleVarDeclarator": "error"
+        "useSingleVarDeclarator": "error",
+        "useArrayLiterals": "error"
       },
       "suspicious": {
         "noCatchAssign": "error",
@@ -94,17 +102,18 @@
         "noShadowRestrictedNames": "error",
         "noSparseArray": "error",
         "noUnsafeNegation": "error",
-        "useValidTypeof": "error"
+        "noWith": "error"
       }
     },
-    "ignore": [
-      "build/**",
-      "css/transloadit.css",
-      "package.json",
-      "coverage/**",
-      "js/dep/**",
-      "node_modules/**",
-      "test-results/"
+    "includes": [
+      "**",
+      "!**/build/**",
+      "!**/css/transloadit.css",
+      "!**/package.json",
+      "!**/coverage/**",
+      "!**/js/dep/**",
+      "!**/node_modules/**",
+      "!**/test-results/"
     ]
   },
   "javascript": {
@@ -119,6 +128,6 @@
       "attributePosition": "auto",
       "bracketSpacing": true
     },
-    "globals": ["jQuery", "testhost", "casper", "arguments"]
+    "globals": ["$", "jQuery", "testhost", "casper", "arguments"]
   }
 }
