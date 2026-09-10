@@ -55,7 +55,7 @@
     "npm-run-all": "^4.1.5",
     "uglify-js": "3.19.3",
     "vite": "^8.0.11",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.11"
   },
   "resolutions": {
     "vite": "8.0.11"
