@@ -55,7 +55,10 @@ jobs:
           if [ "${TRANSLOADIT_ACCESS_KEY}" = "" ]; then
             echo "TRANSLOADIT_ACCESS_KEY is not set. Skipping E2E tests."
           else
-            npx playwright install --with-deps chromium
+            timeout --kill-after=10s 5m npx playwright install --with-deps chromium || {
+              echo "::error::Playwright Chromium installation failed or timed out after 5 minutes; E2E tests were not run."
+              exit 1
+            }
             yarn test:e2e
           fi
       - name: Upload Coverage Report
